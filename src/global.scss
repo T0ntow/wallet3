@@ -35,3 +35,39 @@
 /* @import "@ionic/angular/css/palettes/dark.always.css"; */
 /* @import "@ionic/angular/css/palettes/dark.class.css"; */
 @import "@ionic/angular/css/palettes/dark.system.css";
+
+
+// =========================== COLORS ===========================
+
+// back: fff
+
+// font primary: 171717
+// font secondary 474747
+
+// danger: D33232
+// sucess: 269761
+
+// back items/card: D9D9D9
+// back-stroke: D6D6D6
+
+// contrast: 262626
+
+
+@media (prefers-color-scheme: dark), (prefers-color-scheme: light) {
+    :root.md {
+        --ion-background-color: #fff;
+        --ion-toolbar-background: #fff;
+        --ion-text-color: #171717;
+        --ion-text-color2: #474747;
+
+        --ion-border-color: #38383859;
+
+        --ion-color-success: #269761;
+        --ion-color-danger: #D33232;
+
+        --ion-card-background: #D9D9D9;
+        --ion-item-background: #D9D9D9;
+
+        --ion-contrast: #262626;
+    }
+}

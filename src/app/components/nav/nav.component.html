@@ -1,0 +1,35 @@
+<ion-tabs (ionTabsDidChange)="onTabChange($event.tab)">
+  <ion-tab-bar slot="bottom" class="custom-tab-bar">
+
+    <div class="esquerda">
+      <ion-tab-button tab="home" (click)="onTabChange('home')" [ngClass]="{'selected-tab': selectedTab === 'home'}">
+        <ion-icon name="home"></ion-icon>
+        <ion-label *ngIf="selectedTab === 'home'">Início</ion-label>
+      </ion-tab-button>
+      <ion-tab-button tab="transactions" (click)="onTabChange('transactions')"
+        [ngClass]="{'selected-tab': selectedTab === 'transactions'}">
+        <ion-icon name="document"></ion-icon>
+        <ion-label *ngIf="selectedTab === 'transactions'">Transações</ion-label>
+      </ion-tab-button>
+    </div>
+
+    <ion-tab-button tab="add" class="add-button">
+      <ion-icon class="icon-add" name="add-outline"></ion-icon>
+    </ion-tab-button>
+
+    <div class="direita">
+      <ion-tab-button tab="charts" (click)="onTabChange('charts')"
+        [ngClass]="{'selected-tab': selectedTab === 'charts'}">
+        <ion-icon name="stats-chart"></ion-icon>
+        <ion-label *ngIf="selectedTab === 'charts'">Gráficos</ion-label>
+      </ion-tab-button>
+
+      <ion-tab-button tab="categories" (click)="onTabChange('categories')"
+        [ngClass]="{'selected-tab': selectedTab === 'categories'}">
+        <ion-icon name="grid"></ion-icon>
+        <ion-label *ngIf="selectedTab === 'categories'">Categorias</ion-label>
+      </ion-tab-button>
+    </div>
+
+  </ion-tab-bar>
+</ion-tabs>

@@ -1,0 +1,78 @@
+* {
+    font-family: "Inria Sans";
+}
+
+.cartao-container {
+    border-radius: 12px;
+    padding: 10px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin: 10px 0;
+
+    ion-card-header {
+        padding: 0;
+
+        ion-avatar {
+            margin: 0;
+            display: flex;
+            align-items: center;
+
+            ion-icon {
+                width: 30px;
+                height: 30px;
+            }
+        }
+    }
+
+    ion-card-header div {
+        height: 20px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        border-bottom: 1px solid var(--ion-border-color);
+        color: var(--ion-text-color);
+    }
+
+    ion-card-content {
+        margin-top: 10px;
+        padding: 0;
+
+        ion-icon {
+            margin-right: 10px;
+        }
+    }
+
+    ion-card-content ion-item {
+        border: 1px solid var(--ion-border-color);
+        border-radius: 5px;
+        margin-top: 5px;
+
+        .saldo {
+            span {
+                font-size: 10px;
+                font-weight: bold;
+                color: var(--ion-text-color2);
+            }
+        }
+    }
+}
+
+// "Minhas contas"
+h2 {
+    font-size: 14px;
+    font-weight: bold;
+    margin: 0;
+    color: #000;
+}
+
+h3,
+p {
+    font-size: 13px;
+    font-weight: bold;
+    margin: 0;
+    color: var(--ion-text-color);
+}
+
+ion-button {
+    --padding-top: 0;
+    --padding-bottom: 0;
+}

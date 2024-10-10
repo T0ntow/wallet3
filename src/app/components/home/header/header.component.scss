@@ -1,0 +1,28 @@
+ion-header {
+    padding: 20px 25px 20px 10px;
+
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+}
+
+ion-header > div {
+    display: flex;
+    flex-direction: row;
+    height: 30px;
+    ion-avatar {
+        height: 100%;
+        width: 30px;
+    }
+
+    p {
+        margin: 0 10px;
+        font-family: "Inria Sans";
+        font-style: normal;
+        font-weight: 700;
+        font-size: 16px;
+        line-height: 14px;
+        color: #000;
+    }
+}

@@ -1,0 +1,24 @@
+<div class="saldo-container">
+  <div class="saldo">
+    <span>Saldo: <span id="mes">{{ mes }}</span></span>
+    <ion-text class="valor-saldo negativo" color="danger">- R$ {{ saldo.toFixed(2) }}</ion-text>
+  </div>
+
+  <div class="detalhes-financeiros">
+    <ion-chip outline>
+      <ion-icon  color="success" name="cash"></ion-icon>
+      <div>
+        <ion-label>Receita</ion-label>
+        <p>R$ {{ receita.toFixed(2) }}</p>
+      </div>
+    </ion-chip>
+
+    <ion-chip outline>
+      <ion-icon  color="danger" name="cash"></ion-icon>
+      <div>
+        <ion-label>Despesa</ion-label>
+        <p color="danger">R$ {{ despesa.toFixed(2) }}</p>
+      </div>
+    </ion-chip>
+  </div>
+</div>

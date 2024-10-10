@@ -1,0 +1,56 @@
+.saldo-container {
+    border-radius: 10px;
+    font-size: 13px;
+
+    .saldo {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: #e0e0e0;
+        padding: 10px;
+        border-radius: 10px;
+        margin-bottom: 10px;
+        font-weight: 700;
+
+        span {
+            color: var(--ion-text-color2);
+
+            #mes {
+                color: var(--ion-text-color);
+            }
+        }
+    }
+
+    .detalhes-financeiros {
+        display: flex;
+        justify-content: space-between;
+        gap: 15px;
+        ion-chip {
+            background-color: #e0e0e0;
+            border-radius: 10px;
+            width: 160px;
+            margin: 0;
+
+            div {
+                display: flex;
+                flex-direction: column;
+                align-items: left;
+                gap: 5px;
+                font-family: "Inria Sans";
+                font-weight: bold;
+
+                ion-label {
+                    color: var(--ion-text-color2);
+                }
+                p {
+                    margin: 0;
+                    color: var(--ion-text-color);
+                }
+            }
+        }
+    }
+}
+
+.valor-saldo {
+    font-weight: bold;
+}
