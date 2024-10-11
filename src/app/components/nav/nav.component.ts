@@ -7,6 +7,7 @@ import { Component, OnInit } from '@angular/core';
 })
 export class NavComponent  implements OnInit {
   selectedTab: string = 'home'; // Define uma aba padrão
+  isSheetVisible: boolean = false;
 
   onTabChange(tab: string) {
     this.selectedTab = tab; // Atualiza a aba ativa
@@ -16,4 +17,11 @@ export class NavComponent  implements OnInit {
 
   ngOnInit() {}
 
+  toggleSheet() {
+    this.isSheetVisible = !this.isSheetVisible; // Alterna a visibilidade do sheet
+  }
+
+  closeSheet() {
+    this.isSheetVisible = false; // Fecha o sheet quando clicar fora
+  }
 }

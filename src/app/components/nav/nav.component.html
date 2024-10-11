@@ -13,9 +13,9 @@
       </ion-tab-button>
     </div>
 
-    <ion-tab-button tab="add" class="add-button">
+    <ion-button class="add-button" (click)="toggleSheet()">
       <ion-icon class="icon-add" name="add-outline"></ion-icon>
-    </ion-tab-button>
+    </ion-button>
 
     <div class="direita">
       <ion-tab-button tab="charts" (click)="onTabChange('charts')"
@@ -33,3 +33,34 @@
 
   </ion-tab-bar>
 </ion-tabs>
+
+<!-- Back and Sheet Elements -->
+<div class="back" *ngIf="isSheetVisible" (click)="closeSheet()"></div>
+
+<div class="sheet"  [ngClass]="{'sheet-visible': isSheetVisible}">
+  <div class="block-left">
+    <div class="add-expense">
+      <p>Nova Despesa</p>
+      <ion-icon name="cash"></ion-icon>    
+    </div>
+    <div class="add-receive">
+      <p>Nova Receita</p>
+      <ion-icon name="cash"></ion-icon>    
+    </div>
+  </div>
+
+  <div class="block-right">
+    <div class="add-wallet">
+      <p>Carteira</p>
+      <ion-icon name="add-circle"></ion-icon>
+    </div>
+    <div class="add-account">
+      <p>Conta</p>
+      <ion-icon name="add-circle"></ion-icon>
+    </div>
+    <div class="transfer">
+      <p>Transferência</p>
+      <ion-icon name="swap-horizontal-outline"></ion-icon>    </div>
+  </div>
+  
+</div>
