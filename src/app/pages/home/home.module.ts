@@ -9,19 +9,25 @@ import { HeaderComponent } from 'src/app/components/home/header/header.component
 import { BalanceComponent } from 'src/app/components/home/balance/balance.component';
 import { WalletsComponent } from 'src/app/components/home/wallets/wallets.component';
 import { AccountsComponent } from 'src/app/components/home/accounts/accounts.component';
+import { AddAccountComponent } from 'src/app/components/account-components/add-account/add-account.component';
+import { ReactiveFormsModule } from '@angular/forms';
+import { HttpClientModule, HttpClient } from '@angular/common/http';
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
-    HomePageRoutingModule
+    HomePageRoutingModule,
+    HttpClientModule,
+    ReactiveFormsModule
   ],
   declarations: [
     HomePage,
     HeaderComponent,
     BalanceComponent,
     WalletsComponent,
-    AccountsComponent
+    AccountsComponent,
+    AddAccountComponent,
   ]
 })
 export class HomePageModule {}

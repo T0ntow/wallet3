@@ -214,3 +214,16 @@ ion-tab-button {
 .sheet-visible {
   transform: translateY(0); /* Move o sheet para dentro da tela */
 }
+
+ion-popover .popover-content {
+  display: flex;
+  flex-direction: column;
+}
+
+ion-popover ion-content ion-button {
+    font-size: 13px;
+    color: var(--ion-contrast);
+    font-weight: bold;
+
+    --background: var(--ion-item-background)
+}

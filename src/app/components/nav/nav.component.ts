@@ -1,11 +1,11 @@
 import { Component, OnInit } from '@angular/core';
-
+import { ModalController } from '@ionic/angular';
 @Component({
   selector: 'app-nav',
   templateUrl: './nav.component.html',
   styleUrls: ['./nav.component.scss'],
 })
-export class NavComponent  implements OnInit {
+export class NavComponent implements OnInit {
   selectedTab: string = 'home'; // Define uma aba padrão
   isSheetVisible: boolean = false;
 
@@ -15,7 +15,7 @@ export class NavComponent  implements OnInit {
 
   constructor() { }
 
-  ngOnInit() {}
+  ngOnInit() { }
 
   toggleSheet() {
     this.isSheetVisible = !this.isSheetVisible; // Alterna a visibilidade do sheet

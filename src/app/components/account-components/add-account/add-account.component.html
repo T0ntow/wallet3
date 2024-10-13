@@ -1,0 +1,60 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="dismissModal()">
+        <ion-icon slot="icon-only" name="arrow-back-circle"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Nova Conta</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <form [formGroup]="accountForm">
+    <div class="container-item institution-item" (click)="toggleSheet()">
+      <label position="stacked">Instituição</label>
+      <div class="input-institution" class="custom-input" style="display: flex;align-items: center;">
+        <p style="margin: 0;"> {{ selectedInstitution || 'Selecione uma instituição' }} </p>
+      </div>
+    </div>
+
+    <div class="container-item">
+      <label position="stacked">Nome</label>
+      <input formControlName="name" class="custom-input" type="text">
+    </div>
+
+    <div class="container-item">
+      <label position="stacked">Tipo</label>
+      <ion-select  class="custom-input" formControlName="accountType" >
+        <ion-select-option value="corrente">Corrente</ion-select-option>
+        <ion-select-option value="poupanca">Poupança</ion-select-option>
+      </ion-select>
+    </div>
+
+    <button [disabled]="accountForm.invalid" (click)="submitAccount()" class="submit-button">Adicionar Conta</button>
+  </form>
+</ion-content>
+
+<div class="back" *ngIf="isSheetVisible" (click)="closeSheet()"></div>
+
+<div class="sheet" [ngClass]="{'sheet-visible': isSheetVisible}">
+  <div class="sheet-header">
+    <p>Instituições</p>
+  </div>
+
+  <div class="banks" >
+
+    <div class="bank" (click)="selectInstitution('Carteira')">
+      <ion-icon name="wallet"></ion-icon>
+      <p>Carteira</p>
+    </div>
+
+    <div *ngFor="let bank of bankLogos" class="bank"  (click)="selectInstitution(bank.name)">
+      <img *ngIf="bank.logoUrl" [src]="bank.logoUrl" alt="{{ bank.name }} Logo"/>
+      <p>{{bank.name}} </p>
+    </div>
+
+  </div>
+
+
+</div>
