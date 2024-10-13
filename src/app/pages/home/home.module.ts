@@ -12,6 +12,10 @@ import { AccountsComponent } from 'src/app/components/home/accounts/accounts.com
 import { AddAccountComponent } from 'src/app/components/account-components/add-account/add-account.component';
 import { ReactiveFormsModule } from '@angular/forms';
 import { HttpClientModule, HttpClient } from '@angular/common/http';
+
+import { AddCardComponent } from 'src/app/components/card-components/add-card/add-card.component';
+import { CurrencyPipe } from '@angular/common';
+
 @NgModule({
   imports: [
     CommonModule,
@@ -28,6 +32,8 @@ import { HttpClientModule, HttpClient } from '@angular/common/http';
     WalletsComponent,
     AccountsComponent,
     AddAccountComponent,
-  ]
+    AddCardComponent
+  ],
+  providers: [CurrencyPipe],
 })
 export class HomePageModule {}
