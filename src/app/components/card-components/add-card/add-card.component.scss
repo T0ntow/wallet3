@@ -112,11 +112,18 @@ form {
             align-items: center;
             justify-content: flex-start;
 
-            img, ion-icon{
-                width: 25px;
-                height: 25px;
+            img, ion-icon, fa-icon{
+                width: 22px;
+                height: 22px;
+                font-size: 16px;
                 border-radius: 50%;
                 color: var(--ion-contrast);
+                background-color: var(--ion-item-background);
+                object-fit: contain;
+
+                display: flex;
+                align-items: center;
+                justify-content: center;
             }
             p {
                 font-size: 12px;
