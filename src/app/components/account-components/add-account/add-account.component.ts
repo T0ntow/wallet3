@@ -2,7 +2,7 @@ import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ModalController } from '@ionic/angular';
-
+import { faPiggyBank, faWallet, faArrowTrendUp, faBuildingColumns, faEllipsis} from '@fortawesome/free-solid-svg-icons'; // Ícone do cofrinho
 @Component({
   selector: 'app-add-account',
   templateUrl: './add-account.component.html',
@@ -10,9 +10,21 @@ import { ModalController } from '@ionic/angular';
 })
 export class AddAccountComponent implements OnInit {
   accountForm: FormGroup;
-  isSheetVisible: boolean = false;
-  selectedInstitution: string | null = null;
   bankLogos: Array<{ name: string; logoUrl: string | null }> = []; // Para armazenar os logos de bancos
+
+
+  isInstitutionSheetVisible = false;
+  isAccountTypeSheetVisible = false;
+  selectedInstitution: string | null = null;
+  selectedAccountType: string | null = null;
+
+  // icones
+  faPiggyBank = faPiggyBank;
+  faWallet = faWallet;
+  faArrowTrendUp = faArrowTrendUp;
+  faBuildingColumns = faBuildingColumns;
+  faEllipsis = faEllipsis;
+
 
   constructor(
     private modalController: ModalController,
@@ -35,6 +47,7 @@ export class AddAccountComponent implements OnInit {
     this.modalController.dismiss();
   }
 
+
   submitAccount() {
     if (this.accountForm.valid) {
       console.log('Expense submitted:', this.accountForm.value);
@@ -43,21 +56,32 @@ export class AddAccountComponent implements OnInit {
     }
   }
 
-  toggleSheet() {
-    console.log("toogle");
-    this.isSheetVisible = !this.isSheetVisible; // Alterna a visibilidade do sheet
+  // Sheets 
+  toggleSheet(sheetType: string) {
+    if (sheetType === 'institution') {
+      this.isInstitutionSheetVisible = true;
+      this.isAccountTypeSheetVisible = false;
+    } else if (sheetType === 'accountType') {
+      this.isInstitutionSheetVisible = false;
+      this.isAccountTypeSheetVisible = true;
+    }
   }
 
   closeSheet() {
-    this.isSheetVisible = false; // Fecha o sheet quando clicar fora
+    this.isInstitutionSheetVisible = false;
+    this.isAccountTypeSheetVisible = false;
   }
-
 
   selectInstitution(institution: string) {
     this.selectedInstitution = institution;
-    this.accountForm.controls['institution'].setValue(institution); // Define o valor no formulário
-    this.toggleSheet(); // Fecha a folha após a seleção
+    this.closeSheet();
   }
+
+  selectAccountType(accountType: string) {
+    this.selectedAccountType = accountType;
+    this.closeSheet();
+  }
+
 
 
   async fetchBankLogos() {

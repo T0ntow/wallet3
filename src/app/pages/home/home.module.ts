@@ -15,6 +15,7 @@ import { HttpClientModule, HttpClient } from '@angular/common/http';
 
 import { AddCardComponent } from 'src/app/components/card-components/add-card/add-card.component';
 import { CurrencyPipe } from '@angular/common';
+import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 
 @NgModule({
   imports: [
@@ -23,7 +24,8 @@ import { CurrencyPipe } from '@angular/common';
     IonicModule,
     HomePageRoutingModule,
     HttpClientModule,
-    ReactiveFormsModule
+    ReactiveFormsModule,
+    FontAwesomeModule
   ],
   declarations: [
     HomePage,

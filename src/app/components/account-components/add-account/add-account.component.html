@@ -11,9 +11,9 @@
 
 <ion-content>
   <form [formGroup]="accountForm">
-    <div class="container-item institution-item" (click)="toggleSheet()">
+    <div class="container-item" (click)="toggleSheet('institution')">
       <label position="stacked">Instituição</label>
-      <div class="input-institution" class="custom-input" style="display: flex;align-items: center;">
+      <div class="custom-input" style="display: flex; align-items: center;">
         <p style="margin: 0;"> {{ selectedInstitution || 'Selecione uma instituição' }} </p>
       </div>
     </div>
@@ -22,39 +22,62 @@
       <label position="stacked">Nome</label>
       <input formControlName="name" class="custom-input" type="text">
     </div>
-
-    <div class="container-item">
+    <div class="container-item" (click)="toggleSheet('accountType')">
       <label position="stacked">Tipo</label>
-      <ion-select  class="custom-input" formControlName="accountType" >
-        <ion-select-option value="corrente">Corrente</ion-select-option>
-        <ion-select-option value="poupanca">Poupança</ion-select-option>
-      </ion-select>
+      <div class="custom-input" style="display: flex; align-items: center;">
+        <p style="margin: 0;"> {{ selectedAccountType || 'Tipo de conta' }} </p>
+      </div>
     </div>
 
     <button [disabled]="accountForm.invalid" (click)="submitAccount()" class="submit-button">Adicionar Conta</button>
   </form>
 </ion-content>
 
-<div class="back" *ngIf="isSheetVisible" (click)="closeSheet()"></div>
+<!-- Background for closing sheets -->
+<div class="back" *ngIf="isInstitutionSheetVisible || isAccountTypeSheetVisible" (click)="closeSheet()"></div>
 
-<div class="sheet" [ngClass]="{'sheet-visible': isSheetVisible}">
+<!-- Institution Sheet -->
+<div class="sheet" [ngClass]="{'sheet-visible': isInstitutionSheetVisible}">
   <div class="sheet-header">
     <p>Instituições</p>
   </div>
-
-  <div class="banks" >
-
+  <div class="banks">
     <div class="bank" (click)="selectInstitution('Carteira')">
       <ion-icon name="wallet"></ion-icon>
       <p>Carteira</p>
     </div>
-
-    <div *ngFor="let bank of bankLogos" class="bank"  (click)="selectInstitution(bank.name)">
-      <img *ngIf="bank.logoUrl" [src]="bank.logoUrl" alt="{{ bank.name }} Logo"/>
-      <p>{{bank.name}} </p>
+    <div *ngFor="let bank of bankLogos" class="bank" (click)="selectInstitution(bank.name)">
+      <img *ngIf="bank.logoUrl" [src]="bank.logoUrl" alt="{{ bank.name }} Logo" />
+      <p>{{ bank.name }}</p>
     </div>
-
   </div>
+</div>
 
-
+<!-- Account Type Sheet -->
+<div class="sheet" [ngClass]="{'sheet-visible': isAccountTypeSheetVisible}">
+  <div class="sheet-header">
+    <p>Tipo de conta</p>
+  </div>
+  <div class="banks">
+    <div class="bank" (click)="selectAccountType('corrente')">
+      <fa-icon [icon]="faBuildingColumns"></fa-icon>
+      <p>Conta corrente</p>
+    </div>
+    <div class="bank" (click)="selectAccountType('carteira')">
+      <fa-icon [icon]="faWallet"></fa-icon>
+      <p>Carteira</p>
+    </div>
+    <div class="bank" (click)="selectAccountType('poupanca')">
+      <fa-icon [icon]="faPiggyBank"></fa-icon>
+      <p>Poupança</p>
+    </div>
+    <div class="bank" (click)="selectAccountType('investimentos')">
+      <fa-icon [icon]="faArrowTrendUp"></fa-icon>
+      <p>Investimentos</p>
+    </div>
+    <div class="bank" (click)="selectAccountType('outros')">
+      <fa-icon [icon]="faEllipsis"></fa-icon>
+      <p>Outros</p>
+    </div>
+  </div>
 </div>
