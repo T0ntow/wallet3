@@ -28,7 +28,7 @@ export class AddCardComponent implements OnInit {
       institution: ['', Validators.required],
       name: ['', Validators.required],
       limit: ['', Validators.required],
-      due_date: ['', Validators.required],
+      closing_day: ['', Validators.required],
     });
   }
 
