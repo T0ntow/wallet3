@@ -1,6 +1,7 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { ModalController } from '@ionic/angular';
 import { AddExpenseComponent } from '../expenses-components/add-expense/add-expense.component';
+import { AddCardExpenseComponent } from '../card-expenses/add-card-expense/add-card-expense.component';
 @Component({
   selector: 'app-nav',
   templateUrl: './nav.component.html',
@@ -33,4 +34,12 @@ export class NavComponent implements OnInit {
     });
     modal.present();
   }
+
+  async addCardExpense() {
+    const modal = await this.modalCtrl.create({
+      component: AddCardExpenseComponent,
+    });
+    modal.present();
+  }
+
 }

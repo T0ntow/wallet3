@@ -17,6 +17,8 @@ import { AddCardComponent } from 'src/app/components/card-components/add-card/ad
 import { CurrencyPipe } from '@angular/common';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { AddExpenseComponent } from 'src/app/components/expenses-components/add-expense/add-expense.component';
+import { AddCardExpenseComponent } from 'src/app/components/card-expenses/add-card-expense/add-card-expense.component';
+
 @NgModule({
   imports: [
     CommonModule,
@@ -35,7 +37,8 @@ import { AddExpenseComponent } from 'src/app/components/expenses-components/add-
     AccountsComponent,
     AddAccountComponent,
     AddCardComponent,
-    AddExpenseComponent
+    AddExpenseComponent,
+    AddCardExpenseComponent
   ],
   providers: [CurrencyPipe],
 })

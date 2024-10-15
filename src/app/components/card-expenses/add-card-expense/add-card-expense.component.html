@@ -5,7 +5,7 @@
         <ion-icon slot="icon-only" name="arrow-back-circle"></ion-icon>
       </ion-button>
     </ion-buttons>
-    <ion-title>Nova Despesa</ion-title>
+    <ion-title>Nova Despesa Cartão</ion-title>
   </ion-toolbar>
 </ion-header>
 
@@ -30,6 +30,13 @@
       </div>
     </div>
 
+    <div class="container-item" (click)="toggleSheet('invoice')">
+      <label position="stacked">Fatura</label>
+      <div class="custom-input" style="display: flex; align-items: center;">
+        <p style="margin: 0;"> {{ selectedInvoice || 'Selecione uma fatura' }}</p>
+      </div>
+    </div>
+
     <ion-grid>
       <ion-row>
         <ion-col size="5">
@@ -40,62 +47,60 @@
         </ion-col>
 
         <!-- Mostra o valor normal quando não é parcelado -->
-        <ion-col size="6">
+        <ion-col size="6" *ngIf="!parcelado">
           <div class="container-item">
             <label position="stacked">Valor</label>
             <ion-input type="text" formControlName="amount" class="custom-input"></ion-input>
           </div>
         </ion-col>
 
+        <ion-col size="6" *ngIf="parcelado">
+          <div class="container-item">
+            <label position="stacked">Valor Parcela</label>
+            <ion-input type="text" formControlName="installmentValue" class="custom-input"></ion-input>
+          </div>
+        </ion-col>
+      </ion-row>
+
+      <ion-row>
         <ion-col size="5">
           <div class="container-item">
             <label position="stacked">Detalhes</label>
             <div>
-              <ion-toggle slot="start" (ionChange)="toggleRecorrente($event)" class="custom-input">Repetir</ion-toggle>
+              <ion-toggle slot="start" class="custom-input" (ionChange)="toggleParcelado($event)">Parcelado</ion-toggle>
             </div>
           </div>
         </ion-col>
 
-        <!-- ====================================== ALTERAR ====================================== -->
-      </ion-row>
-
-      <ion-row>
-        <ion-col *ngIf="recorrente">
+        <ion-col size="6" *ngIf="parcelado">
           <div class="container-item">
             <label position="stacked">Quantidade</label>
-            <ion-input type="text" formControlName="quantity" class="custom-input" min="1" max="12"></ion-input>
+            <ion-input type="text" formControlName="installmentCount" class="custom-input"></ion-input>
           </div>
         </ion-col>
       </ion-row>
-      <ion-row>
-        <ion-col *ngIf="recorrente">
-          <div class="container-item" (click)="presentPopover($event)">
-            <label position="stacked">Periodo</label>
-            <p style="margin: 0; display: flex; align-items: center;" class="custom-input"> {{periodo}} </p>
-          </div>
-        </ion-col>
-
-        <ion-popover #popover [isOpen]="isOpen" (didDismiss)="isOpen = false">
-          <ng-template>
-            <ion-content>
-              <ion-list style="display: flex; flex-direction: column; gap: 10px; padding: 5px;">
-                <ion-label (click)="selectPeriod('Mensal')">Mensal</ion-label>
-                <ion-label (click)="selectPeriod('Anual')">Anual</ion-label>
-              </ion-list>
-            </ion-content>
-          </ng-template>
-        </ion-popover>
-      </ion-row>
-
     </ion-grid>
 
     <button [disabled]="accountForm.invalid" (click)="submitAccount()" class="submit-button">Adicionar
-      Despesa</button>
+      Despesa Cartão</button>
   </form>
 </ion-content>
 
 <!-- Background for closing sheets -->
-<div class="back" *ngIf="isCategoriesSheetVisible || isAccountSheetVisible" (click)="closeSheet()"></div>
+<div class="back" *ngIf="isCategoriesSheetVisible || isAccountSheetVisible || isInvoiceSheetVisible"
+  (click)="closeSheet()"></div>
+
+<div class="sheet" [ngClass]="{'sheet-visible': isInvoiceSheetVisible}">
+  <div class="sheet-header">
+    <p>Fatura</p>
+  </div>
+  <div class="invoices">
+    <div class="invoice" *ngFor="let invoice of invoices" (click)="selectInvoice(invoice.label)">
+      <p> {{ invoice.label }}</p>
+    </div>
+  </div>
+</div>
+
 
 <!-- Institution Sheet -->
 <div class="sheet" [ngClass]="{'sheet-visible': isAccountSheetVisible}">
