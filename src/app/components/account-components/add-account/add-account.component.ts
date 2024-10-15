@@ -12,7 +12,6 @@ export class AddAccountComponent implements OnInit {
   accountForm: FormGroup;
   bankLogos: Array<{ name: string; logoUrl: string | null }> = []; // Para armazenar os logos de bancos
 
-
   isInstitutionSheetVisible = false;
   isAccountTypeSheetVisible = false;
   selectedInstitution: string | null = null;
@@ -46,7 +45,6 @@ export class AddAccountComponent implements OnInit {
   dismissModal() {
     this.modalController.dismiss();
   }
-
 
   submitAccount() {
     if (this.accountForm.valid) {

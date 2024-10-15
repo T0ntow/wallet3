@@ -16,7 +16,7 @@ import { HttpClientModule, HttpClient } from '@angular/common/http';
 import { AddCardComponent } from 'src/app/components/card-components/add-card/add-card.component';
 import { CurrencyPipe } from '@angular/common';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-
+import { AddExpenseComponent } from 'src/app/components/expenses-components/add-expense/add-expense.component';
 @NgModule({
   imports: [
     CommonModule,
@@ -34,7 +34,8 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
     WalletsComponent,
     AccountsComponent,
     AddAccountComponent,
-    AddCardComponent
+    AddCardComponent,
+    AddExpenseComponent
   ],
   providers: [CurrencyPipe],
 })

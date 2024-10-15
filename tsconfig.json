@@ -25,9 +25,11 @@
     "useDefineForClassFields": false
   },
   "angularCompilerOptions": {
+    "_enabledBlockTypes": ["if","for","switch","defer"],
     "enableI18nLegacyMessageIdFormat": false,
     "strictInjectionParameters": true,
     "strictInputAccessModifiers": true,
-    "strictTemplates": true
+    "strictTemplates": true,
+
   }
 }

@@ -39,12 +39,18 @@
 
 <div class="sheet" [ngClass]="{'sheet-visible': isSheetVisible}">
   <div class="block-left">
-    <div class="add-expense">
-      <p>Nova Despesa</p>
-      <ion-icon name="cash"></ion-icon>
+    <div class="add-expense" (click)="addExpense()">
+      <p>Despesa</p>
+      <ion-icon name="cash"></ion-icon> 
     </div>
+
+    <div class="add-expense-card">
+      <p>Despesa Cartão</p>
+      <ion-icon name="card"></ion-icon>
+    </div>
+
     <div class="add-receive">
-      <p>Nova Receita</p>
+      <p>Receita</p>
       <ion-icon name="cash"></ion-icon>
     </div>
   </div>

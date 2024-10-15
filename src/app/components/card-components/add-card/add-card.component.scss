@@ -104,6 +104,7 @@ form {
         display: flex;
         flex-direction: column;
         gap: 10px;
+        padding: 20px 5px;
 
         .bank {
             padding: 5px;
@@ -111,6 +112,8 @@ form {
             flex-direction: row;
             align-items: center;
             justify-content: flex-start;
+            background-color: var(--ion-item-background);
+            border-radius: 5px;
 
             img, ion-icon, fa-icon{
                 width: 22px;
@@ -118,7 +121,6 @@ form {
                 font-size: 16px;
                 border-radius: 50%;
                 color: var(--ion-contrast);
-                background-color: var(--ion-item-background);
                 object-fit: contain;
 
                 display: flex;
@@ -135,7 +137,8 @@ form {
 
         .bank:hover {
             cursor: pointer;
-            background-color: #dddddd;
+            transition: all .2s ease-in-out;
+            background-color: #a7a7a7;
         }
     }
 }

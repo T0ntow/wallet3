@@ -1,0 +1,154 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="dismissModal()">
+        <ion-icon slot="icon-only" name="arrow-back-circle"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Nova Despesa</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <form [formGroup]="accountForm">
+    <div class="container-item">
+      <label position="stacked">Descrição</label>
+      <ion-input type="text" formControlName="name" class="custom-input"></ion-input>
+    </div>
+
+    <div class="container-item" (click)="toggleSheet('account')">
+      <label position="stacked">Conta</label>
+      <div class="custom-input" style="display: flex; align-items: center;">
+        <p style="margin: 0;"> {{ selectedAccount || 'Selecione uma conta' }} </p>
+      </div>
+    </div>
+
+    <div class="container-item" (click)="toggleSheet('category')">
+      <label position="stacked">Categoria</label>
+      <div class="custom-input" style="display: flex; align-items: center;">
+        <p style="margin: 0;"> {{ selectedCategory || 'Selecione uma categoria' }}</p>
+      </div>
+    </div>
+
+    <ion-grid>
+      <ion-row>
+        <ion-col size="4">
+          <div class="container-item">
+            <label position="stacked">Data</label>
+            <ion-input type="date" formControlName="date" class="custom-input"></ion-input>
+          </div>
+        </ion-col>
+
+        <!-- Mostra o valor normal quando não é parcelado -->
+        <ion-col size="6">
+          <div class="container-item">
+            <label position="stacked">Valor</label>
+            <ion-input type="text" formControlName="amount" class="custom-input"></ion-input>
+          </div>
+        </ion-col>
+
+        <ion-col size="4">
+          <div class="container-item">
+            <label position="stacked">Detalhes</label>
+            <div>
+              <ion-toggle slot="start" (ionChange)="toggleRecorrente($event)" class="custom-input">Repetir</ion-toggle>
+            </div>
+          </div>
+        </ion-col>
+
+        <!-- ====================================== ALTERAR ====================================== -->
+      </ion-row>
+
+      <ion-row>
+        <ion-col *ngIf="recorrente">
+          <div class="container-item">
+            <label position="stacked">Quantidade</label>
+            <ion-input type="text" formControlName="quantity" class="custom-input" min="1" max="12"></ion-input>
+          </div>
+        </ion-col>
+      </ion-row>
+      <ion-row>
+        <ion-col *ngIf="recorrente">
+          <div class="container-item" (click)="presentPopover($event)">
+            <label position="stacked">Periodo</label>
+            <p style="margin: 0; display: flex; align-items: center;" class="custom-input"> {{periodo}} </p>
+          </div>
+        </ion-col>
+
+        <ion-popover #popover [isOpen]="isOpen" (didDismiss)="isOpen = false">
+          <ng-template>
+            <ion-content>
+              <ion-list style="display: flex; flex-direction: column; gap: 10px; padding: 5px;">
+                <ion-label (click)="selectPeriod('Mensal')">Mensal</ion-label>
+                <ion-label (click)="selectPeriod('Anual')">Anual</ion-label>
+              </ion-list>
+            </ion-content>
+          </ng-template>
+        </ion-popover>
+      </ion-row>
+
+    </ion-grid>
+
+    <button [disabled]="accountForm.invalid" (click)="submitAccount()" class="submit-button">Adicionar
+      Despesa</button>
+  </form>
+</ion-content>
+
+<!-- Background for closing sheets -->
+<div class="back" *ngIf="isCategoriesSheetVisible || isAccountSheetVisible" (click)="closeSheet()"></div>
+
+<!-- Institution Sheet -->
+<div class="sheet" [ngClass]="{'sheet-visible': isAccountSheetVisible}">
+  <div class="sheet-header">
+    <p>Conta</p>
+  </div>
+  <div class="banks">
+    <!-- LISTAR TODAS AS CONTAS CRIADAS -->
+  </div>
+</div>
+
+<!-- Categories Sheet -->
+<div class="sheet" [ngClass]="{'sheet-visible': isCategoriesSheetVisible}">
+  <div class="sheet-header">
+    <p>Categorias</p>
+  </div>
+  <div class="categories">
+    <div class="category" (click)="selectCategory('Alimentação')">
+      <fa-icon [icon]="faUtensils"></fa-icon>
+      <p>Alimentação</p>
+    </div>
+    <div class="category" (click)="selectCategory('Transporte')">
+      <fa-icon [icon]="faBus"></fa-icon>
+      <p>Transporte</p>
+    </div>
+    <div class="category" (click)="selectCategory('Saúde')">
+      <fa-icon [icon]="faHeartbeat"></fa-icon>
+      <p>Saúde</p>
+    </div>
+    <div class="category" (click)="selectCategory('Educação')">
+      <fa-icon [icon]="faGraduationCap"></fa-icon>
+      <p>Educação</p>
+    </div>
+    <div class="category" (click)="selectCategory('Lazer')">
+      <fa-icon [icon]="faFutbol"></fa-icon>
+      <p>Lazer</p>
+    </div>
+    <div class="category" (click)="selectCategory('Compras')">
+      <fa-icon [icon]="faShoppingCart"></fa-icon>
+      <p>Compras</p>
+    </div>
+    <div class="category" (click)="selectCategory('Moradia')">
+      <fa-icon [icon]="faHome"></fa-icon>
+      <p>Moradia</p>
+    </div>
+    <div class="category" (click)="selectCategory('Serviços Públicos')">
+      <fa-icon [icon]="faLightbulb"></fa-icon>
+      <p>Serviços Públicos</p>
+    </div>
+
+    <div class="category" (click)="selectCategory('Outros')">
+      <fa-icon [icon]="faEllipsisH"></fa-icon>
+      <p>Outros</p>
+    </div>
+  </div>
+</div>

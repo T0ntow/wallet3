@@ -140,8 +140,9 @@ ion-tab-button {
   }
 
   .add-expense,
-  .add-receive {
-    width: 100px;
+  .add-receive,
+  .add-expense-card {
+    width: 70px;
     height: 66px;
 
     font-weight: bold;
@@ -174,6 +175,9 @@ ion-tab-button {
   }
   .add-receive {
     color: var(--ion-color-success);
+  }
+  .add-expense-card {
+    color: var(--ion-color-warning);
   }
 
   .add-wallet, .add-account, .transfer {
