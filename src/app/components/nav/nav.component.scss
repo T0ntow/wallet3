@@ -23,7 +23,13 @@
   justify-content: space-evenly;
 }
 
+ion-tab-button:hover {
+  color: var(--color-hover);
+}
+
 ion-tab-button {
+  --color-selected: var(--color-hover);
+
   display: flex;
   flex-direction: column;
   align-items: center;

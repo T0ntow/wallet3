@@ -11,6 +11,19 @@
     ion-card-header {
         padding: 0;
 
+        ion-button {
+            --color-selected: var(--color-hover);
+            --color: var(--color-hover);
+        }
+
+        ion-icon {
+            width: 17px;
+            height: 17px;
+            color:var(--ion-contrast);
+            cursor: pointer;
+        }  
+
+
         ion-avatar {
             margin: 0;
             display: flex;

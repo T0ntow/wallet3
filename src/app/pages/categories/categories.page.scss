@@ -1,0 +1,30 @@
+* {
+    font-family: "Inria Sans";
+}
+ion-button {
+    --color-selected: var(--color-hover);
+    --color: var(--color-hover);
+}
+
+ion-icon {
+    width: 25px;
+        height: 25px;
+    color:var(--ion-contrast);
+    cursor: pointer;
+}  
+
+#searchbar {
+    --background: var(--ion-item-background);
+    --color: #000;
+}
+
+ion-toolbar div {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 0 20px;
+
+    ion-title {
+        padding: 0 !important;
+    }
+}
