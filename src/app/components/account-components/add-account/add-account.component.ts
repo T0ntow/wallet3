@@ -3,6 +3,9 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ModalController } from '@ionic/angular';
 import { faPiggyBank, faWallet, faArrowTrendUp, faBuildingColumns, faEllipsis} from '@fortawesome/free-solid-svg-icons'; // Ícone do cofrinho
+
+import { AccountService } from 'src/app/services/account.service';
+import { DatabaseService } from 'src/app/services/database.service';
 @Component({
   selector: 'app-add-account',
   templateUrl: './add-account.component.html',
@@ -26,31 +29,44 @@ export class AddAccountComponent implements OnInit {
 
 
   constructor(
+    private databaseService: DatabaseService,
     private modalController: ModalController,
     private formBuilder: FormBuilder,
+    private accountService: AccountService,
     private http: HttpClient // Usando HttpClient para requisições HTTP
-
   ) {
     this.accountForm = this.formBuilder.group({
-      institution: ['', Validators.required],
-      name: ['', Validators.required],
-      accountType: ['', Validators.required],
+      instituicao: ['', Validators.required],
+      nome: ['', Validators.required],
+      tipo: ['', Validators.required],
     });
   }
 
-  ngOnInit() {
+  async ngOnInit() {
     this.fetchBankLogos(); // Chama a função para carregar os logos dos bancos
+    await this.databaseService.createDatabaseConnection();
   }
 
   dismissModal() {
     this.modalController.dismiss();
   }
 
-  submitAccount() {
+  async submitAccount() {
     if (this.accountForm.valid) {
-      console.log('Expense submitted:', this.accountForm.value);
-      // Adicione a lógica para salvar a despesa aqui
-      this.dismissModal();
+      const { nome, tipo, instituicao } = this.accountForm.value;
+
+      try {
+        // Chama o método do serviço para adicionar a conta no banco de dados
+        await this.accountService.addAccount(nome, tipo, instituicao);
+
+        console.log('Conta submetida:', this.accountForm.value);
+        // Fecha o modal após o sucesso
+        this.dismissModal();
+      } catch (error) {
+        console.error('Erro ao salvar a conta:', error);
+      }
+    } else {
+      console.log('Formulário inválido');
     }
   }
 
@@ -72,15 +88,16 @@ export class AddAccountComponent implements OnInit {
 
   selectInstitution(institution: string) {
     this.selectedInstitution = institution;
+    this.accountForm.patchValue({ instituicao: institution }); // Atualiza o campo do formulário
     this.closeSheet();
   }
 
+  // Seleciona o tipo de conta e atualiza o formulário
   selectAccountType(accountType: string) {
     this.selectedAccountType = accountType;
+    this.accountForm.patchValue({ tipo: accountType }); // Atualiza o campo do formulário
     this.closeSheet();
   }
-
-
 
   async fetchBankLogos() {
     const apiKey = 'pk_eyQ5ESuFQ3-4_kpNJSUKfg'; // Substitua pela sua chave da API logo.dev
