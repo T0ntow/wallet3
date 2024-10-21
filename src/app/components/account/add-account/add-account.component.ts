@@ -1,7 +1,7 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ModalController } from '@ionic/angular';
+import { ModalController, ToastController } from '@ionic/angular';
 import { faPiggyBank, faWallet, faArrowTrendUp, faBuildingColumns, faEllipsis} from '@fortawesome/free-solid-svg-icons'; // Ícone do cofrinho
 
 import { AccountService } from 'src/app/services/account.service';
@@ -27,18 +27,20 @@ export class AddAccountComponent implements OnInit {
   faBuildingColumns = faBuildingColumns;
   faEllipsis = faEllipsis;
 
-
   constructor(
     private databaseService: DatabaseService,
     private modalController: ModalController,
     private formBuilder: FormBuilder,
     private accountService: AccountService,
-    private http: HttpClient // Usando HttpClient para requisições HTTP
+    private http: HttpClient,
+    private toastController: ToastController,
+    private modalCtrl: ModalController // Usando HttpClient para requisições HTTP
   ) {
     this.accountForm = this.formBuilder.group({
       instituicao: ['', Validators.required],
       nome: ['', Validators.required],
       tipo: ['', Validators.required],
+      saldo: [null, Validators.required]
     });
   }
 
@@ -53,22 +55,34 @@ export class AddAccountComponent implements OnInit {
 
   async submitAccount() {
     if (this.accountForm.valid) {
-      const { nome, tipo, instituicao } = this.accountForm.value;
-
+      const { nome, tipo, instituicao, saldo } = this.accountForm.value;
+  
       try {
         // Chama o método do serviço para adicionar a conta no banco de dados
-        await this.accountService.addAccount(nome, tipo, instituicao);
-
-        console.log('Conta submetida:', this.accountForm.value);
+        await this.accountService.addAccount(nome, tipo, instituicao, saldo);
+  
+        await this.presentToast('Conta criada com sucesso!', 'success');
+        this.modalCtrl.dismiss({ conta: this.accountForm });
+  
         // Fecha o modal após o sucesso
         this.dismissModal();
       } catch (error) {
-        console.error('Erro ao salvar a conta:', error);
+        await this.presentToast('Erro ao salvar a conta!', 'danger');
       }
     } else {
       console.log('Formulário inválido');
     }
   }
+  
+  async presentToast(message: string, color: string) {
+    const toast = await this.toastController.create({
+      message,
+      duration: 2000,
+      color
+    });
+    toast.present();
+  }
+  
 
   // Sheets 
   toggleSheet(sheetType: string) {

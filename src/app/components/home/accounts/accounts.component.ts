@@ -1,6 +1,6 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { ModalController } from '@ionic/angular';
-import { AddAccountComponent } from '../../account-components/add-account/add-account.component';
+import { AddAccountComponent } from '../../account/add-account/add-account.component';
 import { DatabaseService } from 'src/app/services/database.service';
 import { AccountService } from 'src/app/services/account.service';
 import { Account } from 'src/app/models/account.model';
@@ -27,9 +27,16 @@ export class AccountsComponent  implements OnInit {
 
   async addAccount() {
     const modal = await this.modalCtrl.create({
-      component: AddAccountComponent,
+      component: AddAccountComponent
     });
-    modal.present();
+
+    modal.onDidDismiss().then((data) => {
+      if (data.data) {
+        this.getAccounts(); // Recarrega as Contas após adicionar uma nova
+      }
+    });
+
+    return await modal.present();
   }
 
   async getAccounts() {

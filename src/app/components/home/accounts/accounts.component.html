@@ -11,32 +11,20 @@
   </ion-card-header>
 
   <ion-card-content>
-    <ion-item lines="none">
-      <ion-icon name="wallet" color="light"></ion-icon>
-
-      <ion-label>
-        <h3>Carteira 1</h3>
-      </ion-label>
-
-      <div class="saldo">
-        <span>Saldo</span>
-        <p>R$ 20,00</p>
-      </div>
-    </ion-item>
-
-    <ion-item lines="none">
-      <ion-icon name="wallet" color="light"></ion-icon>
-
-      <ion-label>
-        <h3>Carteira 2</h3>
-      </ion-label>
-
-      <div class="saldo">
-        <span>Saldo</span>
-        <p>R$ 20,00</p>
-      </div>
-    </ion-item>
-
-
+    <ion-list lines="none">
+      <ion-item *ngFor="let account of accounts">
+        <ion-icon name="wallet" color="light"></ion-icon>
+  
+        <ion-label>
+          <h3>{{ account.nome }}</h3> <!-- Exibe o nome da conta -->
+        </ion-label>
+  
+        <div class="saldo">
+          <span>Saldo</span>
+          <p>R$ {{ account.saldo || '0,00' }}</p> <!-- Exibe o saldo da conta, se disponível -->
+        </div>
+      </ion-item>
+    </ion-list>
   </ion-card-content>
+  
 </ion-card>

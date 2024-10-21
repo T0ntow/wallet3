@@ -1,36 +1,73 @@
-<!-- <ion-header [translucent]="true">
+<ion-header [translucent]="true">
   <ion-toolbar>
     <div>
       <ion-title>Categorias</ion-title>
-      <ion-button slot="end" fill="clear" size="small">
+      <ion-button slot="end" fill="clear" size="small" *ngIf="segmentValue === 'despesas'">
+        <ion-icon name="add-circle" color="light"></ion-icon>
+      </ion-button>
+
+      <ion-button slot="end" fill="clear" size="small" *ngIf="segmentValue === 'receitas'">
         <ion-icon name="add-circle" color="light"></ion-icon>
       </ion-button>
     </div>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true" class="ion-padding">
-  <ion-searchbar id="searchbar" placeholder="Pesquisar"></ion-searchbar>
+<ion-content [fullscreen]="true">
+  <ion-segment [(ngModel)]="segmentValue" value="despesas">
+    <ion-segment-button value="despesas" class="segment-button">
+      <ion-label class="label">Despesas</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="receitas" class="segment-button">
+      <ion-label class="label">Receitas</ion-label>
+    </ion-segment-button>
+  </ion-segment>
 
-  <ion-card>
-    <ion-card-header>
-      <ion-card-title>Categorias</ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
-      <div class="category-container">
-        <ion-chip outline="false">
-          <ion-icon ></ion-icon>
-          <ion-label>{{ category.name }}</ion-label>
-        </ion-chip>
+  <div *ngIf="segmentValue === 'despesas'">
+    <div class="categories">
+      <div class="category" (click)="selectCategory('Alimentação')">
+        <fa-icon [icon]="faUtensils"></fa-icon>
+        <p>Alimentação</p>
+      </div>
+      <div class="category" (click)="selectCategory('Transporte')">
+        <fa-icon [icon]="faBus"></fa-icon>
+        <p>Transporte</p>
+      </div>
+      <div class="category" (click)="selectCategory('Saúde')">
+        <fa-icon [icon]="faHeartbeat"></fa-icon>
+        <p>Saúde</p>
+      </div>
+      <div class="category" (click)="selectCategory('Educação')">
+        <fa-icon [icon]="faGraduationCap"></fa-icon>
+        <p>Educação</p>
+      </div>
+      <div class="category" (click)="selectCategory('Lazer')">
+        <fa-icon [icon]="faFutbol"></fa-icon>
+        <p>Lazer</p>
+      </div>
+      <div class="category" (click)="selectCategory('Compras')">
+        <fa-icon [icon]="faShoppingCart"></fa-icon>
+        <p>Compras</p>
+      </div>
+      <div class="category" (click)="selectCategory('Moradia')">
+        <fa-icon [icon]="faHome"></fa-icon>
+        <p>Moradia</p>
+      </div>
+      <div class="category" (click)="selectCategory('Serviços Públicos')">
+        <fa-icon [icon]="faLightbulb"></fa-icon>
+        <p>Serviços Públicos</p>
       </div>
 
-      <h3 style="color: #000; font-size: 16px; margin: 10px 0;"  *ngIf="categoriasReceitas.length > 0">Novas</h3>
-      <div class="category-container">
-        <ion-chip *ngFor="let category of categoriasReceitas" outline="false" (click)="showActionsPopover($event, category)">
-          <ion-icon [name]="category.icon" color="primary"></ion-icon>
-          <ion-label>{{ category.name }}</ion-label>
-        </ion-chip>
+      <div class="category" (click)="selectCategory('Outros')">
+        <fa-icon [icon]="faEllipsisH"></fa-icon>
+        <p>Outros</p>
       </div>
-    </ion-card-content>
-  </ion-card>
-</ion-content> -->
+    </div>
+  </div>
+
+  <div *ngIf="segmentValue === 'receitas'">
+    <!-- Conteúdo relacionado às Receitas -->
+    <h2>Conteúdo de Receitas</h2>
+    <!-- Adicione mais conteúdo ou lógica para receitas aqui -->
+  </div>
+</ion-content>

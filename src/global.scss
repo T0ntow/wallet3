@@ -55,6 +55,10 @@
 
 @media (prefers-color-scheme: dark), (prefers-color-scheme: light) {
     :root.md {
+        --ion-color-primary: #262626;
+        --ion-color-primary-contrast-rgb: #fff;
+        --ion-color-primary-contrast: #fff;
+
         --ion-background-color: #fff;
         --ion-toolbar-background: #fff;
         --ion-text-color: #171717;

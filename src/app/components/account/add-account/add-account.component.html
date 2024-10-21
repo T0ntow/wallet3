@@ -11,6 +11,11 @@
 
 <ion-content>
   <form [formGroup]="accountForm">
+    <div class="container-item">
+      <label position="stacked">Saldo Inicial</label>
+      <ion-input formControlName="saldo" class="custom-input" type="number" ></ion-input>
+    </div>
+
     <div class="container-item" (click)="toggleSheet('institution')">
       <label position="stacked">Instituição</label>
       <div class="custom-input" style="display: flex; align-items: center;">
