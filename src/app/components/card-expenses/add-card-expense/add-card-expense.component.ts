@@ -27,7 +27,6 @@ export class AddCardExpenseComponent  implements OnInit {
   //toggle parcelado
   parcelado: boolean = false; // Estado para controle de "parcelado"
 
-
   // Logos
   faUtensils = faUtensils;
   faBus = faBus;

@@ -1,11 +1,12 @@
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ModalController } from '@ionic/angular';
+import { ModalController, ToastController } from '@ionic/angular';
 import { faPiggyBank, faWallet, faArrowTrendUp, faBuildingColumns, faEllipsis} from '@fortawesome/free-solid-svg-icons'; // Ícone do cofrinho
 
 import { AccountService } from 'src/app/services/account.service';
 import { DatabaseService } from 'src/app/services/database.service';
+import { BankService } from 'src/app/services/bank.service';
 @Component({
   selector: 'app-add-account',
   templateUrl: './add-account.component.html',
@@ -13,7 +14,7 @@ import { DatabaseService } from 'src/app/services/database.service';
 })
 export class AddAccountComponent implements OnInit {
   accountForm: FormGroup;
-  bankLogos: Array<{ name: string; logoUrl: string | null }> = []; // Para armazenar os logos de bancos
+  bankLogos: Array<{ name: string; logoUrl: string }> = []; // Para armazenar os logos de bancos
 
   isInstitutionSheetVisible = false;
   isAccountTypeSheetVisible = false;
@@ -27,23 +28,27 @@ export class AddAccountComponent implements OnInit {
   faBuildingColumns = faBuildingColumns;
   faEllipsis = faEllipsis;
 
-
   constructor(
     private databaseService: DatabaseService,
     private modalController: ModalController,
     private formBuilder: FormBuilder,
     private accountService: AccountService,
-    private http: HttpClient // Usando HttpClient para requisições HTTP
+    private http: HttpClient,
+    private toastController: ToastController,
+    private modalCtrl: ModalController,
+    private bankService: BankService // Usando HttpClient para requisições HTTP
   ) {
     this.accountForm = this.formBuilder.group({
       instituicao: ['', Validators.required],
       nome: ['', Validators.required],
       tipo: ['', Validators.required],
+      saldo: [null, Validators.required]
     });
   }
 
   async ngOnInit() {
-    this.fetchBankLogos(); // Chama a função para carregar os logos dos bancos
+    this.bankLogos = await this.bankService.fetchBankLogos();
+
     await this.databaseService.createDatabaseConnection();
   }
 
@@ -53,22 +58,34 @@ export class AddAccountComponent implements OnInit {
 
   async submitAccount() {
     if (this.accountForm.valid) {
-      const { nome, tipo, instituicao } = this.accountForm.value;
-
+      const { nome, tipo, instituicao, saldo } = this.accountForm.value;
+  
       try {
         // Chama o método do serviço para adicionar a conta no banco de dados
-        await this.accountService.addAccount(nome, tipo, instituicao);
-
-        console.log('Conta submetida:', this.accountForm.value);
+        await this.accountService.addAccount(nome, tipo, instituicao, saldo);
+  
+        await this.presentToast('Conta criada com sucesso!', 'success');
+        this.modalCtrl.dismiss({ conta: this.accountForm });
+  
         // Fecha o modal após o sucesso
         this.dismissModal();
       } catch (error) {
-        console.error('Erro ao salvar a conta:', error);
+        await this.presentToast('Erro ao salvar a conta!', 'danger');
       }
     } else {
       console.log('Formulário inválido');
     }
   }
+  
+  async presentToast(message: string, color: string) {
+    const toast = await this.toastController.create({
+      message,
+      duration: 2000,
+      color
+    });
+    toast.present();
+  }
+  
 
   // Sheets 
   toggleSheet(sheetType: string) {
@@ -98,97 +115,5 @@ export class AddAccountComponent implements OnInit {
     this.accountForm.patchValue({ tipo: accountType }); // Atualiza o campo do formulário
     this.closeSheet();
   }
-
-  async fetchBankLogos() {
-    const apiKey = 'pk_eyQ5ESuFQ3-4_kpNJSUKfg'; // Substitua pela sua chave da API logo.dev
-    const banks = [
-      {
-        url: 'alelo.com.br',
-        name: 'Alelo'
-      },
-      {
-        url: 'amedigital.com',
-        name: 'Ame digital'
-      },
-      {
-        url: 'nubank.com.br',
-        name: 'Nubank'
-      },
-      {
-        url: 'bb.com.br',
-        name: 'Banco do Brasil'
-      },
-      {
-        url: 'willbank.com.br',
-        name: 'Will Bank'
-      },
-      {
-        url: 'bancopan.com.br',
-        name: 'Banco Pan'
-      },
-      {
-        url: 'c6bank.com.br',
-        name: 'C6 Bank'
-      },
-      {
-        url: 'cambio.bradesco',
-        name: 'Bradesco'
-      },
-      {
-        url: 'caixa.gov.br',
-        name: 'Caixa'
-      },
-      {
-        url: 'digio.com.br',
-        name: 'Digio'
-      },
-      {
-        url: 'mercadopago.com',
-        name: 'Mercado Pago'
-      },
-      {
-        url: 'meliuz.com.br',
-        name: 'Meliuz'
-      },
-      {
-        url: 'santanderbank.com',
-        name: 'Santander Bank'
-      },
-      {
-        url: 'paypal.com',
-        name: 'PayPal'
-      },
-      {
-        url: 'picpay.com',
-        name: 'PicPay'
-      },
-   
-      {
-        url: 'itau.com.ar',
-        name: 'Itaú'
-      },
-      {
-        url: 'claropay.com',
-        name: 'Claro Pay'
-      },
-      {
-        url: 'xpi.com.br',
-        name: 'XP'
-      }
-    ];
-
-    try {
-      this.bankLogos = banks.map((bank) => {
-        const logoUrl = `https://img.logo.dev/${encodeURIComponent(bank.url)}?token=${apiKey}`;
-        console.log(logoUrl);
-
-        return { name: bank.name, logoUrl };
-      });
-      
-    } catch (error) {
-      console.error('Erro ao buscar logos dos bancos:', error);
-    }
-  }
-
 
 }

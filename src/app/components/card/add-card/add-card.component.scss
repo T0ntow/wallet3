@@ -12,15 +12,14 @@ ion-header,
 ion-toolbar {
     --background: var(--ion-item-background);
 }
+
 ion-grid {
     margin: 0;
     padding: 0;
 
     ion-row {
         gap: 10px;
-        justify-content: space-between;
         text-wrap: nowrap;
-        margin-bottom: 10px;
     }
 
     ion-col {
@@ -38,7 +37,7 @@ form {
         gap: 3px;
 
         label {
-            font-size: 14px;
+            font-size: 16px;
             font-weight: bold;
             padding: 0 3px;
         }
@@ -56,7 +55,7 @@ form {
 
             letter-spacing: 1px;
             text-indent: 3px;
-            font-size: 13px;
+            font-size: 15px;
         }
     }
 
@@ -93,21 +92,21 @@ form {
         background-color: var(--ion-contrast);
         padding: 5px;
         p {
-            font-size: 14px;
+            font-size: 16px;
             font-weight: bold;
             color: #fff;
         }
     }
 
-    .categories {
+    .banks {
         overflow-y: auto;
-        height: 100%;
+        height: 95%;
         display: flex;
         flex-direction: column;
         gap: 10px;
         padding: 20px 5px;
 
-        .category {
+        .bank {
             padding: 5px;
             display: flex;
             flex-direction: row;
@@ -129,14 +128,14 @@ form {
                 justify-content: center;
             }
             p {
-                font-size: 12px;
+                font-size: 14px;
                 font-weight: bold;
                 color: #000;
                 margin: 0 10px;
             }
         }
 
-        .category:hover {
+        .bank:hover {
             cursor: pointer;
             transition: all .2s ease-in-out;
             background-color: #a7a7a7;

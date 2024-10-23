@@ -1,6 +1,6 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { ModalController } from '@ionic/angular';
-import { AddExpenseComponent } from '../expenses-components/add-expense/add-expense.component';
+import { AddExpenseComponent } from '../expenses/add-expense/add-expense.component';
 import { AddCardExpenseComponent } from '../card-expenses/add-card-expense/add-card-expense.component';
 @Component({
   selector: 'app-nav',

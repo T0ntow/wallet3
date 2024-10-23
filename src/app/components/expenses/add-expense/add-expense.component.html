@@ -113,42 +113,9 @@
     <p>Categorias</p>
   </div>
   <div class="categories">
-    <div class="category" (click)="selectCategory('Alimentação')">
-      <fa-icon [icon]="faUtensils"></fa-icon>
-      <p>Alimentação</p>
-    </div>
-    <div class="category" (click)="selectCategory('Transporte')">
-      <fa-icon [icon]="faBus"></fa-icon>
-      <p>Transporte</p>
-    </div>
-    <div class="category" (click)="selectCategory('Saúde')">
-      <fa-icon [icon]="faHeartbeat"></fa-icon>
-      <p>Saúde</p>
-    </div>
-    <div class="category" (click)="selectCategory('Educação')">
-      <fa-icon [icon]="faGraduationCap"></fa-icon>
-      <p>Educação</p>
-    </div>
-    <div class="category" (click)="selectCategory('Lazer')">
-      <fa-icon [icon]="faFutbol"></fa-icon>
-      <p>Lazer</p>
-    </div>
-    <div class="category" (click)="selectCategory('Compras')">
-      <fa-icon [icon]="faShoppingCart"></fa-icon>
-      <p>Compras</p>
-    </div>
-    <div class="category" (click)="selectCategory('Moradia')">
-      <fa-icon [icon]="faHome"></fa-icon>
-      <p>Moradia</p>
-    </div>
-    <div class="category" (click)="selectCategory('Serviços Públicos')">
-      <fa-icon [icon]="faLightbulb"></fa-icon>
-      <p>Serviços Públicos</p>
-    </div>
-
-    <div class="category" (click)="selectCategory('Outros')">
-      <fa-icon [icon]="faEllipsisH"></fa-icon>
-      <p>Outros</p>
+    <div *ngFor="let category of categories" class="category" (click)="selectCategory(category.nome)">
+      <fa-icon [icon]="category.icone"></fa-icon> <!-- Aqui deve ser um IconDefinition -->
+      <p>{{ category.nome }}</p>
     </div>
   </div>
 </div>

@@ -27,6 +27,36 @@ ion-grid {
         padding: 0;
     }
 }
+
+.segment-button {
+    color: var(--ion-contrast);
+    font-size: 14px;
+}
+
+.segment-button:hover ion-label{
+    color: #000;
+    font-weight: bolder;
+}
+.sheet-content {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    padding: 20px 10px;
+    .icon-item {
+        width: 35px;
+        height: 35px;
+    
+        background-color: var(--ion-item-background);
+    
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    
+        border-radius: 50%;
+    }
+    
+}
+
 form {
     padding: 24px 12px;
     display: flex;
@@ -45,7 +75,6 @@ form {
 
         .custom-input {
             width: 100%;
-            height: 35px;
             min-height: 35px;
 
             background: var(--ion-item-background);

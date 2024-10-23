@@ -1,6 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ModalController } from '@ionic/angular';
-import { AddCardComponent } from '../../card-components/add-card/add-card.component';
+import { AddCardComponent } from '../../card/add-card/add-card.component';
 
 @Component({
   selector: 'app-wallets',

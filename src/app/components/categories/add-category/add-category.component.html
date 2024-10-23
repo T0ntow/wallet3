@@ -1,0 +1,66 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="dismissModal()">
+        <ion-icon slot="icon-only" name="arrow-back-circle"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Nova Categoria</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <form [formGroup]="categoryForm">
+    <div class="container-item">
+      <label position="stacked">Nome</label>
+      <ion-input type="text" formControlName="nome" class="custom-input"></ion-input>
+    </div>
+
+    <ion-grid>
+      <ion-row>
+        <ion-col size="8">
+          <div class="container-item">
+            <label position="stacked">Tipo</label>
+            <ion-segment formControlName="tipo" class="custom-input">
+              <ion-segment-button value="despesa" class="segment-button">
+                <ion-label>
+                  Despesa
+                </ion-label>
+              </ion-segment-button>
+              <ion-segment-button value="receita" class="segment-button">
+                <ion-label>
+                  Receita
+                </ion-label>
+              </ion-segment-button>
+            </ion-segment>
+          </div>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+
+    <div class="container-item" (click)="toggleSheet('icon')">
+      <label position="stacked">Icone</label>
+      <div class="custom-input" style="display: flex; align-items: center;">
+        <p style="margin: 0;">{{ selectedIcon || 'Selecione um icone' }}</p>
+      </div>
+    </div>
+
+    <button [disabled]="categoryForm.invalid" (click)="submitCategory()" class="submit-button">Adicionar Categoria</button>
+  </form>
+</ion-content>
+
+<!-- Background for closing sheets -->
+<div class="back" *ngIf="isIconSheetVisible" (click)="closeSheet()"></div>
+
+<!-- Icones Sheet -->
+<div class="sheet" [ngClass]="{'sheet-visible': isIconSheetVisible}">
+  <div class="sheet-header">
+    <p>Icones</p>
+  </div>
+  <div class="sheet-content">
+    <!-- LISTAR ICONES do Font Awesome -->
+    <div *ngFor="let icon of icons" class="icon-item" (click)="selectIcon(icon.icon)">
+      <fa-icon [icon]="icon.icon"></fa-icon>
+    </div>
+  </div>
+</div>

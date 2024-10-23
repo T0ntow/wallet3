@@ -3,43 +3,28 @@ import { Capacitor } from '@capacitor/core';
 import { SQLiteConnection, SQLiteDBConnection, capSQLiteSet } from '@capacitor-community/sqlite';
 import { CapacitorSQLite } from '@capacitor-community/sqlite';
 import { DatabaseService } from './database.service';
+import { Account } from '../models/account.model';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AccountService {
-
   private db!: SQLiteDBConnection;
 
   constructor(private databaseService: DatabaseService) {}
 
-  // Criar a tabela de contas
-  async createTable() {
-    const sql = `
-      CREATE TABLE IF NOT EXISTS accountTable (
-        conta_id INTEGER PRIMARY KEY AUTOINCREMENT,
-        nome TEXT NOT NULL,
-        tipo TEXT NOT NULL,
-        instituicao TEXT NOT NULL
-      );
-    `;
-
-    try {
-      const db = await this.databaseService.createDatabaseConnection();
-      if (db) {
-        await db.execute(sql);
-        console.log("Tabela de contas criada/confirmada!");
-      }
-    } catch (error) {
-    }
-  }
-
   // Inserir nova conta
-  async addAccount(nome: string, tipo: string, instituicao: string) {
-    const sql = `INSERT INTO accountTable (nome, tipo, instituicao) VALUES (?, ?, ?)`;
+  async addAccount(nome: string, tipo: string, instituicao: string, saldo: number): Promise<void> {
+    const db = this.databaseService.getDb();
 
+    if (!db) {
+      console.error('Database is not initialized');
+      return;
+    }
+
+    const sql = `INSERT INTO accountTable (nome, tipo, instituicao, saldo) VALUES (?, ?, ?, ?)`;
     try {
-      await this.db!.run(sql, [nome, tipo, instituicao]);
+      await db.run(sql, [nome, tipo, instituicao, saldo]);
       console.log("Conta inserida com sucesso!");
     } catch (error) {
       console.error("Erro ao inserir conta: ", error);
@@ -47,18 +32,38 @@ export class AccountService {
   }
 
   // Listar todas as contas
-  async getAccounts() {
-    const sql = `SELECT * FROM accountTable`;
+  async getAccounts(): Promise<Account[]> {
+    const db = await this.databaseService.getDb();
 
-    try {
-      const res = await this.db!.query(sql);
-      return res.values || [];
-    } catch (error) {
-      console.error("Erro ao buscar contas: ", error);
+    if (!db) {
+      console.error('Database is not initialized');
       return [];
     }
-  }
 
+    const sql = 'SELECT * FROM accountTable';
+  
+    try {
+      const result = await db.query(sql);
+  
+      // Verifique se result.changes está definido e é um array
+      const accounts: Account[] = Array.isArray(result.values) ? result.values.map((row) => {
+        return {
+          conta_id: row.conta_id,
+          nome: row.nome,
+          tipo: row.tipo,
+          instituicao: row.instituicao,
+          saldo: row.saldo || 0, // Certifique-se de obter o saldo, se disponível
+
+        } as Account;
+      }) : []; // Retorne um array vazio se não houver resultados
+  
+      return accounts;
+    } catch (error) {
+      console.error("Erro ao obter contas: ", error);
+      return []; // Retorna um array vazio em caso de erro
+    }
+  }
+  
   // Buscar uma conta por ID
   async getAccountById(conta_id: number) {
     const sql = `SELECT * FROM accountTable WHERE conta_id = ?`;

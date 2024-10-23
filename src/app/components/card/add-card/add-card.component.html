@@ -57,7 +57,7 @@
       <p>Carteira</p>
     </div>
 
-    <div *ngFor="let bank of bankLogos" class="bank" (click)="selectInstitution(bank.name)">
+    <div *ngFor="let bank of bankLogos" class="bank" (click)="selectInstitution(bank.logoUrl)">
       <img *ngIf="bank.logoUrl" [src]="bank.logoUrl" alt="{{ bank.name }} Logo" />
       <p>{{bank.name}} </p>
     </div>

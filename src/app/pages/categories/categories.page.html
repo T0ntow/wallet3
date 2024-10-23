@@ -1,36 +1,43 @@
-<!-- <ion-header [translucent]="true">
+<ion-header [translucent]="true">
   <ion-toolbar>
     <div>
       <ion-title>Categorias</ion-title>
-      <ion-button slot="end" fill="clear" size="small">
+      <ion-button slot="end" fill="clear" size="small" *ngIf="segmentValue === 'despesas'" (click)="addCategory('despesa')">
+        <ion-icon name="add-circle" color="light"></ion-icon>
+      </ion-button>
+
+      <ion-button slot="end" fill="clear" size="small" *ngIf="segmentValue === 'receitas'" (click)="addCategory('receita')">
         <ion-icon name="add-circle" color="light"></ion-icon>
       </ion-button>
     </div>
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true" class="ion-padding">
-  <ion-searchbar id="searchbar" placeholder="Pesquisar"></ion-searchbar>
+<ion-content [fullscreen]="true">
+  <ion-segment [(ngModel)]="segmentValue" value="despesas">
+    <ion-segment-button value="despesas" class="segment-button">
+      <ion-label class="label">Despesas</ion-label>
+    </ion-segment-button>
+    <ion-segment-button value="receitas" class="segment-button">
+      <ion-label class="label">Receitas</ion-label>
+    </ion-segment-button>
+  </ion-segment>
 
-  <ion-card>
-    <ion-card-header>
-      <ion-card-title>Categorias</ion-card-title>
-    </ion-card-header>
-    <ion-card-content>
-      <div class="category-container">
-        <ion-chip outline="false">
-          <ion-icon ></ion-icon>
-          <ion-label>{{ category.name }}</ion-label>
-        </ion-chip>
+  <div *ngIf="segmentValue === 'despesas'">
+    <div class="categories">
+      <div *ngFor="let category of expenseCategories" class="category" (click)="selectCategory(category.nome)">
+        <fa-icon [icon]="category.icone"></fa-icon> <!-- Aqui deve ser um IconDefinition -->
+        <p>{{ category.nome }}</p>
       </div>
+    </div>
+  </div>
 
-      <h3 style="color: #000; font-size: 16px; margin: 10px 0;"  *ngIf="categoriasReceitas.length > 0">Novas</h3>
-      <div class="category-container">
-        <ion-chip *ngFor="let category of categoriasReceitas" outline="false" (click)="showActionsPopover($event, category)">
-          <ion-icon [name]="category.icon" color="primary"></ion-icon>
-          <ion-label>{{ category.name }}</ion-label>
-        </ion-chip>
+  <div *ngIf="segmentValue === 'receitas'">
+    <div class="categories">
+      <div *ngFor="let category of incomeCategories" class="category" (click)="selectCategory(category.nome)">
+        <fa-icon [icon]="category.icone"></fa-icon> <!-- Aqui deve ser um IconDefinition -->
+        <p>{{ category.nome }}</p>
       </div>
-    </ion-card-content>
-  </ion-card>
-</ion-content> -->
+    </div>
+  </div>
+</ion-content>

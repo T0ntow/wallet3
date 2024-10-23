@@ -1,6 +1,6 @@
 .saldo-container {
     border-radius: 10px;
-    font-size: 13px;
+    font-size: 15px;
 
     .saldo {
         display: flex;
@@ -41,9 +41,13 @@
 
                 ion-label {
                     color: var(--ion-text-color2);
+                    font-size: 15px;
                 }
+
+                // valor da despesa/receita
                 p {
-                    margin: 0;
+                    margin: 0;  
+                    font-size: 14px;
                     color: var(--ion-text-color);
                 }
             }

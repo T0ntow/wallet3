@@ -1,7 +1,11 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, inject, OnInit, ViewChild } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ModalController } from '@ionic/angular';
 import { faUtensils, faBus, faHeartbeat, faGraduationCap, faFutbol, faShoppingCart, faHome, faLightbulb, faEllipsisH } from '@fortawesome/free-solid-svg-icons';
+import { IconDefinition } from '@fortawesome/fontawesome-svg-core';
+import { Category } from 'src/app/models/category.model';
+import { CategoriesService } from 'src/app/services/categories.service';
+import { CategoryLoaderService } from 'src/app/services/category-loader-service.service';
 
 @Component({
   selector: 'app-add-expense',
@@ -15,20 +19,13 @@ export class AddExpenseComponent  implements OnInit {
   isCategoriesSheetVisible: boolean = false;
   isAccountSheetVisible: boolean = false;
 
-  // Logos
-  faUtensils = faUtensils;
-  faBus = faBus;
-  faHeartbeat = faHeartbeat;
-  faGraduationCap = faGraduationCap;
-  faFutbol = faFutbol;
-  faShoppingCart = faShoppingCart;
-  faHome = faHome;
-  faLightbulb = faLightbulb;
-  faEllipsisH = faEllipsisH;
-
   // toogle repetir
   recorrente: boolean = false; // Estado para controle de "recorrente"
   periodo: string = '';
+  
+  //Categorias
+  categories: Category[] = [];
+  categoryLoaderService = inject(CategoryLoaderService)
 
   constructor(
     private formBuilder: FormBuilder,
@@ -52,8 +49,10 @@ export class AddExpenseComponent  implements OnInit {
     this.isOpen = true;
   }
   
-  ngOnInit() {}
-
+  async ngOnInit() {
+    this.categories = await this.categoryLoaderService.loadCategories();
+  }
+  
   dismissModal() {
     this.modalController.dismiss();
   }
@@ -94,8 +93,6 @@ export class AddExpenseComponent  implements OnInit {
     this.isAccountSheetVisible = false;
   }
 
-
-
   submitAccount() {
     if (this.accountForm.valid) {
       const formData = this.accountForm.value;
@@ -103,5 +100,4 @@ export class AddExpenseComponent  implements OnInit {
       // Lógica para envio de dados
     }
   }
-
 }

@@ -9,34 +9,64 @@ import { CapacitorSQLite } from '@capacitor-community/sqlite';
 export class DatabaseService {
 
   private sqliteConnection: SQLiteConnection;
-  private db!: SQLiteDBConnection;
+  private db: SQLiteDBConnection | null = null;
 
   constructor() {
     this.sqliteConnection = new SQLiteConnection(CapacitorSQLite);
   }
 
+  getDb(): SQLiteDBConnection | null {
+    return this.db;
+  }
+
   // Método para criar ou abrir a conexão com o banco de dados
   async createDatabaseConnection() {
     try {
-      if (Capacitor.getPlatform() === 'web') {
-        throw new Error('O SQLite não está disponível na web.');
-      }
-
-      this.db = await this.sqliteConnection.createConnection(
-        'wallet3_db',        // Nome do banco de dados (wallet3)
-        false,               // Banco não criptografado
-        'no-encryption',     // Sem criptografia
-        1,                   // Versão do banco de dados
-        false                // Não é readonly
-      );
-
+      const sqlite = new SQLiteConnection(CapacitorSQLite);
+      this.db = await sqlite.createConnection('wallet3', false, 'no-encryption', 1, false);
       await this.db.open();
-      console.log("Banco de dados 'wallet3_db' criado/aberto com sucesso!");
-
-      return this.db;
+      console.log("Conexão com o banco de dados criada com sucesso!");
+      // Crie a tabela aqui, se ainda não existir
+      await this.createTables();
     } catch (error) {
-      console.error("Erro ao criar ou abrir a conexão com o banco de dados: ", error);
-      return null;
+      console.error("Erro ao criar conexão com o banco de dados:", error);
+    }
+  }
+
+  // Criar a tabela de contas
+  private async createTables() {
+    if (!this.db) {
+      console.error('Database is not initialized');
+      return;
+    }
+
+    try {
+      await this.db.execute(`
+        CREATE TABLE IF NOT EXISTS accountTable (
+        conta_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        nome TEXT NOT NULL,
+        tipo TEXT NOT NULL,
+        instituicao TEXT NOT NULL,
+        saldo REAL NOT NULL DEFAULT 0.00  -- Adicionando o campo saldo
+        );
+    `);
+
+    await this.db.execute(`
+      DROP TABLE IF EXISTS categories`);
+
+      await this.db.execute(`
+      CREATE TABLE IF NOT EXISTS categories (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        nome TEXT NOT NULL,
+        icone TEXT NOT NULL,
+        tipo TEXT NOT NULL
+      );
+    `);
+
+
+      console.log('Tables created successfully');
+    } catch (error) {
+      console.error('Error creating tables:', error);
     }
   }
 
