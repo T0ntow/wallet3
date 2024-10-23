@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { CategoriesService } from './categories.service';
 import { faEllipsis, faHand, IconDefinition } from '@fortawesome/free-solid-svg-icons';
-import { Category } from '../models/category.model';
+import { Category } from '../../models/category.model';
 import { 
   faUtensils, 
   faBus, 

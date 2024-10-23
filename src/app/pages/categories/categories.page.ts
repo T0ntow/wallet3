@@ -1,6 +1,6 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { Category } from 'src/app/models/category.model';
-import { CategoryLoaderService } from 'src/app/services/category-loader-service.service';
+import { CategoryLoaderService } from 'src/app/services/categories/category-loader-service.service';
 import { ModalController } from '@ionic/angular';
 import { AddCategoryComponent } from 'src/app/components/categories/add-category/add-category.component';
 

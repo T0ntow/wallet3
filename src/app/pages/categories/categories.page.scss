@@ -5,13 +5,18 @@ ion-button {
     --color-selected: var(--color-hover);
     --color: var(--color-hover);
 }
+ion-header {
+    margin-bottom: 15px;
+    box-shadow: none;
+    border-bottom: 1px solid var(--ion-contrast);
+}
 
 ion-icon {
     width: 25px;
-        height: 25px;
-    color:var(--ion-contrast);
+    height: 25px;
+    color: var(--ion-contrast);
     cursor: pointer;
-}  
+}
 
 #searchbar {
     --background: var(--ion-item-background);
@@ -26,6 +31,20 @@ ion-toolbar div {
 
     ion-title {
         padding: 0 !important;
+    }
+}
+
+// Segment style
+.segment {
+    width: 100%;
+    display: flex !important;
+    justify-content: space-between !important;
+    padding: 0 20px;
+}
+
+@media screen and (min-width: 768px) {
+    .segment {
+        justify-content: space-around !important;
     }
 }
 
@@ -47,7 +66,7 @@ ion-toolbar div {
     height: 20px;
 }
 
-.edit:hover{
+.edit:hover {
     position: fixed;
     right: 10px;
 
@@ -55,7 +74,7 @@ ion-toolbar div {
     height: 20px;
 }
 
-.segment-button:hover ion-label{
+.segment-button:hover ion-label {
     color: #000;
     font-weight: bolder;
 }
@@ -79,7 +98,9 @@ ion-toolbar div {
 
         height: 40px;
 
-        img, ion-icon, fa-icon{
+        img,
+        ion-icon,
+        fa-icon {
             font-size: 18px;
             border-radius: 50%;
             color: var(--ion-contrast);
@@ -100,7 +121,7 @@ ion-toolbar div {
 
     .category:hover {
         cursor: pointer;
-        transition: all .2s ease-in-out;
+        transition: all 0.2s ease-in-out;
         background-color: #a7a7a7;
     }
 }

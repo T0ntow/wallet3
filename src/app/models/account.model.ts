@@ -6,5 +6,5 @@ export interface Account {
   tipo: string;          // Tipo da conta (ex: corrente, poupança, etc.)
   instituicao: string;   // Instituição financeira da conta
   saldo: number;         // Saldo da conta, se for numérico
-  logoUrl: string;
+  logo_url: string;
 }

@@ -1,5 +1,5 @@
 import { Component, inject } from '@angular/core';
-import { CategoriesService } from './services/categories.service';
+import { CategoriesService } from './services/categories/categories.service';
 import { DatabaseService } from './services/database.service';
 
 @Component({

@@ -6,6 +6,9 @@ ion-header {
     justify-content: space-between;
     align-items: center;
     background-color: #fff;
+
+    box-shadow: none;
+    border-bottom: 1px solid var(--ion-contrast);
 }
 
 ion-header > div {
@@ -13,7 +16,7 @@ ion-header > div {
     flex-direction: row;
     align-items: center;
     height: 30px;
-    
+
     ion-avatar {
         height: 100%;
         width: 30px;

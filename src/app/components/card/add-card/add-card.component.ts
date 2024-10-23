@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ModalController } from '@ionic/angular';
-import { BankService } from 'src/app/services/bank.service';
+import { BankService } from 'src/app/services/bank/bank.service';
 
 @Component({
   selector: 'app-add-card',
@@ -15,7 +15,7 @@ export class AddCardComponent implements OnInit {
   accountForm: FormGroup;
   isSheetVisible: boolean = false;
   selectedInstitution: string | null = null;
-  bankLogos: Array<{ name: string; logoUrl: string }> = []; // Para armazenar os logos de bancos
+  bankLogos: Array<{ name: string; logo_url: string }> = []; // Para armazenar os logos de bancos
   formattedLimit: string | null = null;
 
   constructor(
@@ -147,10 +147,10 @@ export class AddCardComponent implements OnInit {
 
     try {
       this.bankLogos = banks.map((bank) => {
-        const logoUrl = `https://img.logo.dev/${encodeURIComponent(bank.url)}?token=${apiKey}`;
-        console.log(logoUrl);
+        const logo_url = `https://img.logo.dev/${encodeURIComponent(bank.url)}?token=${apiKey}`;
+        console.log(logo_url);
 
-        return { name: bank.name, logoUrl };
+        return { name: bank.name, logo_url };
       });
 
     } catch (error) {

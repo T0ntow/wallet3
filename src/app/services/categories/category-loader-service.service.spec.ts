@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 
-import { CategoryLoaderServiceService } from './category-loader-service.service';
+import { CategoryLoaderServiceService } from '../category-loader-service.service';
 
 describe('CategoryLoaderServiceService', () => {
   let service: CategoryLoaderServiceService;

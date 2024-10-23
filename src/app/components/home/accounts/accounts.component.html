@@ -13,8 +13,13 @@
   <ion-card-content>
     <ion-list lines="none">
       <ion-item *ngFor="let account of accounts">
-        <ion-icon name="wallet" color="light"></ion-icon>
-  
+
+        <!-- Mostra o ícone de carteira se não houver logo -->
+        <ion-icon *ngIf="!account.logo_url" name="wallet"></ion-icon>
+
+        <!-- Mostra a imagem do logo se disponível -->
+        <img *ngIf="account.logo_url" [src]="account.logo_url" alt="{{ account.nome }}" class="logo" />
+
         <ion-label>
           <h3>{{ account.nome }}</h3> <!-- Exibe o nome da conta -->
         </ion-label>

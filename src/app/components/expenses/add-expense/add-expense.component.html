@@ -10,88 +10,113 @@
 </ion-header>
 
 <ion-content>
-  <form [formGroup]="accountForm">
+  <form [formGroup]="transacaoForm">
+
+    <!-- Descrição -->
     <div class="container-item">
       <label position="stacked">Descrição</label>
-      <ion-input type="text" formControlName="name" class="custom-input"></ion-input>
+      <ion-input type="text" formControlName="descricao" class="custom-input"></ion-input>
     </div>
-
+  
+    <!-- Seleção de Conta ou Cartão -->
     <div class="container-item" (click)="toggleSheet('account')">
       <label position="stacked">Conta</label>
       <div class="custom-input" style="display: flex; align-items: center;">
         <p style="margin: 0;"> {{ selectedAccount || 'Selecione uma conta' }} </p>
       </div>
     </div>
-
+  
+    <!-- Seleção de Categoria -->
     <div class="container-item" (click)="toggleSheet('category')">
       <label position="stacked">Categoria</label>
       <div class="custom-input" style="display: flex; align-items: center;">
         <p style="margin: 0;"> {{ selectedCategory || 'Selecione uma categoria' }}</p>
       </div>
     </div>
-
+  
+    <!-- Data -->
     <ion-grid>
       <ion-row>
         <ion-col size="5">
           <div class="container-item">
             <label position="stacked">Data</label>
-            <ion-input type="date" formControlName="date" class="custom-input"></ion-input>
+            <ion-input type="date" formControlName="data" class="custom-input"></ion-input>
           </div>
         </ion-col>
-
-        <!-- Mostra o valor normal quando não é parcelado -->
-        <ion-col size="6">
+  
+        <!-- Valor -->
+        <ion-col size="5">
           <div class="container-item">
             <label position="stacked">Valor</label>
-            <ion-input type="text" formControlName="amount" class="custom-input"></ion-input>
+            <ion-input type="text" formControlName="valor" class="custom-input"></ion-input>
           </div>
         </ion-col>
-
+      </ion-row>
+  
+      <!-- Status -->
+      <ion-row>
+        <ion-col size="5">
+          <div class="container-item">
+            <label position="stacked">Status</label>
+            <ion-select formControlName="status" interface="popover" class="custom-input">
+              <ion-select-option value="pago">Pago</ion-select-option>
+              <ion-select-option value="pendente">Pendente</ion-select-option>
+            </ion-select>
+          </div>
+        </ion-col>
+      </ion-row>
+  
+      <!-- Repetição (se for Recorrente) -->
+      <ion-row>
         <ion-col size="5">
           <div class="container-item">
             <label position="stacked">Detalhes</label>
-            <div>
-              <ion-toggle slot="start" (ionChange)="toggleRecorrente($event)" class="custom-input">Repetir</ion-toggle>
+            <ion-toggle slot="start" (ionChange)="toggleRecorrente($event)" class="custom-input">Repetir</ion-toggle>
+          </div>
+        </ion-col>
+      </ion-row>
+  
+      <ion-row *ngIf="recorrente">
+        <ion-col size="5">
+          <div class="container-item">
+            <label position="stacked">Quantidade de Repetições</label>
+            <ion-input type="number" formControlName="quantidade_repetir" min="1" max="99" class="custom-input" placeholder="máximo 99"></ion-input>
+          </div>
+        </ion-col>
+        <ion-col size="5">
+          <div class="container-item" (click)="presentPopover($event)">
+            <label position="stacked">Período</label>
+            <div class="custom-input" style="display: flex; align-items: center;">
+              <p style="margin: 0;"> {{ periodo || 'Selecione o período' }} </p>
             </div>
           </div>
         </ion-col>
-
-        <!-- ====================================== ALTERAR ====================================== -->
       </ion-row>
-
-      <ion-row>
-        <ion-col *ngIf="recorrente">
-          <div class="container-item">
-            <label position="stacked">Quantidade</label>
-            <ion-input type="text" formControlName="quantity" class="custom-input" min="1" max="12"></ion-input>
-          </div>
-        </ion-col>
-      </ion-row>
-      <ion-row>
-        <ion-col *ngIf="recorrente">
-          <div class="container-item" (click)="presentPopover($event)">
-            <label position="stacked">Periodo</label>
-            <p style="margin: 0; display: flex; align-items: center;" class="custom-input"> {{periodo}} </p>
-          </div>
-        </ion-col>
-
-        <ion-popover #popover [isOpen]="isOpen" (didDismiss)="isOpen = false">
-          <ng-template>
-            <ion-content>
-              <ion-list style="display: flex; flex-direction: column; gap: 10px; padding: 5px;">
-                <ion-label (click)="selectPeriod('Mensal')">Mensal</ion-label>
-                <ion-label (click)="selectPeriod('Anual')">Anual</ion-label>
-              </ion-list>
-            </ion-content>
-          </ng-template>
-        </ion-popover>
-      </ion-row>
-
+  
+      <ion-popover #popover [isOpen]="isOpen" (didDismiss)="isOpen = false">
+        <ng-template>
+          <ion-content>
+            <ion-list>
+              <ion-item button (click)="selectPeriod('Mensal')">
+                <ion-label>Mensal</ion-label>
+              </ion-item>
+              <ion-item button (click)="selectPeriod('Semanal')">
+                <ion-label>Semanal</ion-label>
+              </ion-item>
+              <ion-item button (click)="selectPeriod('Diário')">
+                <ion-label>Diário</ion-label>
+              </ion-item>
+            </ion-list>
+          </ion-content>
+        </ng-template>
+      </ion-popover>
     </ion-grid>
-
-    <button [disabled]="accountForm.invalid" (click)="submitAccount()" class="submit-button">Adicionar
-      Despesa</button>
+  
+    <button [disabled]="transacaoForm.invalid" (click)="submitTransacao()" class="submit-button">
+      Adicionar Despesa
+    </button>
   </form>
+  
 </ion-content>
 
 <!-- Background for closing sheets -->
@@ -102,8 +127,12 @@
   <div class="sheet-header">
     <p>Conta</p>
   </div>
-  <div class="banks">
-    <!-- LISTAR TODAS AS CONTAS CRIADAS -->
+  <div class="accounts">
+    <div *ngFor="let account of accounts" class="account" (click)="selectAccount(account)">
+      <ion-icon *ngIf="!account.logo_url" name="wallet"></ion-icon>
+      <img *ngIf="account.logo_url" [src]="account.logo_url" alt="{{ account.nome }}" class="logo" />
+      <p>{{ account.nome }}</p>
+    </div>
   </div>
 </div>
 
@@ -113,8 +142,8 @@
     <p>Categorias</p>
   </div>
   <div class="categories">
-    <div *ngFor="let category of categories" class="category" (click)="selectCategory(category.nome)">
-      <fa-icon [icon]="category.icone"></fa-icon> <!-- Aqui deve ser um IconDefinition -->
+    <div *ngFor="let category of categories" class="category" (click)="selectCategory(category)">
+      <fa-icon [icon]="category.icone"></fa-icon>
       <p>{{ category.nome }}</p>
     </div>
   </div>

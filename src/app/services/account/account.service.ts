@@ -2,8 +2,8 @@ import { Injectable } from '@angular/core';
 import { Capacitor } from '@capacitor/core';
 import { SQLiteConnection, SQLiteDBConnection, capSQLiteSet } from '@capacitor-community/sqlite';
 import { CapacitorSQLite } from '@capacitor-community/sqlite';
-import { DatabaseService } from './database.service';
-import { Account } from '../models/account.model';
+import { DatabaseService } from '../database.service';
+import { Account } from '../../models/account.model';
 
 @Injectable({
   providedIn: 'root'
@@ -14,7 +14,7 @@ export class AccountService {
   constructor(private databaseService: DatabaseService) {}
 
   // Inserir nova conta
-  async addAccount(nome: string, tipo: string, instituicao: string, saldo: number): Promise<void> {
+  async addAccount(nome: string, tipo: string, instituicao: string, saldo: number, logo_url: string): Promise<void> {
     const db = this.databaseService.getDb();
 
     if (!db) {
@@ -22,9 +22,9 @@ export class AccountService {
       return;
     }
 
-    const sql = `INSERT INTO accountTable (nome, tipo, instituicao, saldo) VALUES (?, ?, ?, ?)`;
+    const sql = `INSERT INTO accountTable (nome, tipo, instituicao, saldo, logo_url) VALUES (?, ?, ?, ?,?)`;
     try {
-      await db.run(sql, [nome, tipo, instituicao, saldo]);
+      await db.run(sql, [nome, tipo, instituicao, saldo, logo_url]);
       console.log("Conta inserida com sucesso!");
     } catch (error) {
       console.error("Erro ao inserir conta: ", error);
@@ -53,6 +53,7 @@ export class AccountService {
           tipo: row.tipo,
           instituicao: row.instituicao,
           saldo: row.saldo || 0, // Certifique-se de obter o saldo, se disponível
+          logo_url: row.logo_url
 
         } as Account;
       }) : []; // Retorne um array vazio se não houver resultados

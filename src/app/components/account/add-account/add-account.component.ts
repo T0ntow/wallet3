@@ -4,9 +4,9 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ModalController, ToastController } from '@ionic/angular';
 import { faPiggyBank, faWallet, faArrowTrendUp, faBuildingColumns, faEllipsis} from '@fortawesome/free-solid-svg-icons'; // Ícone do cofrinho
 
-import { AccountService } from 'src/app/services/account.service';
+import { AccountService } from 'src/app/services/account/account.service';
 import { DatabaseService } from 'src/app/services/database.service';
-import { BankService } from 'src/app/services/bank.service';
+import { BankService } from 'src/app/services/bank/bank.service';
 @Component({
   selector: 'app-add-account',
   templateUrl: './add-account.component.html',
@@ -14,7 +14,7 @@ import { BankService } from 'src/app/services/bank.service';
 })
 export class AddAccountComponent implements OnInit {
   accountForm: FormGroup;
-  bankLogos: Array<{ name: string; logoUrl: string }> = []; // Para armazenar os logos de bancos
+  bankLogos: Array<{ name: string; logo_url: string }> = []; // Para armazenar os logos de bancos
 
   isInstitutionSheetVisible = false;
   isAccountTypeSheetVisible = false;
@@ -48,7 +48,6 @@ export class AddAccountComponent implements OnInit {
 
   async ngOnInit() {
     this.bankLogos = await this.bankService.fetchBankLogos();
-
     await this.databaseService.createDatabaseConnection();
   }
 
@@ -59,23 +58,29 @@ export class AddAccountComponent implements OnInit {
   async submitAccount() {
     if (this.accountForm.valid) {
       const { nome, tipo, instituicao, saldo } = this.accountForm.value;
+      
+      // Encontra o banco correspondente na lista de logos
+      const bank = this.bankLogos.find(b => b.name.toLowerCase() === instituicao.toLowerCase());
   
       try {
+        // Verifica se o banco foi encontrado
+        const logo_url = bank ? bank.logo_url : ''; // Define logo_url como vazio se o banco não for encontrado
+        
         // Chama o método do serviço para adicionar a conta no banco de dados
-        await this.accountService.addAccount(nome, tipo, instituicao, saldo);
+        await this.accountService.addAccount(nome, tipo, instituicao, saldo, logo_url);
   
         await this.presentToast('Conta criada com sucesso!', 'success');
-        this.modalCtrl.dismiss({ conta: this.accountForm });
+        this.modalCtrl.dismiss({ conta: this.accountForm.value }); // Dismiss modal com os valores do formulário
   
-        // Fecha o modal após o sucesso
-        this.dismissModal();
       } catch (error) {
-        await this.presentToast('Erro ao salvar a conta!', 'danger');
+        console.error('Erro ao salvar a conta:', error); // Log detalhado do erro
+        await this.presentToast('Erro ao salvar a conta! Tente novamente.', 'danger');
       }
     } else {
       console.log('Formulário inválido');
     }
   }
+  
   
   async presentToast(message: string, color: string) {
     const toast = await this.toastController.create({

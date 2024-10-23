@@ -70,7 +70,7 @@ form {
 
 .sheet {
     display: block;
-    height: 80%;
+    height: 80vh;
     z-index: 300;
     background-color: #fff;
 
@@ -143,6 +143,11 @@ form {
     }
 }
 
+@media screen and (min-width: 768px) {
+    .sheet {
+        height: 400px;
+    }
+}
 .back {
     position: fixed;
     top: 0;

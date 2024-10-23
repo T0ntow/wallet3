@@ -69,11 +69,12 @@ form {
     }
 }
 
+
 .sheet {
     display: block;
-    height: 80%;
     z-index: 300;
     background-color: #fff;
+    height: 80vh;
 
     position: absolute;
     bottom: 0;
@@ -99,15 +100,15 @@ form {
         }
     }
 
-    .categories {
+    .categories, .accounts {
         overflow-y: auto;
-        height: 100%;
+        height: 95%;
         display: flex;
         flex-direction: column;
         gap: 10px;
         padding: 20px 5px;
 
-        .category {
+        .category, .account{
             padding: 5px;
             display: flex;
             flex-direction: row;
@@ -141,6 +142,12 @@ form {
             transition: all .2s ease-in-out;
             background-color: #a7a7a7;
         }
+    }
+}
+
+@media screen and (min-width: 768px) {
+    .sheet {
+        height: 400px;
     }
 }
 

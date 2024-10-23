@@ -33,10 +33,10 @@ export class BankService {
   async fetchBankLogos() {
     try {
       const bankLogos = this.banks.map((bank) => {
-        const logoUrl = `https://img.logo.dev/${encodeURIComponent(bank.url)}?token=${this.apiKey}`;
-        console.log(logoUrl);
+        const logo_url = `https://img.logo.dev/${encodeURIComponent(bank.url)}?token=${this.apiKey}`;
+        console.log(logo_url);
 
-        return { name: bank.name, logoUrl };
+        return { name: bank.name, logo_url };
       });
       return bankLogos;
     } catch (error) {
@@ -45,21 +45,26 @@ export class BankService {
     }
   }
 
-  async getBankLogoByUrl(bankName: string) {
+  async getBankLogoByUrl(instituicao: string) {
     try {
-      const bank = this.banks.find(b => b.name === bankName);
-
+      console.log('Instituição recebida:', instituicao); // Verifique o valor recebido
+      console.log('Bancos disponíveis:', this.banks); // Verifique os bancos disponíveis
+  
+      // Busca o banco ignorando diferenças entre maiúsculas e minúsculas
+      const bank = this.banks.find(b => b.name.toLowerCase() === instituicao.toLowerCase());
+  
       if (!bank) {
         throw new Error('Banco não encontrado');
       }
-
-      const logoUrl = `https://img.logo.dev/${encodeURIComponent(bank.url)}?token=${this.apiKey}`;
-      return { name: bank.name, logoUrl };
+  
+      const logo_url = `https://img.logo.dev/${encodeURIComponent(bank.url)}?token=${this.apiKey}`;
+      return logo_url ;
       
     } catch (error) {
       console.error('Erro ao buscar logo do banco:', error);
       throw error;
     }
   }
+  
 
 }

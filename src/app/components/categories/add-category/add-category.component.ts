@@ -3,8 +3,8 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { IconDefinition } from '@fortawesome/free-solid-svg-icons';
 import { ModalController, ToastController } from '@ionic/angular';
 import { Category } from 'src/app/models/category.model';
-import { CategoriesService } from 'src/app/services/categories.service';
-import { CategoryLoaderService } from 'src/app/services/category-loader-service.service';
+import { CategoriesService } from 'src/app/services/categories/categories.service';
+import { CategoryLoaderService } from 'src/app/services/categories/category-loader-service.service';
 
 @Component({
   selector: 'app-add-category',
