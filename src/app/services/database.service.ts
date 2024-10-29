@@ -41,7 +41,6 @@ export class DatabaseService {
     }
 
     try {
-      await this.db.execute(`DROP TABLE IF EXISTS transacoes`);
 
       await this.db.execute(`
         CREATE TABLE IF NOT EXISTS accountTable (
@@ -77,36 +76,36 @@ export class DatabaseService {
         );
     `);
 
+    // await this.db.execute(`DROP TABLE IF EXISTS transacoes`);
 
-
-      await this.db.execute(`
-          CREATE TABLE IF NOT EXISTS transacoes (
-          transacao_id INTEGER PRIMARY KEY AUTOINCREMENT,
-          conta_id INTEGER,
-          cartao_id INTEGER,
-          categoria_id INTEGER NOT NULL,
-          tipo TEXT NOT NULL, -- Tipo de transação: "despesa" ou "receita"
-          valor REAL NOT NULL, -- Valor da transação
-          descricao TEXT, -- Descrição da transação
-          is_parcelado BOOLEAN NOT NULL DEFAULT 0, -- Se a transação é parcelada (1 = sim, 0 = não)
-          num_parcelas INTEGER, -- Número de parcelas, se parcelado
-          is_recorrente BOOLEAN NOT NULL DEFAULT 0, -- Se a transação é recorrente (1 = sim, 0 = não)
-          quantidade_repetir INTEGER, -- Quantidade de vezes que a transação se repete, se for recorrente
-          periodo TEXT, -- Período de recorrência (e.g., semanal, mensal)
-          status TEXT NOT NULL, -- Status da transação: "pago" ou "pendente"
-          fk_parcelas_parcela_id INTEGER, -- FK para identificar parcelas, se for parcelada
-          FOREIGN KEY (conta_id) REFERENCES accountTable(conta_id),
-          FOREIGN KEY (cartao_id) REFERENCES cartaoTable(cartao_id),
-          FOREIGN KEY (categoria_id) REFERENCES categories(id),
-          FOREIGN KEY (fk_parcelas_parcela_id) REFERENCES parcelasTable(parcela_id),
-          CHECK (
-            (conta_id IS NOT NULL AND cartao_id IS NULL) -- Somente conta_id ou cartao_id pode ter valor, mas não ambos
-            OR 
-            (cartao_id IS NOT NULL AND conta_id IS NULL)
-          )
+    await this.db.execute(`
+      CREATE TABLE IF NOT EXISTS transacoes (
+        transacao_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        conta_id INTEGER,
+        cartao_id INTEGER,
+        categoria_id INTEGER NOT NULL,
+        tipo TEXT NOT NULL, -- Tipo de transação: "despesa" ou "receita"
+        valor REAL NOT NULL, -- Valor da transação
+        descricao TEXT, -- Descrição da transação
+        is_parcelado BOOLEAN NOT NULL DEFAULT 0, -- Se a transação é parcelada (1 = sim, 0 = não)
+        num_parcelas INTEGER, -- Número de parcelas, se parcelado
+        is_recorrente BOOLEAN NOT NULL DEFAULT 0, -- Se a transação é recorrente (1 = sim, 0 = não)
+        quantidade_repetir INTEGER, -- Quantidade de vezes que a transação se repete, se for recorrente
+        periodo TEXT, -- Período de recorrência (e.g., semanal, mensal)
+        status TEXT NOT NULL, -- Status da transação: "pago" ou "pendente"
+        fk_parcelas_parcela_id INTEGER, -- FK para identificar parcelas, se for parcelada
+        data_transacao TEXT NOT NULL, -- Data da transação
+        FOREIGN KEY (conta_id) REFERENCES accountTable(conta_id),
+        FOREIGN KEY (cartao_id) REFERENCES cartaoTable(cartao_id),
+        FOREIGN KEY (categoria_id) REFERENCES categories(id),
+        FOREIGN KEY (fk_parcelas_parcela_id) REFERENCES parcelasTable(parcela_id),
+        CHECK (
+          (conta_id IS NOT NULL AND cartao_id IS NULL) -- Somente conta_id ou cartao_id pode ter valor, mas não ambos
+          OR 
+          (cartao_id IS NOT NULL AND conta_id IS NULL)
+        )
       );
-
-      `);
+    `);
 
       // await this.db.execute(`DROP TABLE IF EXISTS categories`);
 

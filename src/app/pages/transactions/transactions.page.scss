@@ -1,0 +1,209 @@
+* {
+  font-family: "Inria Sans";
+}
+
+ion-header {
+  box-shadow: none;
+  border-bottom: 1px solid var(--ion-contrast);
+
+  ion-toolbar div {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    padding: 0 15px;
+
+    ion-title {
+      padding: 0 !important;
+    }
+  }
+}
+
+.segment {
+  width: 100%;
+  display: flex !important;
+  justify-content: space-between !important;
+  padding: 0 15px;
+
+  .segment-button {
+    color: var(--ion-contrast);
+    font-size: 15px;
+  }
+
+  .label {
+    font-size: 15px;
+    text-transform: capitalize;
+  }
+}
+.segment-button:hover ion-label {
+  color: #000;
+}
+
+main {
+  padding: 15px;
+  .resumo {
+    margin-top: 25px;
+    p {
+      font-size: 13px;
+      font-weight: bold;
+      color: var(--ion-text-color);
+    }
+  }
+}
+
+.despesas {
+  display: flex;
+  flex-direction: column;
+  gap: 13px;
+
+  // .paga {
+  //     border-left: 3px solid #3eb69ab6;
+  //     border-bottom: 2px solid #3eb69ab6;
+  // }
+
+  .despesa-item {
+    border-radius: 5px;
+    height: 45px;
+    background-color: var(--ion-item-background);
+
+    .despesa-info {
+      display: flex;
+      flex-direction: row;
+      align-items: center;
+      justify-content: space-between;
+      padding: 5px;
+      height: 100%;
+
+      .esquerda {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        .icon {
+          background-color: #9d9d9d;
+          border-radius: 50%;
+          padding: 5px;
+          width: 33px;
+          height: 33px;
+          font-size: 20px;
+          margin: 0 5px;
+
+          display: flex;
+          align-items: center;
+          justify-content: center;
+        }
+      }
+
+      .esquerda div {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+
+        .banco {
+          margin: 0;
+          font-size: 12px;
+          color: var(--ion-text-color);
+        }
+      }
+
+      .direita {
+        display: flex;
+        flex-direction: column;
+        gap: 3px;
+
+        .details {
+          display: flex;
+          flex-direction: row;
+          gap: 5px;
+          justify-content: flex-end;
+          ion-icon {
+            width: 15px;
+            height: 15px;
+          }
+
+          .pendente {
+            color: #da5000;
+          }
+
+          .pago {
+            color: #3eb69a;
+          }
+
+          .cartao {
+            color: #0099ffc4;
+          }
+        }
+      }
+
+      h4,
+      h5 {
+        margin: 0;
+        font-size: 14px;
+        font-weight: bold;
+      }
+    }
+  }
+}
+
+.back {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 200;
+  background-color: #32323261;
+
+  width: 100vw;
+  height: 100vh;
+  transition: opacity 0.3s ease-in-out;
+}
+
+.sheet {
+  // display: flex;
+  height: 40vh;
+  z-index: 999;
+  background-color: #fff;
+
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+
+  margin: auto;
+
+  flex-direction: row;
+  align-items: center;
+  justify-content: space-between;
+
+  transform: translateY(100%); /* Inicia fora da tela */
+  transition: transform 0.25s ease-in-out; /* Adiciona transição */
+
+  border-radius: 25px 25px 0 0;
+}
+
+.sheet-visible {
+  transform: translateY(15px); /* Move o sheet para dentro da tela */
+}
+
+ion-grid {
+  padding: 5px 0;
+  .header-grid {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-evenly;
+
+    align-items: center;
+
+    border-bottom: 1px solid var(--ion-border-color);
+
+    ion-col {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+
+      ion-label {
+        font-size: 13px;
+        color: var(--ion-text-color2);
+      }
+    }
+  }
+}

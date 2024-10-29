@@ -3,11 +3,12 @@ import { Category } from 'src/app/models/category.model';
 import { CategoryLoaderService } from 'src/app/services/categories/category-loader-service.service';
 import { ModalController } from '@ionic/angular';
 import { AddCategoryComponent } from 'src/app/components/categories/add-category/add-category.component';
+import { DatabaseService } from 'src/app/services/database.service';
 
 @Component({
   selector: 'app-categories',
   templateUrl: './categories.page.html',
-  styleUrls: ['./categories.page.scss'],  
+  styleUrls: ['./categories.page.scss'],
 })
 
 export class CategoriesPage implements OnInit {
@@ -19,13 +20,15 @@ export class CategoriesPage implements OnInit {
   incomeCategories: Category[] = [];
 
   categoryLoaderService = inject(CategoryLoaderService)
-  
+  databaseService = inject(DatabaseService)
+
   constructor(
     private modalCtrl: ModalController,
-  ) {}
+  ) { }
 
   async ngOnInit() {
-   await this.getCatgories();
+    await this.databaseService.createDatabaseConnection();
+    await this.getCatgories();
   }
 
   async getCatgories() {
@@ -47,13 +50,13 @@ export class CategoriesPage implements OnInit {
         categoryType: categoryType// Passe a categoria como uma propriedade
       }
     });
-  
+
     modal.onDidDismiss().then((data) => {
       if (data.data) {
         this.getCatgories()
       }
     });
-  
+
     return await modal.present();
   }
 }

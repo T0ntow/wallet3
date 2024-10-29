@@ -2,6 +2,8 @@ import { Injectable } from '@angular/core';
 import { SQLiteDBConnection } from '@capacitor-community/sqlite';
 import { DatabaseService } from '../database.service';
 import { Transacao } from 'src/app/models/transaction.model';
+import * as moment from 'moment';
+import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -9,7 +11,14 @@ import { Transacao } from 'src/app/models/transaction.model';
 export class TransactionsService {
   private db!: SQLiteDBConnection;
 
-  constructor(private databaseService: DatabaseService) {}
+  private transactionUpdatedSource = new BehaviorSubject<void>(undefined);
+  transactionUpdated$ = this.transactionUpdatedSource.asObservable();
+
+  notifyTransactionUpdate() {
+    this.transactionUpdatedSource.next();
+  }
+  
+  constructor(private databaseService: DatabaseService) { }
 
   // Inserir nova transação
   async addTransaction(
@@ -24,64 +33,90 @@ export class TransactionsService {
     is_recorrente: boolean,
     quantidade_repetir: number | null,
     periodo: string | null,
+    status: string, // Novo campo para o status (pago/pendente)
     fk_parcelas_parcela_id: number | null,
-    status: string // Novo campo para o status (pago/pendente)
-  ): Promise<void> {
-    const db = await this.databaseService.getDb();
-  
-    if (!db) {
-      console.error('Database is not initialized');
-      return;
-    }
-  
-    const sql = `INSERT INTO transacoes (conta_id, cartao_id, categoria_id, tipo, valor, descricao, is_parcelado, num_parcelas, is_recorrente, quantidade_repetir, periodo, fk_parcelas_parcela_id, status) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-    try {
-      await db.run(sql, [conta_id, cartao_id, categoria_id, tipo, valor, descricao, is_parcelado, num_parcelas, is_recorrente, quantidade_repetir, periodo, fk_parcelas_parcela_id, status]);
-      console.log("Transação inserida com sucesso!");
-    } catch (error) {
-      console.error("Erro ao inserir transação: ", error);
-    }
-  }
-  
-
-  // Listar todas as transações
-  async getTransactions(): Promise<Transacao[]> {
+    data_transacao: string // Campo para a data da transação
+): Promise<void> {
     const db = await this.databaseService.getDb();
 
     if (!db) {
-      console.error('Database is not initialized');
-      return [];
+        console.error('Database is not initialized');
+        return;
     }
 
-    const sql = 'SELECT * FROM transacoes';
-  
+    // Ajustando a consulta SQL para garantir que todos os campos sejam inseridos corretamente
+    const sql = `INSERT INTO transacoes 
+                 (conta_id, cartao_id, categoria_id, tipo, valor, descricao, 
+                  is_parcelado, num_parcelas, is_recorrente, 
+                  quantidade_repetir, periodo, 
+                  status, fk_parcelas_parcela_id, data_transacao) 
+                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
+
     try {
-      const result = await db.query(sql);
-  
-      const transactions: Transacao[] = Array.isArray(result.values) ? result.values.map((row) => {
-        return {
-          transacao_id: row.transacao_id,
-          conta_id: row.conta_id,
-          cartao_id: row.cartao_id,
-          categoria_id: row.categoria_id,
-          tipo: row.tipo,
-          valor: row.valor,
-          descricao: row.descricao,
-          is_parcelado: row.is_parcelado,
-          num_parcelas: row.num_parcelas,
-          is_recorrente: row.is_recorrente,
-          quantidade_repetir: row.quantidade_repetir,
-          periodo: row.periodo,
-          fk_parcelas_parcela_id: row.fk_parcelas_parcela_id
-        } as Transacao;
-      }) : [];
-  
-      return transactions;
+        await db.run(sql, [
+            conta_id,
+            cartao_id,
+            categoria_id,
+            tipo,
+            valor,
+            descricao,
+            is_parcelado,
+            num_parcelas,
+            is_recorrente,
+            quantidade_repetir,
+            periodo,
+            status,
+            fk_parcelas_parcela_id,
+            data_transacao // Aqui é onde você deve garantir que a data seja passada corretamente
+        ]);
+        console.log("Transação inserida com sucesso!");
     } catch (error) {
-      console.error("Erro ao obter transações: ", error);
-      return [];
+        console.error("Erro ao inserir transação: ", error);
     }
-  }
+}
+
+
+// async getAllTransactions(): Promise<Transacao[]> {
+//   const db = await this.databaseService.getDb();
+
+//   if (!db) {
+//       console.error('Database is not initialized');
+//       return [];
+//   }
+
+//   // Consulta para pegar todas as transações
+//   const sql = 'SELECT * FROM transacoes';
+
+//   try {
+//       const result = await db.query(sql);
+
+//       const transactions: Transacao[] = Array.isArray(result.values)
+//           ? result.values.map((row) => {
+//               return {
+//                   transacao_id: row.transacao_id,
+//                   conta_id: row.conta_id,
+//                   cartao_id: row.cartao_id,
+//                   categoria_id: row.categoria_id,
+//                   tipo: row.tipo,
+//                   valor: row.valor,
+//                   descricao: row.descricao,
+//                   is_parcelado: row.is_parcelado,
+//                   num_parcelas: row.num_parcelas,
+//                   is_recorrente: row.is_recorrente,
+//                   quantidade_repetir: row.quantidade_repetir,
+//                   periodo: row.periodo,
+//                   fk_parcelas_parcela_id: row.fk_parcelas_parcela_id,
+//                   data_transacao: row.data_transacao // caso precise
+//               } as Transacao;
+//           })
+//           : [];
+
+//       return transactions;
+//   } catch (error) {
+//       console.error('Erro ao obter transações: ', error);
+//       return [];
+//   }
+// }
 
   // Buscar uma transação por ID
   async getTransactionById(transacao_id: number): Promise<Transacao | null> {
@@ -96,6 +131,52 @@ export class TransactionsService {
     } catch (error) {
       console.error("Erro ao buscar transação: ", error);
       return null;
+    }
+  }
+
+  async getTransactionsByMonth(month: string): Promise<Transacao[]> {
+    const db = await this.databaseService.getDb();
+  
+    if (!db) {
+      console.error('Database is not initialized');
+      return [];
+    }
+  
+    // Ajuste o formato do mês para o formato 'YYYY-MM', como '2024-10' para outubro de 2024
+    const startOfMonth = moment(month, 'YYYY-MM').startOf('month').format('YYYY-MM-DD');
+    const endOfMonth = moment(month, 'YYYY-MM').endOf('month').format('YYYY-MM-DD');
+  
+    const sql = 'SELECT * FROM transacoes WHERE data_transacao BETWEEN ? AND ?';
+  
+    try {
+      const result = await db.query(sql, [startOfMonth, endOfMonth]);
+  
+      const transactions: Transacao[] = Array.isArray(result.values)
+        ? result.values.map((row) => {
+            return {
+              transacao_id: row.transacao_id,
+              conta_id: row.conta_id,
+              cartao_id: row.cartao_id,
+              categoria_id: row.categoria_id,
+              tipo: row.tipo,
+              valor: row.valor,
+              descricao: row.descricao,
+              is_parcelado: row.is_parcelado,
+              num_parcelas: row.num_parcelas,
+              is_recorrente: row.is_recorrente,
+              quantidade_repetir: row.quantidade_repetir,
+              periodo: row.periodo,
+              status: row.status,
+              fk_parcelas_parcela_id: row.fk_parcelas_parcela_id,
+              data_transacao: row.data_transacao // caso precise
+            } as Transacao;
+          })
+        : [];
+  
+      return transactions;
+    } catch (error) {
+      console.error('Erro ao obter transações: ', error);
+      return [];
     }
   }
 

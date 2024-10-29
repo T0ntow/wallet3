@@ -14,6 +14,7 @@ export class WalletsComponent  implements OnInit {
   ) { }
 
   ngOnInit() {}
+  
   getIconUrl(bank: string): string {
     return `https://cdn.jsdelivr.net/npm/simple-icons/icons/${bank}.svg`;
   }

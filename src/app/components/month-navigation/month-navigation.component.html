@@ -1,0 +1,21 @@
+<ion-header>
+    <div>
+      <ion-buttons slot="start">
+        <ion-button (click)="prevMonth()" class="button-back">
+          <ion-icon name="chevron-back-circle"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+      <!-- <ion-title> -->
+      <div class="month-display">
+        <ion-label (click)="selectPrevMonth()" class="clickable">{{ prevMonthLabel }}</ion-label>
+        <ion-label class="active">{{ selectedMonthLabel }}</ion-label>
+        <ion-label (click)="selectNextMonth()" class="clickable">{{ nextMonthLabel }}</ion-label>
+      </div>
+      <!-- </ion-title> -->
+      <ion-buttons slot="end">
+        <ion-button (click)="nextMonth()" class="button-forward">
+          <ion-icon name="chevron-forward-circle"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+    </div>
+</ion-header>

@@ -12,14 +12,17 @@ export class AppComponent {
   databaseService = inject(DatabaseService)
 
   constructor() {
-    this.initializeApp();
+    try {
+      this.initializeApp();
+    } catch (error) {
+      console.error("==================== FALHA AO INICIAR APP ====================");
+    }
   }
 
   async initializeApp() {
     await this.databaseService.createDatabaseConnection();
     await this.initializeCategories();
   }
-
 
   async initializeCategories() {
   const categories = await this.categoriesService.getCategories();

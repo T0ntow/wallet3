@@ -9,6 +9,7 @@ import { CategoryLoaderService } from 'src/app/services/categories/category-load
 import { Account } from 'src/app/models/account.model';
 import { AccountService } from 'src/app/services/account/account.service';
 import { TransactionsService } from 'src/app/services/transactions/transactions.service';
+import * as moment from 'moment';
 
 @Component({
   selector: 'app-add-expense',
@@ -70,7 +71,7 @@ export class AddExpenseComponent  implements OnInit {
   
   async ngOnInit() {
     try {
-      this.categories = await this.categoryLoaderService.loadCategories();
+      this.categories = await this.categoryLoaderService.loadCategoriesByExpenses();
       this.accounts = await this.accountService.getAccounts();
     } catch (error) {
       console.error('Error loading categories or accounts:', error);
@@ -130,9 +131,10 @@ export class AddExpenseComponent  implements OnInit {
         cartao_id: formData.cartao_id || null,
         categoria_id: formData.categoria_id,
         tipo: formData.tipo,  // "despesa" ou "receita", deve ser parte do seu formulário
-        data: formData.data,
+        // Formatação da data usando moment
+        data: moment(formData.data).format('YYYY-MM-DD'), // Formato desejado
         valor: formData.valor,
-        status: formData.status || 'pendente',  // Adicionando status, padrão como 'pendente'
+        status: formData.status,  // Adicionando status, padrão como 'pendente'
         is_parcelado: formData.is_parcelado,
         num_parcelas: formData.num_parcelas || null,
         is_recorrente: formData.is_recorrente,
@@ -154,14 +156,15 @@ export class AddExpenseComponent  implements OnInit {
         transacao.is_recorrente,
         transacao.quantidade_repetir,
         transacao.periodo,
+        transacao.status, // Enviando status para o método
         transacao.fk_parcelas_parcela_id,
-        transacao.status // Enviando status para o método
+        transacao.data // Enviando data formatada
       )
       .then(async () => {
         console.log('Transação adicionada com sucesso');
         await this.presentToast('Transação adicionada com sucesso!', 'success');
         this.modalController.dismiss({ transacao: this.transacaoForm });
-
+  
         this.transacaoForm.reset(); // Reseta o formulário
       })
       .catch(error => {

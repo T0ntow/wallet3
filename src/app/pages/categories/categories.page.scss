@@ -5,32 +5,28 @@ ion-button {
     --color-selected: var(--color-hover);
     --color: var(--color-hover);
 }
+
 ion-header {
     margin-bottom: 15px;
     box-shadow: none;
     border-bottom: 1px solid var(--ion-contrast);
-}
 
-ion-icon {
-    width: 25px;
-    height: 25px;
-    color: var(--ion-contrast);
-    cursor: pointer;
-}
+    ion-toolbar div {
+        display: flex;
+        flex-direction: row;
+        justify-content: space-between;
+        padding: 0 20px;
+    
+        ion-title {
+            padding: 0 !important;
+        }
+    }
 
-#searchbar {
-    --background: var(--ion-item-background);
-    --color: #000;
-}
-
-ion-toolbar div {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    padding: 0 20px;
-
-    ion-title {
-        padding: 0 !important;
+    ion-icon {
+        width: 25px;
+        height: 25px;
+        color: var(--ion-contrast);
+        cursor: pointer;
     }
 }
 
@@ -40,7 +36,23 @@ ion-toolbar div {
     display: flex !important;
     justify-content: space-between !important;
     padding: 0 20px;
+
+    .segment-button {
+        color: var(--ion-contrast);
+        font-size: 14px;
+    }
+    
+    .label {
+        font-size: 14px;
+        text-transform: uppercase;
+    }
 }
+.segment-button:hover ion-label {
+    color: #000;
+    font-weight: bolder;
+}
+
+
 
 @media screen and (min-width: 768px) {
     .segment {
@@ -48,36 +60,6 @@ ion-toolbar div {
     }
 }
 
-.segment-button {
-    color: var(--ion-contrast);
-    font-size: 14px;
-}
-
-.label {
-    font-size: 14px;
-    text-transform: uppercase;
-}
-
-.edit {
-    position: fixed;
-    right: 10px;
-
-    width: 20px;
-    height: 20px;
-}
-
-.edit:hover {
-    position: fixed;
-    right: 10px;
-
-    width: 20px;
-    height: 20px;
-}
-
-.segment-button:hover ion-label {
-    color: #000;
-    font-weight: bolder;
-}
 
 .categories {
     overflow-y: auto;

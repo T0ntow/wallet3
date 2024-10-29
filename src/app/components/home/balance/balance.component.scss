@@ -6,7 +6,7 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
-        background-color: #e0e0e0;
+        background-color: var(--ion-item-background);
         padding: 10px;
         border-radius: 10px;
         margin-bottom: 10px;
@@ -26,7 +26,7 @@
         justify-content: space-between;
         gap: 15px;
         ion-chip {
-            background-color: #e0e0e0;
+            background-color: var(--ion-item-background);
             border-radius: 10px;
             width: 160px;
             margin: 0;

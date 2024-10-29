@@ -65,10 +65,7 @@ export class CategoryLoaderService {
 
   async loadCategories(): Promise<Category[]> {
     const categoriesFromDb = await this.categoriesService.getCategories();
-
-    console.log("categoriesFromDb", JSON.stringify(categoriesFromDb));
     
-
     return Promise.all(categoriesFromDb.map(async (category) => {
       return {
         id: category.id,
@@ -77,6 +74,44 @@ export class CategoryLoaderService {
         tipo: category.tipo
       } as Category;
     }));
+  }
+
+  async loadCategoriesByExpenses(): Promise<Category[]> {
+    try {
+      const allCategories = await this.categoriesService.getCategories();
+      const expenseCategories = allCategories.filter(category => category.tipo === 'despesa');
+  
+      return Promise.all(expenseCategories.map(async (category) => {
+        return {
+          id: category.id,
+          nome: category.nome,
+          icone: this.getIconByName(category.icone), // Obtém o ícone diretamente pelo nome
+          tipo: category.tipo
+        } as Category;
+      }));
+    } catch (error) {
+      console.error('Erro ao carregar categorias de despesas:', error);
+      return []; // Retorna um array vazio em caso de erro
+    }
+  }
+  
+  async loadCategoriesByReceveis(): Promise<Category[]> {
+    try {
+      const allCategories = await this.categoriesService.getCategories();
+      const expenseCategories = allCategories.filter(category => category.tipo === 'receita');
+  
+      return Promise.all(expenseCategories.map(async (category) => {
+        return {
+          id: category.id,
+          nome: category.nome,
+          icone: this.getIconByName(category.icone), // Obtém o ícone diretamente pelo nome
+          tipo: category.tipo
+        } as Category;
+      }));
+    } catch (error) {
+      console.error('Erro ao carregar categorias de despesas:', error);
+      return []; // Retorna um array vazio em caso de erro
+    }
   }
 
   private getIconByName(iconName: any): IconDefinition {
