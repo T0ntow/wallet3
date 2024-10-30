@@ -79,7 +79,6 @@ export class AddAccountComponent implements OnInit {
     }
   }
   
-  
   async presentToast(message: string, color: string) {
     const toast = await this.toastController.create({
       message,

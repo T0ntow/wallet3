@@ -1,3 +1,7 @@
+@import '../../mixins/segment-mixin.scss';
+
+@include segment-style;
+
 * {
     font-family: "Inria Sans";
 }
@@ -27,36 +31,6 @@ ion-header {
         height: 25px;
         color: var(--ion-contrast);
         cursor: pointer;
-    }
-}
-
-// Segment style
-.segment {
-    width: 100%;
-    display: flex !important;
-    justify-content: space-between !important;
-    padding: 0 20px;
-
-    .segment-button {
-        color: var(--ion-contrast);
-        font-size: 14px;
-    }
-    
-    .label {
-        font-size: 14px;
-        text-transform: uppercase;
-    }
-}
-.segment-button:hover ion-label {
-    color: #000;
-    font-weight: bolder;
-}
-
-
-
-@media screen and (min-width: 768px) {
-    .segment {
-        justify-content: space-around !important;
     }
 }
 

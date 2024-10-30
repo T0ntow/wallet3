@@ -1,0 +1,31 @@
+@mixin segment-style($contrast-color: var(--ion-contrast), $hover-color: #000) {
+
+    .segment-button {
+        color: $contrast-color;
+        font-size: 14px;
+    }
+    
+    .label {
+        font-size: 14px;
+        text-transform: uppercase;
+    }
+
+    .segment-button:hover ion-label {
+        color: $hover-color;
+        font-weight: bolder;
+    }
+
+    @media screen and (min-width: 768px) {
+        .segment {
+            justify-content: space-around !important;
+        }
+    }
+}
+
+.segment {
+    width: 100%;
+    display: flex !important;
+    justify-content: space-between !important;
+    padding: 0 20px;
+    @include segment-style;
+}

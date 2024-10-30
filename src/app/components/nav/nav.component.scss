@@ -126,7 +126,7 @@ ion-tab-button {
   .block-left {
     display: flex;
     flex-direction: row;
-    width: 70%;
+    width: 75%;
 
     align-items: center;
     justify-content: space-evenly;
@@ -136,7 +136,7 @@ ion-tab-button {
   .block-right {
     display: flex;
     flex-direction: column;
-    width: 30%;
+    width: 25%;
 
     align-items: center;
     justify-content: space-evenly;
@@ -186,11 +186,11 @@ ion-tab-button {
     color: var(--ion-color-warning);
   }
 
-  .add-wallet, .add-account, .transfer {
+   .transfer {
     background: rgba(172, 172, 172, 0.427451);
     border-radius: 12px;
     font-weight: bold;
-    width: 100px;
+    width: 95%;
     height: 22px;
 
     display: flex;
@@ -205,7 +205,6 @@ ion-tab-button {
     p {
       margin: 0;
       font-size: 13px;
-      text-transform: uppercase;
     }
 
     ion-icon {

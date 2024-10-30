@@ -1,3 +1,7 @@
+@import '../../mixins/segment-mixin.scss';
+
+@include segment-style;
+
 * {
   font-family: "Inria Sans";
 }
@@ -16,26 +20,6 @@ ion-header {
       padding: 0 !important;
     }
   }
-}
-
-.segment {
-  width: 100%;
-  display: flex !important;
-  justify-content: space-between !important;
-  padding: 0 15px;
-
-  .segment-button {
-    color: var(--ion-contrast);
-    font-size: 15px;
-  }
-
-  .label {
-    font-size: 15px;
-    text-transform: capitalize;
-  }
-}
-.segment-button:hover ion-label {
-  color: #000;
 }
 
 main {
@@ -66,11 +50,6 @@ main {
   display: flex;
   flex-direction: column;
   gap: 13px;
-
-  // .paga {
-  //     border-left: 3px solid #3eb69ab6;
-  //     border-bottom: 2px solid #3eb69ab6;
-  // }
 
   .despesa-item {
     border-radius: 5px;
@@ -202,5 +181,4 @@ ion-grid {
       }
     }
   }
-  
 }
