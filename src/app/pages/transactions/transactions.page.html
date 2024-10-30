@@ -6,7 +6,7 @@
   </ion-toolbar>
 </ion-header>
 
-<ion-content [fullscreen]="true">
+<ion-content #page [fullscreen]="true">
   <ion-segment value="despesas" class="segment" [(ngModel)]="segmentValue">
     <ion-segment-button value="despesas" class="segment-button">
       <ion-label class="label">Despesas</ion-label>
@@ -24,7 +24,7 @@
       <p>Pendente: {{ calcularTotalPendentes() | currency }}</p>
     </div>
     <div class="despesas">
-      <!-- <div *ngFor="let despesa of despesasFiltradas" class="despesa-item">
+      <div *ngFor="let despesa of despesasFiltradas" class="despesa-item" (click)="openModal(despesa)" expand="block">
         <div class="despesa-info">
           <div class="esquerda">
             <fa-icon *ngIf="getIconByCategoryId(despesa.categoria_id) as icon" [icon]="icon" class="icon"></fa-icon>
@@ -43,30 +43,63 @@
             </div>
           </div>
         </div>
-      </div> -->
-
-
-      <div class="despesa-item" (click)="toggleSheet()">
-        <div class="despesa-info">
-          <div class="esquerda">
-            <fa-icon  [icon]="faBus" class="icon"></fa-icon>
-
-            <div>
-              <h4>descricao</h4>
-              <p class="banco" >Nubas</p>
-              <!-- <p class="banco" *ngIf="despesa.cartao_id">{{ getAccountNameById(despesa.conta_id) }}</p>   -->
-            </div>
-          </div>
-          <div class="direita">
-            <h5> $ 500 </h5>
-            <div class="details">
-              <ion-icon  class="cartao" name="card"></ion-icon>
-              <ion-icon  class="pago" name="checkmark-circle"></ion-icon>
-              <!-- <ion-icon class="pendente"  name="alert-circle"></ion-icon> -->
-            </div>
-          </div>
-        </div>
       </div>
+
+      <ion-modal 
+          #modal 
+           [isOpen]="isModalOpen" 
+           [componentProps]="{ despesa: selectedDespesa }" 
+           [initialBreakpoint]="0.5" 
+           [breakpoints]="[0, 0.5]"
+           (ionModalDidDismiss)="closeModal()">>
+        <ng-template>
+          <ion-content>
+            <ion-grid>
+              <ion-row class="header-grid">
+                <ion-col *ngIf="selectedDespesa?.status === 'pendente'">
+                  <ion-icon class="pendente" name="alert-circle"></ion-icon>
+                  <ion-label>Pendente</ion-label>
+                </ion-col>
+                <ion-col *ngIf="selectedDespesa?.status === 'pago'">
+                  <ion-icon class="pago" name="checkmark-circle"></ion-icon>
+                  <ion-label>Pago</ion-label>
+                </ion-col>
+                <ion-col *ngIf="selectedDespesa?.cartao_id">
+                  <ion-icon class="cartao" name="card"></ion-icon>
+                  <ion-label>Despesa Cartão</ion-label>
+                </ion-col>
+              </ion-row>
+              <ion-row>
+                <ion-col>
+                  <ion-label>Descrição:</ion-label>
+                  <span>{{ selectedDespesa?.descricao }}</span>
+                </ion-col>
+                <ion-col>
+                  <ion-label>Valor:</ion-label>
+                  <span>{{ selectedDespesa?.valor | currency }}</span>
+                </ion-col>
+              </ion-row>
+              <ion-row>
+                <ion-col>
+                  <ion-label>Conta/Cartão:</ion-label>
+                  <span>{{ getAccountNameById(selectedDespesa?.conta_id) }}</span>
+                </ion-col>
+                <ion-col>
+                  <ion-label>Categoria:</ion-label>
+                  <span>{{ getCategoryNameById(selectedDespesa?.categoria_id) }}</span>
+                </ion-col>
+              </ion-row>
+              <ion-row>
+                <ion-col class="buttons">
+                  <ion-button fill="outline" color="warning">Editar Despesa</ion-button>
+                  <ion-button fill="outline" color="success"
+                    *ngIf="selectedDespesa?.status === 'pendente'">Pagar</ion-button>
+                </ion-col>
+              </ion-row>
+            </ion-grid>
+          </ion-content>
+        </ng-template>
+      </ion-modal>
     </div>
   </main>
 
@@ -75,48 +108,4 @@
     <div class="receitas">
     </div>
   </div>
-
 </ion-content>
-
-<!-- Back and Sheet Elements -->
-<div class="back" *ngIf="isSheetVisible" (click)="closeSheet()"></div>
-
-<div class="sheet" [ngClass]="{'sheet-visible': isSheetVisible}">
-
-  <ion-grid>
-    <!-- RESUMO -->
-
-    <ion-row class="header-grid">
-      <ion-col>
-        <ion-icon class="pendente"  name="alert-circle"></ion-icon>
-        <ion-label>Pendente</ion-label>
-      </ion-col>
-      <ion-col>
-        <ion-icon class="paga" name="checkmark-circle"></ion-icon>
-        <ion-label>Pago</ion-label>
-      </ion-col>
-
-      <ion-col>
-        <ion-icon class="cartao" name="card"></ion-icon>
-        <ion-label>Despesa Cartão</ion-label>
-      </ion-col>
-    </ion-row>
-
-    <ion-row>
-      
-      <ion-col></ion-col>
-      <ion-col></ion-col>
-    </ion-row>
-
-    <ion-row>
-      <ion-col></ion-col>
-      <ion-col></ion-col>
-    </ion-row>
-
-    <ion-row>
-      <ion-col></ion-col>
-      <ion-col></ion-col>
-    </ion-row>
-  </ion-grid>
-  
-</div> 

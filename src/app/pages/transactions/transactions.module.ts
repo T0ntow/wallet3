@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { NgModule,CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControlName, FormsModule } from '@angular/forms';
 
@@ -9,7 +9,6 @@ import { TransactionsPageRoutingModule } from './transactions-routing.module';
 import { TransactionsPage } from './transactions.page';
 import { MonthNavigationComponent } from 'src/app/components/month-navigation/month-navigation.component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
-
 @NgModule({
   imports: [
     CommonModule,
@@ -20,7 +19,8 @@ import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
   ],
   declarations: [
     TransactionsPage,
-    MonthNavigationComponent
-  ]
+    MonthNavigationComponent,
+  ],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],  // Adicione esta linha
 })
 export class TransactionsPageModule {}

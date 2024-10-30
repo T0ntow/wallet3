@@ -12,6 +12,6 @@ export interface Transacao {
     quantidade_repetir?: number | null;  // Quantidade de vezes que a transação vai se repetir, se recorrente
     periodo?: string | null;  // Período de recorrência (ex: semanal, mensal), se aplicável
     fk_parcelas_parcela_id?: number | null;  // ID da parcela associada, se parcelado
-    status: string;
+    status: string; // -- Status da transação: "pago" ou "pendente"
     data_transacao: string
 }

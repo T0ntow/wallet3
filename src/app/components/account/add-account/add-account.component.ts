@@ -16,8 +16,6 @@ export class AddAccountComponent implements OnInit {
   accountForm: FormGroup;
   bankLogos: Array<{ name: string; logo_url: string }> = []; // Para armazenar os logos de bancos
 
-  isInstitutionSheetVisible = false;
-  isAccountTypeSheetVisible = false;
   selectedInstitution: string | null = null;
   selectedAccountType: string | null = null;
 
@@ -91,34 +89,16 @@ export class AddAccountComponent implements OnInit {
     toast.present();
   }
   
-
-  // Sheets 
-  toggleSheet(sheetType: string) {
-    if (sheetType === 'institution') {
-      this.isInstitutionSheetVisible = true;
-      this.isAccountTypeSheetVisible = false;
-    } else if (sheetType === 'accountType') {
-      this.isInstitutionSheetVisible = false;
-      this.isAccountTypeSheetVisible = true;
-    }
-  }
-
-  closeSheet() {
-    this.isInstitutionSheetVisible = false;
-    this.isAccountTypeSheetVisible = false;
-  }
-
-  selectInstitution(institution: string) {
+  async selectInstitution(institution: string) {
     this.selectedInstitution = institution;
     this.accountForm.patchValue({ instituicao: institution }); // Atualiza o campo do formulário
-    this.closeSheet();
+    await this.modalController.dismiss(); // Fecha o modal
   }
 
   // Seleciona o tipo de conta e atualiza o formulário
-  selectAccountType(accountType: string) {
+  async selectAccountType(accountType: string) {
     this.selectedAccountType = accountType;
     this.accountForm.patchValue({ tipo: accountType }); // Atualiza o campo do formulário
-    this.closeSheet();
+    await this.modalController.dismiss(); // Fecha o modal
   }
-
 }

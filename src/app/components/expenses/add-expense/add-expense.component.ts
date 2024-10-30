@@ -22,9 +22,6 @@ export class AddExpenseComponent  implements OnInit {
   selectedCategory: string = '';
   periodo: string = '';
 
-  isCategoriesSheetVisible: boolean = false;
-  isAccountSheetVisible: boolean = false;
-
   // toogle repetir
   recorrente: boolean = false; // Estado para controle de "recorrente"
   
@@ -82,17 +79,16 @@ export class AddExpenseComponent  implements OnInit {
     this.modalController.dismiss();
   }
 
-  selectCategory(category: Category) {
+  async selectCategory(category: Category) {
     this.selectedCategory = category.nome;
     this.transacaoForm.patchValue({ categoria_id: category.id }); // Atualiza o valor do ícone no formulário
-    this.closeSheet();
+    await this.modalController.dismiss(); // Fecha o modal
   }
 
-  selectAccount(account: Account) {
+  async selectAccount(account: Account) {
     this.selectedAccount = account.nome;
     this.transacaoForm.patchValue({ conta_id: account.conta_id }); // Atualiza o valor do ícone no formulário
-
-    this.closeSheet();
+    await this.modalController.dismiss(); // Fecha o modal
   }
 
   selectPeriod(period: string) {
@@ -103,21 +99,6 @@ export class AddExpenseComponent  implements OnInit {
   toggleRecorrente(event: any) {
     this.recorrente = event.detail.checked;
     console.log('Recorrente:', this.recorrente);
-  }
-
-  toggleSheet(sheet: string) {
-    if (sheet === 'account') {
-      this.isAccountSheetVisible = !this.isAccountSheetVisible;
-      this.isCategoriesSheetVisible = false;  // Fechar o sheet de categorias
-    } else if (sheet === 'category') {
-      this.isCategoriesSheetVisible = !this.isCategoriesSheetVisible;
-      this.isAccountSheetVisible = false;    // Fechar o sheet de contas
-    }
-  }
-
-  closeSheet() {
-    this.isCategoriesSheetVisible = false;
-    this.isAccountSheetVisible = false;
   }
 
   submitTransacao() {

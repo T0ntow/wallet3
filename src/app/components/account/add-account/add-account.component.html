@@ -13,10 +13,10 @@
   <form [formGroup]="accountForm">
     <div class="container-item">
       <label position="stacked">Saldo Inicial</label>
-      <ion-input formControlName="saldo" class="custom-input" type="number" ></ion-input>
+      <ion-input formControlName="saldo" class="custom-input" type="number"></ion-input>
     </div>
 
-    <div class="container-item" (click)="toggleSheet('institution')">
+    <div class="container-item" id="open-modal-institution" expand="block">
       <label position="stacked">Instituição</label>
       <div class="custom-input" style="display: flex; align-items: center;">
         <p style="margin: 0;"> {{ selectedInstitution || 'Selecione uma instituição' }} </p>
@@ -27,7 +27,7 @@
       <label position="stacked">Nome</label>
       <ion-input formControlName="nome" class="custom-input" type="text"></ion-input>
     </div>
-    <div class="container-item" (click)="toggleSheet('accountType')">
+    <div class="container-item" id="open-modal-type" expand="block">
       <label position="stacked">Tipo</label>
       <div class="custom-input" style="display: flex; align-items: center;">
         <p style="margin: 0;"> {{ selectedAccountType || 'Tipo de conta' }} </p>
@@ -36,53 +36,56 @@
 
     <button [disabled]="accountForm.invalid" (click)="submitAccount()" class="submit-button">Adicionar Conta</button>
   </form>
+
+  <ion-modal trigger="open-modal-institution" [initialBreakpoint]="1" [breakpoints]="[0, 0.75, 1]">
+    <ng-template>
+      <div class="sheet">
+        <div class="sheet-header">
+          <p>Instituições</p>
+        </div>
+        <div class="banks">
+          <div class="bank" (click)="selectInstitution('Carteira')">
+            <ion-icon name="wallet"></ion-icon>
+            <p>Carteira</p>
+          </div>
+          <div *ngFor="let bank of bankLogos" class="bank" (click)="selectInstitution(bank.name)">
+            <img *ngIf="bank.logo_url" [src]="bank.logo_url" alt="{{ bank.name }} Logo" />
+            <p>{{ bank.name }}</p>
+          </div>
+        </div>
+      </div>
+    </ng-template>
+  </ion-modal>
+
+  <ion-modal trigger="open-modal-type" [initialBreakpoint]="0.75" [breakpoints]="[0, 0.75]">
+    <ng-template>
+      <div class="sheet">
+        <div class="sheet-header">
+          <p>Tipo de conta</p>
+        </div>
+        <div class="banks">
+          <div class="bank" (click)="selectAccountType('corrente')">
+            <fa-icon [icon]="faBuildingColumns"></fa-icon>
+            <p>Conta corrente</p>
+          </div>
+          <div class="bank" (click)="selectAccountType('carteira')">
+            <fa-icon [icon]="faWallet"></fa-icon>
+            <p>Carteira</p>
+          </div>
+          <div class="bank" (click)="selectAccountType('poupanca')">
+            <fa-icon [icon]="faPiggyBank"></fa-icon>
+            <p>Poupança</p>
+          </div>
+          <div class="bank" (click)="selectAccountType('investimentos')">
+            <fa-icon [icon]="faArrowTrendUp"></fa-icon>
+            <p>Investimentos</p>
+          </div>
+          <div class="bank" (click)="selectAccountType('outros')">
+            <fa-icon [icon]="faEllipsis"></fa-icon>
+            <p>Outros</p>
+          </div>
+        </div>
+      </div>
+    </ng-template>
+  </ion-modal>
 </ion-content>
-
-<!-- Background for closing sheets -->
-<div class="back" *ngIf="isInstitutionSheetVisible || isAccountTypeSheetVisible" (click)="closeSheet()"></div>
-
-<!-- Institution Sheet -->
-<div class="sheet" [ngClass]="{'sheet-visible': isInstitutionSheetVisible}">
-  <div class="sheet-header">
-    <p>Instituições</p>
-  </div>
-  <div class="banks">
-    <div class="bank" (click)="selectInstitution('Carteira')">
-      <ion-icon name="wallet"></ion-icon>
-      <p>Carteira</p>
-    </div>
-    <div *ngFor="let bank of bankLogos" class="bank" (click)="selectInstitution(bank.name)">
-      <img *ngIf="bank.logo_url" [src]="bank.logo_url" alt="{{ bank.name }} Logo" />
-      <p>{{ bank.name }}</p>
-    </div>
-  </div>
-</div>
-
-<!-- Account Type Sheet -->
-<div class="sheet" [ngClass]="{'sheet-visible': isAccountTypeSheetVisible}">
-  <div class="sheet-header">
-    <p>Tipo de conta</p>
-  </div>
-  <div class="banks">
-    <div class="bank" (click)="selectAccountType('corrente')">
-      <fa-icon [icon]="faBuildingColumns"></fa-icon>
-      <p>Conta corrente</p>
-    </div>
-    <div class="bank" (click)="selectAccountType('carteira')">
-      <fa-icon [icon]="faWallet"></fa-icon>
-      <p>Carteira</p>
-    </div>
-    <div class="bank" (click)="selectAccountType('poupanca')">
-      <fa-icon [icon]="faPiggyBank"></fa-icon>
-      <p>Poupança</p>
-    </div>
-    <div class="bank" (click)="selectAccountType('investimentos')">
-      <fa-icon [icon]="faArrowTrendUp"></fa-icon>
-      <p>Investimentos</p>
-    </div>
-    <div class="bank" (click)="selectAccountType('outros')">
-      <fa-icon [icon]="faEllipsis"></fa-icon>
-      <p>Outros</p>
-    </div>
-  </div>
-</div>

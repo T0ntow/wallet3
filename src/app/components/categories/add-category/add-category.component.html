@@ -38,29 +38,33 @@
       </ion-row>
     </ion-grid>
 
-    <div class="container-item" (click)="toggleSheet('icon')">
+    <div class="container-item" id="open-modal-icon" expand="block">
       <label position="stacked">Icone</label>
       <div class="custom-input" style="display: flex; align-items: center;">
         <p style="margin: 0;">{{ selectedIcon || 'Selecione um icone' }}</p>
       </div>
     </div>
 
-    <button [disabled]="categoryForm.invalid" (click)="submitCategory()" class="submit-button">Adicionar Categoria</button>
+    <button [disabled]="categoryForm.invalid" (click)="submitCategory()" class="submit-button">Adicionar
+      Categoria</button>
   </form>
+
+  <ion-modal trigger="open-modal-icon" [initialBreakpoint]="0.75" [breakpoints]="[0, 0.75, 1]">
+    <ng-template>
+      <div class="sheet">
+        <div class="sheet-header">
+          <p>Icones</p>
+        </div>
+        <div class="sheet-content">
+          <!-- LISTAR ICONES do Font Awesome -->
+          <div *ngFor="let icon of icons" class="icon-item" (click)="selectIcon(icon.icon)">
+            <fa-icon [icon]="icon.icon"></fa-icon>
+          </div>
+        </div>
+      </div>
+    </ng-template>
+  </ion-modal>
+
+
+
 </ion-content>
-
-<!-- Background for closing sheets -->
-<div class="back" *ngIf="isIconSheetVisible" (click)="closeSheet()"></div>
-
-<!-- Icones Sheet -->
-<div class="sheet" [ngClass]="{'sheet-visible': isIconSheetVisible}">
-  <div class="sheet-header">
-    <p>Icones</p>
-  </div>
-  <div class="sheet-content">
-    <!-- LISTAR ICONES do Font Awesome -->
-    <div *ngFor="let icon of icons" class="icon-item" (click)="selectIcon(icon.icon)">
-      <fa-icon [icon]="icon.icon"></fa-icon>
-    </div>
-  </div>
-</div>

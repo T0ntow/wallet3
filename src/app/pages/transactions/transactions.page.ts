@@ -10,6 +10,7 @@ import { CategoriesService } from 'src/app/services/categories/categories.servic
 import { CategoryLoaderService } from 'src/app/services/categories/category-loader-service.service';
 import { IconDefinition } from '@fortawesome/free-solid-svg-icons';
 import { faBus } from '@fortawesome/free-solid-svg-icons';
+import { ModalController } from '@ionic/angular';
 
 @Component({
   selector: 'app-transactions',
@@ -32,6 +33,7 @@ export class TransactionsPage implements OnInit {
   databaseService = inject(DatabaseService);
   accountService = inject(AccountService);
   categoriesService = inject(CategoryLoaderService);
+  modalController = inject(ModalController)
 
   currentMonth = moment(); // Inicializa com o mês atual
 
@@ -118,19 +120,29 @@ export class TransactionsPage implements OnInit {
 
   getIconByCategoryId(categoryId: number): IconDefinition | null {
     const category = this.categorias.find(cat => cat.id === categoryId);
-    console.log("category ===", category);
-
     return category ? category.icone : null; // Retorna o ícone ou null se não encontrado
   }
 
-  toggleSheet() {
-    console.log(this.isSheetVisible);
-    
-    this.isSheetVisible = !this.isSheetVisible; // Alterna a visibilidade do sheet
+  getCategoryNameById(id: number): string {
+    const categoria = this.categorias.find(cat => cat.id === id);
+    return categoria ? categoria.nome : 'Categoria desconhecida';
   }
 
-  closeSheet() {
-    this.isSheetVisible = false; // Fecha o sheet quando clicar fora
+  isModalOpen = false;
+  selectedDespesa: any = null;
+
+  openModal(despesa: any) {
+    this.selectedDespesa = despesa;
+    console.log("this.selectedDespesa", JSON.stringify(this.selectedDespesa));
+    
+    this.isModalOpen = true;
+  }
+
+  closeModal() {
+    console.log("CLOSE MODAL");
+    
+    this.isModalOpen = false;
+    this.selectedDespesa = null; // Limpa a despesa selecionada
   }
 
 }

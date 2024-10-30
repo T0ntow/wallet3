@@ -71,21 +71,7 @@ form {
 
 
 .sheet {
-    display: block;
-    z-index: 300;
-    background-color: #fff;
-    height: 80vh;
-
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-
-    margin: auto;
-
-    transform: translateY(100%); /* Inicia fora da tela */
-    transition: transform 0.25s ease-in-out; /* Adiciona transição */
-
+    height: 100%;
 
     .sheet-header {
         height: 40px;

@@ -99,22 +99,7 @@ form {
 }
 
 .sheet {
-    display: block;
-    height: 80%;
-    z-index: 300;
-    background-color: #fff;
-
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-
-    margin: auto;
-
-    transform: translateY(100%); /* Inicia fora da tela */
-    transition: transform 0.25s ease-in-out; /* Adiciona transição */
-
-
+    height: 100%;
     .sheet-header {
         height: 40px;
         display: flex;

@@ -17,23 +17,23 @@
       <label position="stacked">Descrição</label>
       <ion-input type="text" formControlName="descricao" class="custom-input"></ion-input>
     </div>
-  
+
     <!-- Seleção de Conta ou Cartão -->
-    <div class="container-item" (click)="toggleSheet('account')">
+    <div class="container-item" id="open-modal-account" expand="block">
       <label position="stacked">Conta</label>
       <div class="custom-input" style="display: flex; align-items: center;">
         <p style="margin: 0;"> {{ selectedAccount || 'Selecione uma conta' }} </p>
       </div>
     </div>
-  
+
     <!-- Seleção de Categoria -->
-    <div class="container-item" (click)="toggleSheet('category')">
+    <div class="container-item" id="open-modal-categories" expand="block">
       <label position="stacked">Categoria</label>
       <div class="custom-input" style="display: flex; align-items: center;">
         <p style="margin: 0;"> {{ selectedCategory || 'Selecione uma categoria' }}</p>
       </div>
     </div>
-  
+
     <!-- Data -->
     <ion-grid>
       <ion-row>
@@ -43,7 +43,7 @@
             <ion-input type="date" formControlName="data" class="custom-input"></ion-input>
           </div>
         </ion-col>
-  
+
         <!-- Valor -->
         <ion-col size="5">
           <div class="container-item">
@@ -52,7 +52,7 @@
           </div>
         </ion-col>
       </ion-row>
-  
+
       <!-- Status -->
       <ion-row>
         <ion-col size="5">
@@ -65,7 +65,7 @@
           </div>
         </ion-col>
       </ion-row>
-  
+
       <!-- Repetição (se for Recorrente) -->
       <ion-row>
         <ion-col size="5">
@@ -75,12 +75,13 @@
           </div>
         </ion-col>
       </ion-row>
-  
+
       <ion-row *ngIf="recorrente">
         <ion-col size="5">
           <div class="container-item">
             <label position="stacked">Quantidade de Repetições</label>
-            <ion-input type="number" formControlName="quantidade_repetir" min="1" max="99" class="custom-input" placeholder="máximo 99"></ion-input>
+            <ion-input type="number" formControlName="quantidade_repetir" min="1" max="99" class="custom-input"
+              placeholder="máximo 99"></ion-input>
           </div>
         </ion-col>
         <ion-col size="5">
@@ -92,7 +93,7 @@
           </div>
         </ion-col>
       </ion-row>
-  
+
       <ion-popover #popover [isOpen]="isOpen" (didDismiss)="isOpen = false">
         <ng-template>
           <ion-content>
@@ -111,40 +112,44 @@
         </ng-template>
       </ion-popover>
     </ion-grid>
-  
+
     <button [disabled]="transacaoForm.invalid" (click)="submitTransacao()" class="submit-button">
       Adicionar Despesa
     </button>
   </form>
-  
+
+
+  <ion-modal trigger="open-modal-account" [initialBreakpoint]="0.75" [breakpoints]="[0, 0.75, 1]">
+    <ng-template>
+      <div class="sheet">
+        <div class="sheet-header">
+          <p>Conta</p>
+        </div>
+        <div class="accounts">
+          <div *ngFor="let account of accounts" class="account" (click)="selectAccount(account)">
+            <ion-icon *ngIf="!account.logo_url" name="wallet"></ion-icon>
+            <img *ngIf="account.logo_url" [src]="account.logo_url" alt="{{ account.nome }}" class="logo" />
+            <p>{{ account.nome }}</p>
+          </div>
+        </div>
+      </div>
+    </ng-template>
+  </ion-modal>
+
+  <ion-modal trigger="open-modal-categories" [initialBreakpoint]="0.75" [breakpoints]="[0, 0.75, 1]">
+    <ng-template>
+      <div class="sheet">
+        <div class="sheet-header">
+          <p>Categorias</p>
+        </div>
+        <div class="categories">
+          <div *ngFor="let category of categories" class="category" (click)="selectCategory(category)">
+            <fa-icon [icon]="category.icone"></fa-icon>
+            <p>{{ category.nome }}</p>
+          </div>
+        </div>
+      </div>
+    </ng-template>
+  </ion-modal>
+
 </ion-content>
-
-<!-- Background for closing sheets -->
-<div class="back" *ngIf="isCategoriesSheetVisible || isAccountSheetVisible" (click)="closeSheet()"></div>
-
-<!-- Institution Sheet -->
-<div class="sheet" [ngClass]="{'sheet-visible': isAccountSheetVisible}">
-  <div class="sheet-header">
-    <p>Conta</p>
-  </div>
-  <div class="accounts">
-    <div *ngFor="let account of accounts" class="account" (click)="selectAccount(account)">
-      <ion-icon *ngIf="!account.logo_url" name="wallet"></ion-icon>
-      <img *ngIf="account.logo_url" [src]="account.logo_url" alt="{{ account.nome }}" class="logo" />
-      <p>{{ account.nome }}</p>
-    </div>
-  </div>
-</div>
-
-<!-- Categories Sheet -->
-<div class="sheet" [ngClass]="{'sheet-visible': isCategoriesSheetVisible}">
-  <div class="sheet-header">
-    <p>Categorias</p>
-  </div>
-  <div class="categories">
-    <div *ngFor="let category of categories" class="category" (click)="selectCategory(category)">
-      <fa-icon [icon]="category.icone"></fa-icon>
-      <p>{{ category.nome }}</p>
-    </div>
-  </div>
-</div>

@@ -17,8 +17,6 @@ export class AddCategoryComponent  implements OnInit {
 
   icons: { icon: IconDefinition }[] = []; // Armazena os ícones e seus nomes
 
-  isIconSheetVisible: boolean = false;
-
   @Input() categoryType: string | undefined;
 
   constructor(
@@ -41,24 +39,14 @@ export class AddCategoryComponent  implements OnInit {
     this.categoryForm.patchValue({ tipo: this.categoryType }); // Atualiza o valor do ícone no formulário
   }
   
-  selectIcon(icon: IconDefinition) {
+  async selectIcon(icon: IconDefinition) {
     this.selectedIcon = icon.iconName; 
     this.categoryForm.patchValue({ icone: this.selectedIcon }); // Atualiza o valor do ícone no formulário
-    this.closeSheet(); // Fecha a folha de seleção de ícones
-  }
-
-  closeSheet() {
-    this.isIconSheetVisible = false;
+    await this.modalController.dismiss(); // Fecha o modal
   }
 
   dismissModal() {
     this.modalController.dismiss();
-  }
-
-  toggleSheet(sheet: string) {
-    if (sheet === 'icon') {
-      this.isIconSheetVisible = !this.isIconSheetVisible;
-    } 
   }
 
   async submitCategory() {
