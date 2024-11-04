@@ -2,8 +2,10 @@ import { CurrencyPipe } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ModalController } from '@ionic/angular';
+import { ModalController, ToastController } from '@ionic/angular';
 import { BankService } from 'src/app/services/bank/bank.service';
+import { CardService } from 'src/app/services/card/card.service';
+import { DatabaseService } from 'src/app/services/database.service';
 
 @Component({
   selector: 'app-add-card',
@@ -11,151 +13,87 @@ import { BankService } from 'src/app/services/bank/bank.service';
   styleUrls: ['./add-card.component.scss'],
 })
 export class AddCardComponent implements OnInit {
-  price: number | null = null;
-  accountForm: FormGroup;
-  isSheetVisible: boolean = false;
-  selectedInstitution: string | null = null;
+  cardForm: FormGroup;
   bankLogos: Array<{ name: string; logo_url: string }> = []; // Para armazenar os logos de bancos
+
+
+  selectedInstitution: string | null = null;
   formattedLimit: string | null = null;
 
   constructor(
+    private databaseService: DatabaseService,
     private modalController: ModalController,
     private formBuilder: FormBuilder,
     private http: HttpClient,
-    private currencyPipe: CurrencyPipe,// Usando HttpClient para requisições HTTP
-    private bankService: BankService
-
+    private toastController: ToastController,
+    private modalCtrl: ModalController,
+    private cardService: CardService,
+    private bankService: BankService // Usando HttpClient para requisições HTTP
   ) {
-    this.accountForm = this.formBuilder.group({
-      institution: ['', Validators.required],
-      name: ['', Validators.required],
-      limit: ['', Validators.required],
-      closing_day: ['', Validators.required],
+    this.cardForm = this.formBuilder.group({
+      institution: ['', Validators.required], // Validates that 'institution' is not empty
+      name: ['', Validators.required],        // Validates that 'name' is not empty
+      limit: [null, [Validators.required, Validators.min(0)]], // Ensures 'limit' is a number >= 0
+      closing_day: [null, [Validators.required, Validators.min(1), Validators.max(31)]], // Ensures 'closing_day' is between 1 and 31
     });
   }
 
   async ngOnInit() {
     this.bankLogos = await this.bankService.fetchBankLogos();
+    await this.databaseService.createDatabaseConnection();
   }
 
   dismissModal() {
     this.modalController.dismiss();
-  }  
-
-  submitAccount() {
-    if (this.accountForm.valid) {
-      console.log('Expense submitted:', this.accountForm.value);
-      // Adicione a lógica para salvar a despesa aqui
-      this.dismissModal();
-    }
   }
 
-  toggleSheet() {
-    console.log("toogle");
-    this.isSheetVisible = !this.isSheetVisible; // Alterna a visibilidade do sheet
-  }
-
-  closeSheet() {
-    this.isSheetVisible = false; // Fecha o sheet quando clicar fora
-  }
-
-
-  selectInstitution(institution: string) {
-    this.selectedInstitution = institution;
-    this.accountForm.controls['institution'].setValue(institution); // Define o valor no formulário
-    this.toggleSheet(); // Fecha a folha após a seleção
-  }
-
-
-  async fetchBankLogos() {
-    const apiKey = 'pk_eyQ5ESuFQ3-4_kpNJSUKfg'; // Substitua pela sua chave da API logo.dev
-    const banks = [
-      {
-        url: 'alelo.com.br',
-        name: 'Alelo'
-      },
-      {
-        url: 'amedigital.com',
-        name: 'Ame digital'
-      },
-      {
-        url: 'nubank.com.br',
-        name: 'Nubank'
-      },
-      {
-        url: 'bb.com.br',
-        name: 'Banco do Brasil'
-      },
-      {
-        url: 'willbank.com.br',
-        name: 'Will Bank'
-      },
-      {
-        url: 'bancopan.com.br',
-        name: 'Banco Pan'
-      },
-      {
-        url: 'c6bank.com.br',
-        name: 'C6 Bank'
-      },
-      {
-        url: 'cambio.bradesco',
-        name: 'Bradesco'
-      },
-      {
-        url: 'caixa.gov.br',
-        name: 'Caixa'
-      },
-      {
-        url: 'digio.com.br',
-        name: 'Digio'
-      },
-      {
-        url: 'mercadopago.com',
-        name: 'Mercado Pago'
-      },
-      {
-        url: 'meliuz.com.br',
-        name: 'Meliuz'
-      },
-      {
-        url: 'santanderbank.com',
-        name: 'Santander Bank'
-      },
-      {
-        url: 'paypal.com',
-        name: 'PayPal'
-      },
-      {
-        url: 'picpay.com',
-        name: 'PicPay'
-      },
-
-      {
-        url: 'itau.com.ar',
-        name: 'Itaú'
-      },
-      {
-        url: 'claropay.com',
-        name: 'Claro Pay'
-      },
-      {
-        url: 'xpi.com.br',
-        name: 'XP'
+  async submitCard() {
+    if (this.cardForm.valid) {
+      // Extract form values
+      const { institution, name, limit, closing_day } = this.cardForm.value;
+  
+      // Find the matching bank from the bankLogos list
+      const bank = this.bankLogos.find(
+        (b) => b.name.toLowerCase() === institution.toLowerCase()
+      );
+  
+      try {
+        // Determine the logo URL or set it as an empty string if not found
+        const logo_url = bank ? bank.logo_url : '';
+  
+        // Call the CardService method to add a card to the database
+        await this.cardService.addCard(name,  institution, limit, logo_url, closing_day);
+  
+        // Show a success message
+        await this.presentToast('Cartão criada com sucesso!', 'success');
+  
+        // Dismiss the modal with the form values
+        this.modalCtrl.dismiss({ cartao: this.cardForm.value });
+      } catch (error) {
+        // Log detailed error information for debugging
+        console.error('Erro ao salvar o cartão:', error);
+  
+        // Show an error message to the user
+        await this.presentToast('Erro ao salvar o cartão! Tente novamente.', 'danger');
       }
-    ];
-
-    try {
-      this.bankLogos = banks.map((bank) => {
-        const logo_url = `https://img.logo.dev/${encodeURIComponent(bank.url)}?token=${apiKey}`;
-        console.log(logo_url);
-
-        return { name: bank.name, logo_url };
-      });
-
-    } catch (error) {
-      console.error('Erro ao buscar logos dos bancos:', error);
+    } else {
+      console.log('Formulário inválido');
     }
+  }
+
+  async presentToast(message: string, color: string) {
+    const toast = await this.toastController.create({
+      message,
+      duration: 2000,
+      color
+    });
+    toast.present();
+  }
+
+  async selectInstitution(institution: string) {
+    this.selectedInstitution = institution;
+    this.cardForm.patchValue({ institution: institution }); // Atualiza o campo do formulário
+    await this.modalController.dismiss(); // Fecha o modal
   }
 
 }

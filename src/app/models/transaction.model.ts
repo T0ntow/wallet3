@@ -14,4 +14,5 @@ export interface Transacao {
     fk_parcelas_parcela_id?: number | null;  // ID da parcela associada, se parcelado
     status: string; // -- Status da transação: "pago" ou "pendente"
     data_transacao: string
+    mes_fatura?: string; // ========== Para quando a despesa for em cartão ==========
 }

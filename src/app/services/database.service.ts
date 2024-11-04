@@ -53,15 +53,16 @@ export class DatabaseService {
         );
     `);
 
+      // await this.db.execute(`DROP TABLE IF EXISTS cartaoTable`);
+
       await this.db.execute(`
           CREATE TABLE IF NOT EXISTS cartaoTable (
-          cartao_id INTEGER PRIMARY KEY AUTOINCREMENT,
-          conta_id INTEGER NOT NULL, -- Referência à tabela de contas
-          dia_fechamento INTEGER NOT NULL, -- Dia do fechamento
-          dia_vencimento INTEGER NOT NULL, -- Dia do vencimento
-          nome TEXT NOT NULL, -- Nome do cartão
-          limite REAL NOT NULL, -- Limite do cartão
-          FOREIGN KEY (conta_id) REFERENCES accountTable(conta_id) -- Chave estrangeira para a tabela de contas
+          cartao_id INTEGER PRIMARY KEY,  -- ID da conta (chave primária)
+          nome TEXT NOT NULL,             -- Nome da conta
+          instituicao TEXT NOT NULL,      -- Instituição financeira da conta
+          limite REAL NOT NULL,           -- Limite do cartão
+          logo_url TEXT,                  -- URL do logo da instituição
+          dia_fechamento TEXT NOT NULL    -- Dia de fechamento da fatura (ex: "10")
       );
   `);
 
@@ -76,9 +77,9 @@ export class DatabaseService {
         );
     `);
 
-    // await this.db.execute(`DROP TABLE IF EXISTS transacoes`);
+      // await this.db.execute(`DROP TABLE IF EXISTS transacoes`);
 
-    await this.db.execute(`
+      await this.db.execute(`
       CREATE TABLE IF NOT EXISTS transacoes (
         transacao_id INTEGER PRIMARY KEY AUTOINCREMENT,
         conta_id INTEGER,

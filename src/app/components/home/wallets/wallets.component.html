@@ -11,16 +11,25 @@
   </ion-card-header>
 
   <ion-card-content>
-    <ion-item lines="none">
-      <ion-avatar slot="start">
-        <img src="https://logo.clearbit.com/nubank.com" alt="Nubank Logo" />
-      </ion-avatar>
+    <ion-list lines="none">
+      <ion-item *ngFor="let card of cards">
+        <!-- Mostra o ícone de carteira se não houver logo -->
+        <ion-icon *ngIf="!card.logo_url" name="wallet"></ion-icon>
 
-      <ion-label>
-        <p>Cartão de crédito</p>
-        <h3>Nubank</h3>
-      </ion-label>
-    </ion-item>
+        <!-- Mostra a imagem do logo se disponível -->
+        <img *ngIf="card.logo_url" [src]="card.logo_url" alt="{{ card.nome }}" class="logo" />
+
+        <ion-label>
+          <p>Cartão de crédito</p>
+          <h3>{{ card.nome }}</h3> <!-- Exibe o nome do cartão -->
+        </ion-label>
+  
+        <div class="saldo">
+          <span>Limite</span>
+          <p>R$ {{ card.limite || '0,00' }}</p> <!-- Exibe o limite da conta, se disponível -->
+        </div>
+      </ion-item>
+    </ion-list>
 
   </ion-card-content>
 </ion-card>

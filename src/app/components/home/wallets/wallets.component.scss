@@ -16,21 +16,23 @@
             --color: var(--color-hover);
         }
 
-        ion-icon {
+        ion-icon, img {
             width: 25px;
             height: 25px;
             color:var(--ion-contrast);
             cursor: pointer;
         }  
-    }
 
-    ion-avatar {
-        margin: 0;
-        display: flex;
-        align-items: center;
-        img {
-            width: 30px;
-            height: 30px;
+
+        ion-avatar {
+            margin: 0;
+            display: flex;
+            align-items: center;
+
+            ion-icon {
+                width: 30px;
+                height: 30px;
+            }
         }
     }
 
@@ -46,16 +48,39 @@
     ion-card-content {
         margin-top: 10px;
         padding: 0;
+
+        ion-icon, img{
+            margin-right: 10px;
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            color: var(--ion-contrast);
+        }
+        
     }
 
     ion-card-content ion-item {
         border: 1px solid var(--ion-border-color);
         border-radius: 5px;
         margin-top: 5px;
+
+        .saldo {
+            span {
+                font-size: 14px;
+                font-weight: bold;
+                color: var(--ion-text-color2);
+            }
+        }
+
+        ion-label p  {
+            font-size: 13px;
+            color: var(--ion-text-color2);
+            font-weight: bold;
+        }
     }
 }
 
-// "Meus cartões"
+// "Minhas contas"
 h2 {
     font-size: 16px;
     font-weight: bold;
@@ -68,12 +93,6 @@ h3 {
     font-weight: bold;
     margin: 0;
     color: var(--ion-text-color);
-}
-
-p {
-    font-size: 13px;
-    color: var(--ion-text-color2);
-    font-weight: bold;
 }
 
 ion-button {

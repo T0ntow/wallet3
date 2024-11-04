@@ -1,56 +1,55 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, inject, OnInit, ViewChild } from '@angular/core';
 import { ModalController } from '@ionic/angular';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { faUtensils, faBus, faHeartbeat, faGraduationCap, faFutbol, faShoppingCart, faHome, faLightbulb, faEllipsisH } from '@fortawesome/free-solid-svg-icons';
 import * as moment from 'moment';
 import 'moment/locale/pt-br';  // Importa o locale para português
+import { Account } from 'src/app/models/account.model';
+import { Category } from 'src/app/models/category.model';
+import { CategoryLoaderService } from 'src/app/services/categories/category-loader-service.service';
+import { AccountService } from 'src/app/services/account/account.service';
+import { TransactionsService } from 'src/app/services/transactions/transactions.service';
 @Component({
   selector: 'app-add-card-expense',
   templateUrl: './add-card-expense.component.html',
   styleUrls: ['./add-card-expense.component.scss'],
 })
-export class AddCardExpenseComponent  implements OnInit {
-
-  accountForm: FormGroup;
+export class AddCardExpenseComponent implements OnInit {
+  transacaoForm: FormGroup;
   selectedAccount: string = '';
   selectedCategory: string = '';
   selectedInvoice: string = '';
-
-
-  isCategoriesSheetVisible: boolean = false;
-  isAccountSheetVisible: boolean = false;
-  isInvoiceSheetVisible: boolean = false;
-
+ 
   // Fatura mes
   invoices: { label: string, date: moment.Moment }[] = [];
 
   //toggle parcelado
   parcelado: boolean = false; // Estado para controle de "parcelado"
 
-  // Logos
-  faUtensils = faUtensils;
-  faBus = faBus;
-  faHeartbeat = faHeartbeat;
-  faGraduationCap = faGraduationCap;
-  faFutbol = faFutbol;
-  faShoppingCart = faShoppingCart;
-  faHome = faHome;
-  faLightbulb = faLightbulb;
-  faEllipsisH = faEllipsisH;
+  //Categorias
+  categories: Category[] = [];
+  accounts: Account[] = [];
 
+  categoryLoaderService = inject(CategoryLoaderService)
+  accountService = inject(AccountService)
+  transactionService = inject(TransactionsService)
 
   constructor(
     private formBuilder: FormBuilder,
     private modalController: ModalController
   ) {
-    this.accountForm = this.formBuilder.group({
-      name: ['', Validators.required],
-      date: ['', Validators.required],
-      amount: ['', Validators.required],
-      quantity: ['', Validators.required],
-      installmentValue: ['', Validators.required],
-      installmentCount: ['', Validators.required],
-
+    this.transacaoForm = this.formBuilder.group({
+      descricao: ['', Validators.required],
+      conta_id: [null],
+      categoria_id: [null, Validators.required],
+      data: ['', Validators.required],
+      valor: ['', Validators.required],
+      status: ['pago', Validators.required],
+      tipo: ['despesa'],
+      is_parcelado: [false],
+      num_parcelas: [null],
+      is_recorrente: [false],
+      quantidade_repetir: [null],
+      periodo: [null]
     });
   }
 
@@ -62,52 +61,41 @@ export class AddCardExpenseComponent  implements OnInit {
     this.popover!.event = e;
     this.isOpen = true;
   }
-  
-  ngOnInit() {
-    this.generateInvoiceOptions();
+
+
+  async ngOnInit() {
+    try {
+      this.categories = await this.categoryLoaderService.loadCategoriesByExpenses();
+      this.accounts = await this.accountService.getAccounts();
+      this.generateInvoiceOptions();
+    } catch (error) {
+      console.error('Error loading categories or accounts:', error);
+    }
   }
 
   dismissModal() {
     this.modalController.dismiss();
   }
 
-  selectCategory(category: string) {
-    this.selectedCategory = category;
-    this.closeSheet();
+  async selectAccount(account: Account) {
+    this.selectedAccount = account.nome;
+    this.transacaoForm.patchValue({ conta_id: account.conta_id }); // Atualiza o valor do ícone no formulário
+    await this.modalController.dismiss(); // Fecha o modal
   }
 
-  selectAccount(account: string) {
-    this.selectedAccount = account;
-    this.closeSheet();
+  async selectCategory(category: Category) {
+    this.selectedCategory = category.nome;
+    this.transacaoForm.patchValue({ categoria_id: category.id }); // Atualiza o valor do ícone no formulário
+    await this.modalController.dismiss(); // Fecha o modal
   }
+
 
   selectInvoice(invoice: string) {
     this.selectedInvoice = invoice;
-    this.closeSheet();
+    // this.closeSheet();
     console.log('Fatura selecionada:', invoice);
   }
 
-  toggleSheet(sheet: string) {
-    if (sheet === 'account') {
-      this.isAccountSheetVisible = !this.isAccountSheetVisible;
-      this.isCategoriesSheetVisible = false;  // Fechar o sheet de categorias
-      this.isInvoiceSheetVisible = false;     // Fechar o sheet de faturas
-    } else if (sheet === 'category') {
-      this.isCategoriesSheetVisible = !this.isCategoriesSheetVisible;
-      this.isAccountSheetVisible = false;     // Fechar o sheet de contas
-      this.isInvoiceSheetVisible = false;     // Fechar o sheet de faturas
-    } else if (sheet === 'invoice') {
-      this.isInvoiceSheetVisible = !this.isInvoiceSheetVisible;
-      this.isAccountSheetVisible = false;     // Fechar o sheet de contas
-      this.isCategoriesSheetVisible = false;  // Fechar o sheet de categorias
-    }
-  }
-
-  closeSheet() {
-    this.isCategoriesSheetVisible = false;
-    this.isAccountSheetVisible = false;
-    this.isInvoiceSheetVisible = false;
-  }
 
   toggleParcelado(event: any) {
     this.parcelado = event.detail.checked;
@@ -140,8 +128,8 @@ export class AddCardExpenseComponent  implements OnInit {
 
 
   submitAccount() {
-    if (this.accountForm.valid) {
-      const formData = this.accountForm.value;
+    if (this.transacaoForm.valid) {
+      const formData = this.transacaoForm.value;
       console.log('Form Data:', formData);
       // Lógica para envio de dados
     }

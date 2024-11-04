@@ -10,56 +10,69 @@
 </ion-header>
 
 <ion-content>
-  <form [formGroup]="accountForm">
-    <div class="container-item institution-item" (click)="toggleSheet()">
-      <label position="stacked">Instituição</label>
-      <div class="input-institution" class="custom-input" style="display: flex;align-items: center;">
-        <p style="margin: 0;"> {{ selectedInstitution || 'Selecione uma instituição' }} </p>
+  <form [formGroup]="cardForm">
+    <!-- Institution Selection -->
+    <div class="container-item institution-item"  id="open-modal-institution" expand="block">
+      <label>Instituição</label>
+      <div class="input-institution custom-input" style="display: flex; align-items: center;">
+        <p style="margin: 0;">{{ selectedInstitution || 'Selecione uma instituição' }}</p>
       </div>
     </div>
 
+    <!-- Limit and Closing Day Fields -->
     <ion-grid>
       <ion-row>
-        <ion-col size="7">
+        <ion-col size="6">
           <div class="container-item">
-            <label position="stacked">Limite</label>
-            <ion-input formControlName="limit" class="custom-input" type="number" ></ion-input>
+            <label>Dia de Fechamento</label>
+            <ion-input
+              formControlName="closing_day"
+              class="custom-input"
+              type="number"
+              min="1"
+              max="31"
+            ></ion-input>
           </div>
         </ion-col>
-        <ion-col>
+
+        <ion-col size="4">
           <div class="container-item">
-            <label position="stacked">Dia de Fechamento</label>
-            <ion-input formControlName="closing_day" class="custom-input" type="number" min="1" max="31"></ion-input>
+            <label>Limite</label>
+            <ion-input formControlName="limit" class="custom-input" type="number"></ion-input>
           </div>
         </ion-col>
       </ion-row>
     </ion-grid>
 
+    <!-- Name Field -->
     <div class="container-item">
-      <label position="stacked">Nome</label>
+      <label>Nome</label>
       <ion-input formControlName="name" class="custom-input" type="text"></ion-input>
     </div>
 
-    <button [disabled]="accountForm.invalid" (click)="submitAccount()" class="submit-button">Adicionar Cartão</button>
+    <!-- Submit Button -->
+    <button [disabled]="cardForm.invalid" (click)="submitCard()" class="submit-button">
+      Adicionar Cartão
+    </button>
   </form>
+
+  <ion-modal trigger="open-modal-institution" [initialBreakpoint]="1" [breakpoints]="[0, 0.75, 1]">
+    <ng-template>
+      <div class="sheet">
+        <div class="sheet-header">
+          <p>Instituições</p>
+        </div>
+        <div class="banks">
+          <div class="bank" (click)="selectInstitution('Carteira')">
+            <ion-icon name="wallet"></ion-icon>
+            <p>Carteira</p>
+          </div>
+          <div *ngFor="let bank of bankLogos" class="bank" (click)="selectInstitution(bank.name)">
+            <img *ngIf="bank.logo_url" [src]="bank.logo_url" alt="{{ bank.name }} Logo" />
+            <p>{{ bank.name }}</p>
+          </div>
+        </div>
+      </div>
+    </ng-template>
+  </ion-modal>
 </ion-content>
-
-<div class="back" *ngIf="isSheetVisible" (click)="closeSheet()"></div>
-
-<div class="sheet" [ngClass]="{'sheet-visible': isSheetVisible}">
-  <div class="sheet-header">
-    <p>Instituições</p>
-  </div>
-
-  <div class="banks">
-    <div class="bank" (click)="selectInstitution('Carteira')">
-      <ion-icon name="wallet"></ion-icon>
-      <p>Carteira</p>
-    </div>
-
-    <div *ngFor="let bank of bankLogos" class="bank" (click)="selectInstitution(bank.logo_url)">
-      <img *ngIf="bank.logo_url" [src]="bank.logo_url" alt="{{ bank.name }} Logo" />
-      <p>{{bank.name}} </p>
-    </div>
-  </div>
-</div>
