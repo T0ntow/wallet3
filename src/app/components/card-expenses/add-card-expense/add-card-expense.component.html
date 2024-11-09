@@ -13,13 +13,13 @@
   <form [formGroup]="transacaoForm">
     <div class="container-item">
       <label position="stacked">Descrição</label>
-      <ion-input type="text" formControlName="name" class="custom-input"></ion-input>
+      <ion-input type="text" formControlName="descricao" class="custom-input"></ion-input>
     </div>
 
-    <div class="container-item" id="open-modal-account" expand="block">
-      <label position="stacked">Conta</label>
+    <div class="container-item" id="open-modal-card" expand="block">
+      <label position="stacked">Cartão</label>
       <div class="custom-input" style="display: flex; align-items: center;">
-        <p style="margin: 0;"> {{ selectedAccount || 'Selecione uma conta' }} </p>
+        <p style="margin: 0;"> {{ selectedCard|| 'Selecione um cartão' }} </p>
       </div>
     </div>
 
@@ -42,7 +42,7 @@
         <ion-col size="5">
           <div class="container-item">
             <label position="stacked">Data</label>
-            <ion-input type="date" formControlName="date" class="custom-input"></ion-input>
+            <ion-input type="date" formControlName="data" class="custom-input"></ion-input>
           </div>
         </ion-col>
 
@@ -50,14 +50,14 @@
         <ion-col size="6" *ngIf="!parcelado">
           <div class="container-item">
             <label position="stacked">Valor</label>
-            <ion-input type="text" formControlName="amount" class="custom-input"></ion-input>
+            <ion-input type="text" formControlName="valor" class="custom-input"></ion-input>
           </div>
         </ion-col>
 
         <ion-col size="6" *ngIf="parcelado">
           <div class="container-item">
             <label position="stacked">Valor Parcela</label>
-            <ion-input type="text" formControlName="installmentValue" class="custom-input"></ion-input>
+            <ion-input type="text" formControlName="valor_parcela" class="custom-input"></ion-input>
           </div>
         </ion-col>
       </ion-row>
@@ -75,27 +75,27 @@
         <ion-col size="6" *ngIf="parcelado">
           <div class="container-item">
             <label position="stacked">Quantidade</label>
-            <ion-input type="text" formControlName="installmentCount" class="custom-input"></ion-input>
+            <ion-input type="text" formControlName="num_parcelas" class="custom-input"></ion-input>
           </div>
         </ion-col>
       </ion-row>
     </ion-grid>
 
-    <button [disabled]="transacaoForm.invalid" (click)="submitAccount()" class="submit-button">Adicionar
+    <button [disabled]="transacaoForm.invalid" (click)="submitTransacao()" class="submit-button">Adicionar
       Despesa Cartão</button>
   </form>
 
-  <ion-modal trigger="open-modal-account" [initialBreakpoint]="0.75" [breakpoints]="[0, 0.75, 1]">
+  <ion-modal trigger="open-modal-card" [initialBreakpoint]="0.75" [breakpoints]="[0, 0.75, 1]">
     <ng-template>
       <div class="sheet">
         <div class="sheet-header">
           <p>Conta</p>
         </div>
-        <div class="accounts">
-          <div *ngFor="let account of accounts" class="account" (click)="selectAccount(account)">
-            <ion-icon *ngIf="!account.logo_url" name="wallet"></ion-icon>
-            <img *ngIf="account.logo_url" [src]="account.logo_url" alt="{{ account.nome }}" class="logo" />
-            <p>{{ account.nome }}</p>
+        <div class="elements">
+          <div *ngFor="let card of cards" class="element" (click)="selectCard(card)">
+            <ion-icon *ngIf="!card.logo_url" name="wallet"></ion-icon>
+            <img *ngIf="card.logo_url" [src]="card.logo_url" alt="{{ card.nome }}" class="logo" />
+            <p>{{ card.nome }}</p>
           </div>
         </div>
       </div>
@@ -108,8 +108,8 @@
         <div class="sheet-header">
           <p>Categorias</p>
         </div>
-        <div class="categories">
-          <div *ngFor="let category of categories" class="category" (click)="selectCategory(category)">
+        <div class="elements">
+          <div *ngFor="let category of categories" class="element" (click)="selectCategory(category)">
             <fa-icon [icon]="category.icone"></fa-icon>
             <p>{{ category.nome }}</p>
           </div>
@@ -124,9 +124,13 @@
         <div class="sheet-header">
           <p>Fatura</p>
         </div>
-        <div class="invoices">
-          <div class="invoice" *ngFor="let invoice of invoices" (click)="selectInvoice(invoice.label)">
-            <p> {{ invoice.label }}</p>
+        <div class="elements">
+          <div *ngIf="invoices.length === 0">
+            <ion-label color="danger">Selecione o cartão</ion-label>
+          </div>
+          
+          <div class="element" *ngFor="let invoice of invoices" (click)="selectInvoice(invoice)">
+            <ion-label>{{ invoice.label }}</ion-label>
           </div>
         </div>
       </div>

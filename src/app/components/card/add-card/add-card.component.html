@@ -62,12 +62,12 @@
         <div class="sheet-header">
           <p>Instituições</p>
         </div>
-        <div class="banks">
-          <div class="bank" (click)="selectInstitution('Carteira')">
+        <div class="elements">
+          <div class="element" (click)="selectInstitution('Carteira')">
             <ion-icon name="wallet"></ion-icon>
             <p>Carteira</p>
           </div>
-          <div *ngFor="let bank of bankLogos" class="bank" (click)="selectInstitution(bank.name)">
+          <div *ngFor="let bank of bankLogos" class="element" (click)="selectInstitution(bank.name)">
             <img *ngIf="bank.logo_url" [src]="bank.logo_url" alt="{{ bank.name }} Logo" />
             <p>{{ bank.name }}</p>
           </div>

@@ -11,6 +11,8 @@ import { CategoryLoaderService } from 'src/app/services/categories/category-load
 import { IconDefinition } from '@fortawesome/free-solid-svg-icons';
 import { faBus } from '@fortawesome/free-solid-svg-icons';
 import { ModalController } from '@ionic/angular';
+import { CardService } from 'src/app/services/card/card.service';
+import { Card } from 'src/app/models/card.model';
 
 @Component({
   selector: 'app-transactions',
@@ -19,11 +21,16 @@ import { ModalController } from '@ionic/angular';
 })
 export class TransactionsPage implements OnInit {
   segmentValue: string = 'despesas';  // Valor padrão do segmento
+
   despesasFiltradas: Transacao[] = []; // Array de despesas filtradas
   receitasFiltradas: Transacao[] = []; // Array de receitas filtradas
+  despesasContaFiltradas: Transacao[] = [];
+  despesasCartaoFiltradas: Transacao[] = [];
+
   transactions: Transacao[] = []; // Array para armazenar todas as transações
 
   contas: Account[] = []; // Array para armazenar todas as contas
+  cartoes: Card[] = []; // Array para armazenar todas as contas
   categorias: Category[] = []; // Array para armazenar todas as categorias
 
   isSheetVisible: boolean = false;
@@ -34,13 +41,42 @@ export class TransactionsPage implements OnInit {
   accountService = inject(AccountService);
   categoriesService = inject(CategoryLoaderService);
   modalController = inject(ModalController)
+  cardService = inject(CardService)
+
 
   currentMonth = moment(); // Inicializa com o mês atual
 
-
   faBus = faBus;
+  
+  isModalOpen = false;
+  selectedDespesa: any = null;
 
   constructor() { }
+
+  async loadCards() {
+    try {
+      this.cartoes = await this.cardService.getCards(); // Carrega todas as contas
+    } catch (error) {
+      console.error('Erro ao carregar contas:', error);
+    }
+  }
+
+  async loadAccounts() {
+    try {
+      this.contas = await this.accountService.getAccounts(); // Carrega todas as contas
+    } catch (error) {
+      console.error('Erro ao carregar contas:', error);
+    }
+  }
+
+  async loadCategories() {
+    try {
+      this.categorias = await this.categoriesService.loadCategories(); // Carrega todas as contas
+    } catch (error) {
+      console.error('Erro ao carregar contas:', error);
+    }
+  }
+
 
   async ngOnInit() {
     try {
@@ -49,6 +85,7 @@ export class TransactionsPage implements OnInit {
       // Sequential loading of accounts and categories with individual error handling
       await this.loadAccounts().catch(error => console.error("Error loading accounts:", error));
       await this.loadCategories().catch(error => console.error("Error loading categories:", error));
+      await this.loadCards().catch(error => console.error("Error loading cards:", error));
 
       // Load initial transactions by the current month
       await this.updateTransactionsByMonth(this.currentMonth.format('YYYY-MM'));
@@ -70,38 +107,70 @@ export class TransactionsPage implements OnInit {
     console.log("MES", month); // Formato 'YYYY-MM'
     this.currentMonth = moment(month); // Atualiza currentMonth com o novo mês
 
-    this.transactions = await this.transactionService.getTransactionsByMonth(month);
-    console.log("this.transactions", JSON.stringify(this.transactions));
+    // Obtém as despesas de cartão e conta
+    const despesas = await this.transactionService.getAllTransactions();
+    const despesasCartao = await this.transactionService.getDespesasCartaoByMonth(month);
+    const despesasConta = await this.transactionService.getDespesasContaByMonth(month);
+    console.log("despesasCartao", JSON.stringify(despesasCartao));
+    console.log("despesasConta", JSON.stringify(despesasConta));
 
+    // Obter parcelas pendentes para o mês
+    const installmentsResult = await this.transactionService.getParcelasByMonth(month);
+    console.log("PARCELAS", JSON.stringify(installmentsResult));
 
+    // Mapeia as parcelas para incluir detalhes da despesa associada
+    const mappedInstallments = installmentsResult.map(installment => {
+      const associatedExpense = despesas.find(transaction => transaction.transacao_id === installment.transacao_id);
+
+      // Extrair as informações da despesa associada
+      const associatedExpenseData = associatedExpense ? {
+        tipo: associatedExpense.tipo,
+        descricao: associatedExpense.descricao,
+        categoria_id: associatedExpense.categoria_id,
+        cartao_id: associatedExpense.cartao_id,
+      } : null;
+
+      // Retornar a parcela com a despesa associada separada
+      return {
+        ...installment,
+        ...associatedExpenseData // Inclui as propriedades diretamente no objeto da parcela
+      };
+    });
+
+    // Preenche a lista de despesas combinadas
+    this.despesasFiltradas = [
+      ...despesasCartao,
+      ...despesasConta,
+      ...mappedInstallments // Inclui as parcelas mapeadas dentro do mês
+    ];
+
+    console.log("Despesas e Parcelas", JSON.stringify(this.despesasFiltradas));
+
+    // Chama a função para separar e processar as despesas e receitas
     this.separarDespesasEReceitas();
   }
 
-  async loadAccounts() {
-    try {
-      this.contas = await this.accountService.getAccounts(); // Carrega todas as contas
-    } catch (error) {
-      console.error('Erro ao carregar contas:', error);
-    }
-  }
-
-  async loadCategories() {
-    try {
-      this.categorias = await this.categoriesService.loadCategories(); // Carrega todas as contas
-    } catch (error) {
-      console.error('Erro ao carregar contas:', error);
-    }
-  }
-
   separarDespesasEReceitas() {
-    this.despesasFiltradas = this.transactions.filter(transacao => transacao.tipo === 'despesa');
-    console.log("this.despesasFiltradas", this.despesasFiltradas);
+    // Filtra as despesas do tipo 'cartão' e 'conta'
+    this.despesasCartaoFiltradas = this.despesasFiltradas.filter(transacao => transacao.cartao_id);
+    this.despesasContaFiltradas = this.despesasFiltradas.filter(transacao => !transacao.cartao_id);
 
-    this.receitasFiltradas = this.transactions.filter(transacao => transacao.tipo === 'receita');
+    console.log("Despesas de Cartão", JSON.stringify(this.despesasCartaoFiltradas));
+    console.log("Despesas de Conta", JSON.stringify(this.despesasContaFiltradas));
 
-    // Ordena as transações por data, da mais recente para a mais antiga
-    this.despesasFiltradas.sort((a, b) => moment(b.data_transacao).diff(moment(a.data_transacao)));
+    // Filtra as receitas
+    this.receitasFiltradas = this.despesasFiltradas.filter(transacao => transacao.tipo === 'receita');
+
+    // Ordena as despesas de cartão, conta e receitas por data
+    this.despesasCartaoFiltradas.sort((a, b) => moment(b.mes_fatura).diff(moment(a.mes_fatura)));
+    this.despesasContaFiltradas.sort((a, b) => moment(b.data_transacao).diff(moment(a.data_transacao)));
     this.receitasFiltradas.sort((a, b) => moment(b.data_transacao).diff(moment(a.data_transacao)));
+
+    // Combina as despesas de cartão e conta para o mês atual
+    this.despesasFiltradas = [
+      ...this.despesasCartaoFiltradas,
+      ...this.despesasContaFiltradas
+    ];
   }
 
   calcularTotalDespesas(): number {
@@ -118,6 +187,11 @@ export class TransactionsPage implements OnInit {
     return conta ? conta.nome : 'Conta desconhecida'; // Retorna o nome ou uma string padrão
   }
 
+  getCardNameById(cartao_id: number): string {
+    const cartao = this.cartoes.find(card => card.cartao_id === cartao_id);
+    return cartao ? cartao.nome : 'Cartão desconhecido'; // Retorna o nome ou uma string padrão
+  }
+
   getIconByCategoryId(categoryId: number): IconDefinition | null {
     const category = this.categorias.find(cat => cat.id === categoryId);
     return category ? category.icone : null; // Retorna o ícone ou null se não encontrado
@@ -128,19 +202,17 @@ export class TransactionsPage implements OnInit {
     return categoria ? categoria.nome : 'Categoria desconhecida';
   }
 
-  isModalOpen = false;
-  selectedDespesa: any = null;
 
   openModal(despesa: any) {
     this.selectedDespesa = despesa;
     console.log("this.selectedDespesa", JSON.stringify(this.selectedDespesa));
-    
+
     this.isModalOpen = true;
   }
 
   closeModal() {
     console.log("CLOSE MODAL");
-    
+
     this.isModalOpen = false;
     this.selectedDespesa = null; // Limpa a despesa selecionada
   }

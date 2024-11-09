@@ -56,7 +56,7 @@
         }
     }
 
-    .banks, .categories, .invoices {
+    .elements {
         overflow-y: auto;
         height: 95%;
         display: flex;
@@ -64,7 +64,7 @@
         gap: $banks-gap;
         padding: 10px 5px;
 
-        .bank, .category, .invoice{
+        .element {
             padding: 5px;
             display: flex;
             flex-direction: row;
@@ -85,7 +85,7 @@
                 justify-content: center;
             }
 
-            p {
+            p, ion-label {
                 font-size: 14px;
                 font-weight: bold;
                 color: #000;
@@ -93,7 +93,7 @@
             }
         }
 
-        .bank:hover {
+        .element:hover {
             cursor: pointer;
             transition: all .2s ease-in-out;
             background-color: #a7a7a7;

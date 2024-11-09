@@ -5,6 +5,6 @@ export interface Card {
     instituicao: string;   // Instituição financeira da conta
     limite: number;         // Saldo da conta, se for numérico
     logo_url: string;
-    dia_fechamento: string;
+    dia_fechamento: number;
   }
   

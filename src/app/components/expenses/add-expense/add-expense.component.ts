@@ -11,12 +11,34 @@ import { AccountService } from 'src/app/services/account/account.service';
 import { TransactionsService } from 'src/app/services/transactions/transactions.service';
 import * as moment from 'moment';
 
+import { AbstractControl, ValidatorFn } from '@angular/forms';
+
+export function atLeastOneRequiredValidator(): ValidatorFn {
+  return (control: AbstractControl): { [key: string]: boolean } | null => {
+    const valor = control.get('valor')?.value;
+    const valor_parcela = control.get('valor_parcela')?.value;
+    const is_parcelado = control.get('is_parcelado')?.value;
+
+    // If is_parcelado is true, then valor_parcela is required
+    if (is_parcelado && !valor_parcela) {
+      return { required: true };
+    }
+
+    // If is_parcelado is false, then valor is required
+    if (!is_parcelado && !valor) {
+      return { required: true };
+    }
+
+    return null; // No errors
+  };
+}
+
 @Component({
   selector: 'app-add-expense',
   templateUrl: './add-expense.component.html',
   styleUrls: ['./add-expense.component.scss'],
 })
-export class AddExpenseComponent  implements OnInit {
+export class AddExpenseComponent implements OnInit {
   transacaoForm: FormGroup;
   selectedAccount: string = '';
   selectedCategory: string = '';
@@ -24,7 +46,7 @@ export class AddExpenseComponent  implements OnInit {
 
   // toogle repetir
   recorrente: boolean = false; // Estado para controle de "recorrente"
-  
+
   //Categorias
   categories: Category[] = [];
   accounts: Account[] = [];
@@ -46,15 +68,26 @@ export class AddExpenseComponent  implements OnInit {
       categoria_id: [null, Validators.required],
       data: ['', Validators.required],
       valor: ['', Validators.required],
-      status: ['pago', Validators.required], 
-      tipo:['despesa'], 
+      valor_parcela: [{ value: '', disabled: true }], // Inicialmente desabilitado
+      status: ['pago', Validators.required],
+      tipo: ['despesa'],
       is_parcelado: [false],
       num_parcelas: [null],
       is_recorrente: [false],
       quantidade_repetir: [null],
-      periodo: [null]
-    });
+      periodo: [null],
+      mes_fatura: [null]
+    }, { validators: atLeastOneRequiredValidator() }); // Adicionando o validador personalizado
     
+    // No seu ngOnInit ou no construtor
+    this.transacaoForm.get('is_parcelado')?.valueChanges.subscribe((isParcelado: boolean) => {
+      if (isParcelado) {
+        this.transacaoForm.get('valor_parcela')?.enable();
+      } else {
+        this.transacaoForm.get('valor_parcela')?.disable();
+        this.transacaoForm.get('valor_parcela')?.reset(); // Opcional: limpar o campo
+      }
+    });
   }
 
   @ViewChild('popover') popover: { event: Event; } | undefined;
@@ -65,7 +98,7 @@ export class AddExpenseComponent  implements OnInit {
     this.popover!.event = e;
     this.isOpen = true;
   }
-  
+
   async ngOnInit() {
     try {
       this.categories = await this.categoryLoaderService.loadCategoriesByExpenses();
@@ -74,7 +107,7 @@ export class AddExpenseComponent  implements OnInit {
       console.error('Error loading categories or accounts:', error);
     }
   }
-  
+
   dismissModal() {
     this.modalController.dismiss();
   }
@@ -104,7 +137,7 @@ export class AddExpenseComponent  implements OnInit {
   submitTransacao() {
     if (this.transacaoForm.valid) {
       const formData = this.transacaoForm.value;
-  
+
       // Formatação dos dados
       const transacao = {
         descricao: formData.descricao,
@@ -121,9 +154,11 @@ export class AddExpenseComponent  implements OnInit {
         is_recorrente: formData.is_recorrente,
         quantidade_repetir: formData.quantidade_repetir || null,
         periodo: formData.periodo || null,
-        fk_parcelas_parcela_id: formData.fk_parcelas_parcela_id || null  // Caso aplicável
+        fk_parcelas_parcela_id: formData.fk_parcelas_parcela_id || null, // Caso aplicável
+        valor_parcela: formData.valor_parcela || null,
+        mes_fatura: formData.mes_fatura || null
       };
-  
+
       // Chama o serviço para salvar a transação no banco de dados
       this.transactionService.addTransaction(
         transacao.conta_id,
@@ -134,23 +169,25 @@ export class AddExpenseComponent  implements OnInit {
         transacao.descricao,
         transacao.is_parcelado,
         transacao.num_parcelas,
+        transacao.valor_parcela,
         transacao.is_recorrente,
         transacao.quantidade_repetir,
         transacao.periodo,
         transacao.status, // Enviando status para o método
         transacao.fk_parcelas_parcela_id,
-        transacao.data // Enviando data formatada
+        transacao.data, // Enviando data formatada
+        transacao.mes_fatura
       )
-      .then(async () => {
-        console.log('Transação adicionada com sucesso');
-        await this.presentToast('Transação adicionada com sucesso!', 'success');
-        this.modalController.dismiss({ transacao: this.transacaoForm });
-  
-        this.transacaoForm.reset(); // Reseta o formulário
-      })
-      .catch(error => {
-        console.error('Erro ao adicionar transação:', error);
-      });
+        .then(async () => {
+          console.log('Transação adicionada com sucesso');
+          await this.presentToast('Transação adicionada com sucesso!', 'success');
+          this.modalController.dismiss({ transacao: this.transacaoForm });
+
+          this.transacaoForm.reset(); // Reseta o formulário
+        })
+        .catch(error => {
+          console.error('Erro ao adicionar transação:', error);
+        });
     } else {
       console.log('Formulário inválido');
     }
@@ -164,5 +201,5 @@ export class AddExpenseComponent  implements OnInit {
     });
     toast.present();
   }
-  
+
 }

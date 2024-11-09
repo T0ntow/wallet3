@@ -16,7 +16,6 @@ export class AddCardComponent implements OnInit {
   cardForm: FormGroup;
   bankLogos: Array<{ name: string; logo_url: string }> = []; // Para armazenar os logos de bancos
 
-
   selectedInstitution: string | null = null;
   formattedLimit: string | null = null;
 

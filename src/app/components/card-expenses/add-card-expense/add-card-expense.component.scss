@@ -1,6 +1,5 @@
 @import '../../../mixins/forms.mixin.scss';
 
-
 * {
     font-family: "Inria Sans";
 }
@@ -11,10 +10,12 @@ ion-title {
     font-weight: bold;
     padding: 0;
 }
+
 ion-header,
 ion-toolbar {
     --background: var(--ion-item-background);
 }
+
 ion-grid {
     margin: 0;
     padding: 0;

@@ -32,10 +32,14 @@
             <div>
               <h4>{{ despesa.descricao }}</h4>
               <p class="banco" *ngIf="despesa.conta_id">{{ getAccountNameById(despesa.conta_id) }}</p>
+              <p class="banco" *ngIf="despesa.cartao_id">{{ getCardNameById(despesa.cartao_id) }}</p>
             </div>
           </div>
           <div class="direita">
-            <h5> {{ despesa.valor | currency }}</h5>
+            <h5 *ngIf="despesa.valor"> {{ despesa.valor | currency }}</h5>
+            <!-- PARCELADA -->
+            <h5 *ngIf="despesa.cartao_id"> {{ despesa.valor_parcela | currency }}</h5>
+
             <div class="details">
               <ion-icon *ngIf="despesa.cartao_id" class="cartao" name="card"></ion-icon>
               <ion-icon *ngIf="despesa.status === 'pago'" class="pago" name="checkmark-circle"></ion-icon>
@@ -45,13 +49,8 @@
         </div>
       </div>
 
-      <ion-modal 
-          #modal 
-           [isOpen]="isModalOpen" 
-           [componentProps]="{ despesa: selectedDespesa }" 
-           [initialBreakpoint]="0.5" 
-           [breakpoints]="[0, 0.5]"
-           (ionModalDidDismiss)="closeModal()">>
+      <ion-modal #modal [isOpen]="isModalOpen" [componentProps]="{ despesa: selectedDespesa }" [initialBreakpoint]="0.5"
+        [breakpoints]="[0, 0.5]" (ionModalDidDismiss)="closeModal()">>
         <ng-template>
           <ion-content>
             <ion-grid>

@@ -124,8 +124,8 @@
         <div class="sheet-header">
           <p>Conta</p>
         </div>
-        <div class="accounts">
-          <div *ngFor="let account of accounts" class="account" (click)="selectAccount(account)">
+        <div class="elements">
+          <div *ngFor="let account of accounts" class="element" (click)="selectAccount(account)">
             <ion-icon *ngIf="!account.logo_url" name="wallet"></ion-icon>
             <img *ngIf="account.logo_url" [src]="account.logo_url" alt="{{ account.nome }}" class="logo" />
             <p>{{ account.nome }}</p>
@@ -141,8 +141,8 @@
         <div class="sheet-header">
           <p>Categorias</p>
         </div>
-        <div class="categories">
-          <div *ngFor="let category of categories" class="category" (click)="selectCategory(category)">
+        <div class="elements">
+          <div *ngFor="let category of categories" class="element" (click)="selectCategory(category)">
             <fa-icon [icon]="category.icone"></fa-icon>
             <p>{{ category.nome }}</p>
           </div>
