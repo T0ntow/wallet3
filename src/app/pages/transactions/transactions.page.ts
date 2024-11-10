@@ -47,7 +47,7 @@ export class TransactionsPage implements OnInit {
   currentMonth = moment(); // Inicializa com o mês atual
 
   faBus = faBus;
-  
+
   isModalOpen = false;
   selectedDespesa: any = null;
 
@@ -144,7 +144,7 @@ export class TransactionsPage implements OnInit {
       ...mappedInstallments // Inclui as parcelas mapeadas dentro do mês
     ];
 
-    console.log("Despesas e Parcelas", JSON.stringify(this.despesasFiltradas));
+    // console.log("Despesas e Parcelas", JSON.stringify(this.despesasFiltradas));
 
     // Chama a função para separar e processar as despesas e receitas
     this.separarDespesasEReceitas();
@@ -155,8 +155,8 @@ export class TransactionsPage implements OnInit {
     this.despesasCartaoFiltradas = this.despesasFiltradas.filter(transacao => transacao.cartao_id);
     this.despesasContaFiltradas = this.despesasFiltradas.filter(transacao => !transacao.cartao_id);
 
-    console.log("Despesas de Cartão", JSON.stringify(this.despesasCartaoFiltradas));
-    console.log("Despesas de Conta", JSON.stringify(this.despesasContaFiltradas));
+    // console.log("Despesas de Cartão", JSON.stringify(this.despesasCartaoFiltradas));
+    // console.log("Despesas de Conta", JSON.stringify(this.despesasContaFiltradas));
 
     // Filtra as receitas
     this.receitasFiltradas = this.despesasFiltradas.filter(transacao => transacao.tipo === 'receita');
@@ -174,14 +174,24 @@ export class TransactionsPage implements OnInit {
   }
 
   calcularTotalDespesas(): number {
-    return this.despesasFiltradas.reduce((total, despesa) => total + despesa.valor, 0);
+    return this.despesasFiltradas.reduce((total, despesa) => {
+      // Garantir que tanto valor quanto valor_parcela sejam números válidos
+      const valor = Number(despesa.valor) || 0;
+      const valorParcela = Number(despesa.valor_parcela) || 0; 
+      return total + valor + valorParcela;
+    }, 0);
   }
-
+  
   calcularTotalPendentes(): number {
-    return this.despesasFiltradas.filter(despesa => despesa.status === 'pendente')
-      .reduce((total, despesa) => total + despesa.valor, 0);
+    return this.despesasFiltradas
+      .filter(despesa => despesa.status === 'pendente')
+      .reduce((total, despesa) => {
+        const valor = Number(despesa.valor) || 0; 
+        const valorParcela = Number(despesa.valor_parcela) || 0; 
+        return total + valor + valorParcela;
+      }, 0);
   }
-
+  
   getAccountNameById(conta_id: number): string {
     const conta = this.contas.find(account => account.conta_id === conta_id);
     return conta ? conta.nome : 'Conta desconhecida'; // Retorna o nome ou uma string padrão

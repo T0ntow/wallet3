@@ -41,7 +41,7 @@ export class NavComponent implements OnInit {
         this.transactionService.notifyTransactionUpdate()
       }
     });
-    
+
     this.closeSheet()
     return await modal.present();
   }
@@ -50,7 +50,14 @@ export class NavComponent implements OnInit {
     const modal = await this.modalCtrl.create({
       component: AddCardExpenseComponent,
     });
-    modal.present();
+    modal.onDidDismiss().then((data) => {
+      if (data.data) {
+        this.transactionService.notifyTransactionUpdate()
+      }
+    });
+
+    this.closeSheet()
+    return await modal.present();
   }
 
 }

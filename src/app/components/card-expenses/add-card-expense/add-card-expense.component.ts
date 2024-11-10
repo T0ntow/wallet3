@@ -48,17 +48,17 @@ export class AddCardExpenseComponent implements OnInit {
       cartao_id: [null, Validators.required],
       categoria_id: [null, Validators.required],
       data: ['', Validators.required],
-      valor: ['', Validators.required],
-      valor_parcela: [{ value: '', disabled: true }], // Inicialmente desabilitado
+      valor: [null, [Validators.required, Validators.min(0)]], // Valor inicial como null e validado como número
+      valor_parcela: [{ value: null, disabled: true }, [Validators.min(0)]], // Inicialmente desabilitado e validado como número
       status: ['pendente', Validators.required],
       tipo: ['despesa'],
       is_parcelado: [false],
-      num_parcelas: [null, [Validators.min(2), Validators.max(100)]],  // Validador para garantir que seja entre 2 e 100
+      num_parcelas: [null, [Validators.min(2), Validators.max(100)]], // Validador para garantir que seja entre 2 e 100
       is_recorrente: [false],
       quantidade_repetir: [null],
       periodo: [null],
       mes_fatura: [null, Validators.required]
-    }); // Adicionando o validador personalizado
+    });
   }
 
   @ViewChild('popover') popover: { event: Event; } | undefined;
