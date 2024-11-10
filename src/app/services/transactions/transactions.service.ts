@@ -89,7 +89,7 @@ export class TransactionsService {
 
           const insertParcelaSql = `
           INSERT INTO parcelasTable 
-          (transacao_id, valor_parcela, data_vencimento, status, descricao) 
+          (transacao_id, valor_parcela, data_vencimento, status, descricao_parcela) 
           VALUES (?, ?, ?, ?, ?)
         `;
 

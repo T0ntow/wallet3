@@ -30,7 +30,8 @@
             <fa-icon *ngIf="getIconByCategoryId(despesa.categoria_id) as icon" [icon]="icon" class="icon"></fa-icon>
 
             <div>
-              <h4>{{ despesa.descricao }}</h4>
+              <h4 *ngIf="despesa.conta_id">{{ despesa.descricao }}</h4>
+              <h4 *ngIf="despesa.valor_parcela">{{ despesa.descricao_parcela }}</h4>
               <p class="banco" *ngIf="despesa.conta_id">{{ getAccountNameById(despesa.conta_id) }}</p>
               <p class="banco" *ngIf="despesa.cartao_id">{{ getCardNameById(despesa.cartao_id) }}</p>
             </div>

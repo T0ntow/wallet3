@@ -66,7 +66,7 @@ export class DatabaseService {
       );
   `);
 
-      // await this.db.execute(`DROP TABLE IF EXISTS parcelasTable`);
+      await this.db.execute(`DROP TABLE IF EXISTS parcelasTable`);
 
       await this.db.execute(`
         CREATE TABLE IF NOT EXISTS parcelasTable (
@@ -75,12 +75,12 @@ export class DatabaseService {
         valor_parcela REAL NOT NULL,
         data_vencimento DATE NOT NULL,
         status TEXT NOT NULL DEFAULT 'pendente', -- Campo para o status da parcela
-        descricao TEXT,
+        descricao_parcela TEXT,
         FOREIGN KEY (transacao_id) REFERENCES transacoes(transacao_id) -- Definindo a relação
         );
     `);
 
-      // await this.db.execute(`DROP TABLE IF EXISTS transacoes`);
+      await this.db.execute(`DROP TABLE IF EXISTS transacoes`);
 
       await this.db.execute(`
         CREATE TABLE IF NOT EXISTS transacoes (

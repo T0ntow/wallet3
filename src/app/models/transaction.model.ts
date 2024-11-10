@@ -16,5 +16,6 @@ export interface Transacao {
     status: string; // Status da transação: "pago" ou "pendente"
     data_transacao: string; // Data da transação
     mes_fatura?: string; // Para quando a despesa for em cartão
+    descricao_parcela?: string;
   }
   
