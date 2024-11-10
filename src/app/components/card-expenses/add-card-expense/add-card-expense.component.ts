@@ -11,27 +11,7 @@ import { TransactionsService } from 'src/app/services/transactions/transactions.
 import { Card } from 'src/app/models/card.model';
 import { CardService } from 'src/app/services/card/card.service';
 
-import { AbstractControl, ValidatorFn } from '@angular/forms';
 
-export function atLeastOneRequiredValidator(): ValidatorFn {
-  return (control: AbstractControl): { [key: string]: boolean } | null => {
-    const valor = control.get('valor')?.value;
-    const valor_parcela = control.get('valor_parcela')?.value;
-    const is_parcelado = control.get('is_parcelado')?.value;
-
-    // If is_parcelado is true, then valor_parcela is required
-    if (is_parcelado && !valor_parcela) {
-      return { required: true };
-    }
-
-    // If is_parcelado is false, then valor is required
-    if (!is_parcelado && !valor) {
-      return { required: true };
-    }
-
-    return null; // No errors
-  };
-}
 
 @Component({
   selector: 'app-add-card-expense',
@@ -65,7 +45,7 @@ export class AddCardExpenseComponent implements OnInit {
   ) {
     this.transacaoForm = this.formBuilder.group({
       descricao: ['', Validators.required],
-      cartao_id: [null],
+      cartao_id: [null, Validators.required],
       categoria_id: [null, Validators.required],
       data: ['', Validators.required],
       valor: ['', Validators.required],
@@ -73,12 +53,12 @@ export class AddCardExpenseComponent implements OnInit {
       status: ['pendente', Validators.required],
       tipo: ['despesa'],
       is_parcelado: [false],
-      num_parcelas: [null],
+      num_parcelas: [null, [Validators.min(2), Validators.max(100)]],  // Validador para garantir que seja entre 2 e 100
       is_recorrente: [false],
       quantidade_repetir: [null],
       periodo: [null],
       mes_fatura: [null, Validators.required]
-    }, { validators: atLeastOneRequiredValidator() }); // Adicionando o validador personalizado
+    }); // Adicionando o validador personalizado
   }
 
   @ViewChild('popover') popover: { event: Event; } | undefined;
@@ -97,6 +77,30 @@ export class AddCardExpenseComponent implements OnInit {
     } catch (error) {
       console.error('Error loading categories or accounts:', error);
     }
+
+    this.transacaoForm.get('is_parcelado')?.valueChanges.subscribe(isParcelado => {
+      this.parcelado = isParcelado;
+      const numParcelasControl = this.transacaoForm.get('num_parcelas');
+      const valorParcela = this.transacaoForm.get('valor_parcela');
+      
+      
+      if (this.parcelado) {
+        numParcelasControl?.setValidators([Validators.required, Validators.min(2), Validators.max(100)]);
+        valorParcela?.setValidators([Validators.required, Validators.min(0)]);
+
+        valorParcela?.enable();  // Habilita o campo
+        numParcelasControl?.enable();  // Habilita o campo
+      } else {
+        numParcelasControl?.clearValidators();  // Remove o validador
+        numParcelasControl?.disable();  // Desabilita o campo
+
+        valorParcela?.clearValidators();  // Remove o validador
+        valorParcela?.disable();  // Desabilita o campo
+      }
+      
+      numParcelasControl?.updateValueAndValidity();  // Atualiza a validade do campo
+      valorParcela?.updateValueAndValidity();  // Atualiza a validade do campo
+    });
   }
 
   dismissModal() {
@@ -174,6 +178,12 @@ export class AddCardExpenseComponent implements OnInit {
   }
 
   submitTransacao() {
+    if (this.transacaoForm.invalid) {
+      // Marca todos os campos como tocados para exibir a validação
+      this.transacaoForm.markAllAsTouched();
+      return;
+    }
+    
     if (this.transacaoForm.valid) {
       const formData = this.transacaoForm.value;
 

@@ -73,15 +73,23 @@
                   <ion-label>Descrição:</ion-label>
                   <span>{{ selectedDespesa?.descricao }}</span>
                 </ion-col>
-                <ion-col>
+                <ion-col *ngIf="selectedDespesa?.conta_id">
                   <ion-label>Valor:</ion-label>
                   <span>{{ selectedDespesa?.valor | currency }}</span>
                 </ion-col>
+                <ion-col  *ngIf="selectedDespesa?.cartao_id">
+                  <ion-label>Valor Parcela:</ion-label>
+                  <span>{{ selectedDespesa?.valor_parcela | currency }}</span>
+                </ion-col>
               </ion-row>
               <ion-row>
-                <ion-col>
-                  <ion-label>Conta/Cartão:</ion-label>
+                <ion-col *ngIf="selectedDespesa?.conta_id">
+                  <ion-label>Conta:</ion-label>
                   <span>{{ getAccountNameById(selectedDespesa?.conta_id) }}</span>
+                </ion-col>
+                <ion-col *ngIf="selectedDespesa?.cartao_id">
+                  <ion-label>Cartão:</ion-label>
+                  <span>{{ getCardNameById(selectedDespesa?.cartao_id) }}</span>
                 </ion-col>
                 <ion-col>
                   <ion-label>Categoria:</ion-label>

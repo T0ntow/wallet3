@@ -20,7 +20,6 @@ export class TransactionsService {
 
   constructor(private databaseService: DatabaseService) { }
 
-  // Inserir nova transação
   async addTransaction(
     conta_id: number | null,
     cartao_id: number | null,
@@ -40,12 +39,12 @@ export class TransactionsService {
     mes_fatura: string | null
   ): Promise<void> {
     const db = await this.databaseService.getDb();
-  
+
     if (!db) {
       console.error('Database is not initialized');
       return;
     }
-  
+
     // Inserir transação na tabela 'transacoes'
     const sql = `INSERT INTO transacoes 
                  (conta_id, cartao_id, categoria_id, tipo, valor, descricao, 
@@ -53,7 +52,7 @@ export class TransactionsService {
                   quantidade_repetir, periodo, status, 
                   fk_parcelas_parcela_id, data_transacao, mes_fatura) 
                  VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-  
+
     try {
       // Executa a inserção da transação
       const result = await db.run(sql, [
@@ -75,28 +74,31 @@ export class TransactionsService {
         mes_fatura
       ]);
       console.log("Transação inserida com sucesso!");
-  
+
       // Se a transação for parcelada, cria as parcelas associadas
       if (is_parcelado && num_parcelas && valor_parcela && mes_fatura) {
         // Obter o ID da última inserção (se necessário para criar parcelas futuras)
         const idResult = await db.query('SELECT last_insert_rowid() AS id');
         const transacao_id = idResult.values![0].id;
-  
+
         // Adicionar as parcelas relacionadas à transação
-        for (let i = 1; i <= num_parcelas - 1; i++) {  // Começa em 1 para iniciar no próximo mês
+        for (let i = 0; i < num_parcelas; i++) {  // Começa em 0 para que a primeira parcela seja no mês da fatura
           const vencimento = this.calculateDueDate(mes_fatura, i); // Passa o índice da parcela
-  
+
+          const descricaoParcela = `${descricao} (${i + 1} de ${num_parcelas})`; // Exemplo: "Descricao (1 de 3)"
+
           const insertParcelaSql = `
-            INSERT INTO parcelasTable 
-            (transacao_id, valor, data_vencimento, status) 
-            VALUES (?, ?, ?, ?)
-          `;
-  
+          INSERT INTO parcelasTable 
+          (transacao_id, valor_parcela, data_vencimento, status, descricao) 
+          VALUES (?, ?, ?, ?, ?)
+        `;
+
           await db.run(insertParcelaSql, [
             transacao_id,
             valor_parcela,
             vencimento,
-            'pendente'  // Status 'pendente' para a parcela
+            'pendente',  // Status 'pendente' para a parcela
+            descricaoParcela
           ]);
         }
         console.log(`${num_parcelas} parcelas inseridas com sucesso!`);
@@ -105,15 +107,18 @@ export class TransactionsService {
       console.error("Erro ao inserir transação ou parcelas: ", error);
     }
   }
-  
-  // Função auxiliar para calcular a data de vencimento das parcelas
+
+  // Função para calcular a data de vencimento de cada parcela
   calculateDueDate(mes_fatura: string, parcelaIndex: number): string {
-    // Converter a data de transação para um objeto de data usando Moment.js ou outra biblioteca de manipulação de datas
-    const initialDate = moment(mes_fatura, 'YYYY-MM-DD');
-    const dueDate = initialDate.add(parcelaIndex, 'months'); // Incrementa os meses de acordo com o índice da parcela
-    return dueDate.format('YYYY-MM-DD'); // Formato da data de vencimento
+    // Aqui você pode implementar a lógica para calcular a data de vencimento, 
+    // começando com o mês da fatura e depois incrementando o mês para as parcelas subsequentes.
+    const data = new Date(mes_fatura); // Mes e ano no formato "YYYY-MM"
+
+    // A primeira parcela será no mês da fatura (sem incremento)
+    data.setMonth(data.getMonth() + parcelaIndex); // Incrementa o mês da parcela conforme o índice (0 = mês da fatura)
+
+    return data.toISOString().split('T')[0]; // Retorna a data no formato YYYY-MM-DD
   }
-  
 
   // Buscar uma transação por ID
   async getTransactionById(transacao_id: number): Promise<Transacao | null> {
@@ -233,6 +238,7 @@ export class TransactionsService {
       AND cartao_id IS NOT NULL 
       AND mes_fatura >= ? 
       AND mes_fatura <= ?
+      AND (num_parcelas < 1 OR num_parcelas IS NULL)
     `;
 
     try {

@@ -4,6 +4,12 @@
     font-family: "Inria Sans";
 }
 
+.invalid-input {
+    border: 1px solid rgba(255, 115, 0, 0.884) !important;
+    background-color: #ffe6e6 !important; /* Um fundo vermelho suave */
+  }
+  
+
 ion-title {
     font-size: 18px;
     color: #000;

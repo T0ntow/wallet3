@@ -43,12 +43,12 @@
         <div class="sheet-header">
           <p>Instituições</p>
         </div>
-        <div class="banks">
-          <div class="bank" (click)="selectInstitution('Carteira')">
+        <div class="elements">
+          <div class="element" (click)="selectInstitution('Carteira')">
             <ion-icon name="wallet"></ion-icon>
             <p>Carteira</p>
           </div>
-          <div *ngFor="let bank of bankLogos" class="bank" (click)="selectInstitution(bank.name)">
+          <div *ngFor="let bank of bankLogos" class="element" (click)="selectInstitution(bank.name)">
             <img *ngIf="bank.logo_url" [src]="bank.logo_url" alt="{{ bank.name }} Logo" />
             <p>{{ bank.name }}</p>
           </div>
@@ -63,24 +63,24 @@
         <div class="sheet-header">
           <p>Tipo de conta</p>
         </div>
-        <div class="banks">
-          <div class="bank" (click)="selectAccountType('corrente')">
+        <div class="elements">
+          <div class="element" (click)="selectAccountType('corrente')">
             <fa-icon [icon]="faBuildingColumns"></fa-icon>
             <p>Conta corrente</p>
           </div>
-          <div class="bank" (click)="selectAccountType('carteira')">
+          <div class="element" (click)="selectAccountType('carteira')">
             <fa-icon [icon]="faWallet"></fa-icon>
             <p>Carteira</p>
           </div>
-          <div class="bank" (click)="selectAccountType('poupanca')">
+          <div class="element" (click)="selectAccountType('poupanca')">
             <fa-icon [icon]="faPiggyBank"></fa-icon>
             <p>Poupança</p>
           </div>
-          <div class="bank" (click)="selectAccountType('investimentos')">
+          <div class="element" (click)="selectAccountType('investimentos')">
             <fa-icon [icon]="faArrowTrendUp"></fa-icon>
             <p>Investimentos</p>
           </div>
-          <div class="bank" (click)="selectAccountType('outros')">
+          <div class="element" (click)="selectAccountType('outros')">
             <fa-icon [icon]="faEllipsis"></fa-icon>
             <p>Outros</p>
           </div>

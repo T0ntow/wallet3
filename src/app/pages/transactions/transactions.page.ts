@@ -125,7 +125,7 @@ export class TransactionsPage implements OnInit {
       // Extrair as informações da despesa associada
       const associatedExpenseData = associatedExpense ? {
         tipo: associatedExpense.tipo,
-        descricao: associatedExpense.descricao,
+        // descricao: associatedExpense.descricao,
         categoria_id: associatedExpense.categoria_id,
         cartao_id: associatedExpense.cartao_id,
       } : null;
