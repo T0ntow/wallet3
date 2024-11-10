@@ -38,7 +38,7 @@
           <div class="direita">
             <h5 *ngIf="despesa.valor"> {{ despesa.valor | currency }}</h5>
             <!-- PARCELADA -->
-            <h5 *ngIf="despesa.cartao_id"> {{ despesa.valor_parcela | currency }}</h5>
+            <h5 *ngIf="despesa.valor_parcela"> {{ despesa.valor_parcela | currency }}</h5>
 
             <div class="details">
               <ion-icon *ngIf="despesa.cartao_id" class="cartao" name="card"></ion-icon>
@@ -73,11 +73,13 @@
                   <ion-label>Descrição:</ion-label>
                   <span>{{ selectedDespesa?.descricao }}</span>
                 </ion-col>
-                <ion-col *ngIf="selectedDespesa?.conta_id">
+
+                <!-- caso não tenha parcelas -->
+                <ion-col *ngIf="selectedDespesa?.valor">
                   <ion-label>Valor:</ion-label>
                   <span>{{ selectedDespesa?.valor | currency }}</span>
                 </ion-col>
-                <ion-col  *ngIf="selectedDespesa?.cartao_id">
+                <ion-col *ngIf="selectedDespesa?.valor_parcela">
                   <ion-label>Valor Parcela:</ion-label>
                   <span>{{ selectedDespesa?.valor_parcela | currency }}</span>
                 </ion-col>
