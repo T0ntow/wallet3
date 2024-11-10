@@ -1,0 +1,162 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="dismissModal()">
+        <ion-icon slot="icon-only" name="arrow-back-circle"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Editar Despesa Cartão</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <form [formGroup]="transacaoForm">
+    <div class="container-item">
+      <label position="stacked">Descrição</label>
+      <ion-input 
+        type="text" 
+        formControlName="descricao" 
+        class="custom-input" 
+        [ngClass]="{'invalid-input': transacaoForm.get('descricao')?.invalid && transacaoForm.get('descricao')?.touched}">
+      </ion-input>
+    </div>
+
+    <div class="container-item" id="open-modal-card" expand="block">
+      <label position="stacked">Cartão</label>
+      <div class="custom-input" style="display: flex; align-items: center;"  [ngClass]="{'invalid-input': transacaoForm.get('cartao_id')?.invalid && transacaoForm.get('cartao_id')?.touched}">
+        <p style="margin: 0;"> {{ selectedCard || 'Selecione um cartão' }} </p>
+      </div>
+    </div>
+
+    <div class="container-item" id="open-modal-categories" expand="block">
+      <label position="stacked">Categoria</label>
+      <div class="custom-input" style="display: flex; align-items: center;"   [ngClass]="{'invalid-input': transacaoForm.get('categoria_id')?.invalid && transacaoForm.get('categoria_id')?.touched}">
+        <p style="margin: 0;" > {{ selectedCategory || 'Selecione uma categoria' }}</p>
+      </div>
+    </div>
+
+    <div class="container-item" id="open-modal-invoice" expand="block">
+      <label position="stacked">Fatura</label>
+      <div class="custom-input" style="display: flex; align-items: center;"  [ngClass]="{'invalid-input': transacaoForm.get('mes_fatura')?.invalid && transacaoForm.get('mes_fatura')?.touched}">
+        <p style="margin: 0;"> {{ selectedInvoice || 'Selecione uma fatura' }}</p>
+      </div>
+    </div>
+
+    <ion-grid>
+      <ion-row>
+        <ion-col size="5">
+          <div class="container-item">
+            <label position="stacked">Data</label>
+            <ion-input 
+              type="date" 
+              formControlName="data" 
+              class="custom-input" 
+              [ngClass]="{'invalid-input': transacaoForm.get('data')?.invalid && transacaoForm.get('data')?.touched}">
+            </ion-input>
+          </div>
+        </ion-col>
+
+        <ion-col size="6" *ngIf="!parcelado">
+          <div class="container-item">
+            <label position="stacked">Valor</label>
+            <ion-input 
+              type="number" 
+              formControlName="valor" 
+              class="custom-input" 
+              [ngClass]="{'invalid-input': transacaoForm.get('valor')?.invalid && transacaoForm.get('valor')?.touched}">
+            </ion-input>
+          </div>
+        </ion-col>
+
+        <ion-col size="6" *ngIf="parcelado">
+          <div class="container-item">
+            <label position="stacked">Valor Parcela</label>
+            <ion-input 
+              type="number" 
+              formControlName="valor_parcela" 
+              class="custom-input" 
+              [ngClass]="{'invalid-input': transacaoForm.get('valor_parcela')?.invalid && transacaoForm.get('valor_parcela')?.touched}">
+            </ion-input>
+          </div>
+        </ion-col>
+      </ion-row>
+
+      <ion-row>
+        <ion-col size="5">
+          <div class="container-item">
+            <label position="stacked">Detalhes</label>
+            <div>
+              <ion-toggle slot="start" class="custom-input"  #mytoggle (ionChange)="toggleParcelado($event)">Parcelado</ion-toggle>
+            </div>
+          </div>
+        </ion-col>
+
+        <ion-col size="6" *ngIf="parcelado">
+          <div class="container-item">
+            <label position="stacked">Quantidade</label>
+            <ion-input 
+              type="text" 
+              formControlName="num_parcelas" 
+              class="custom-input" 
+              [ngClass]="{'invalid-input': transacaoForm.get('num_parcelas')?.invalid && transacaoForm.get('num_parcelas')?.touched}">
+            </ion-input>
+          </div>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+
+    <button (click)="submitTransacao()" class="submit-button">Adicionar Despesa Cartão</button>
+  </form>
+
+  <ion-modal trigger="open-modal-card" [initialBreakpoint]="0.75" [breakpoints]="[0, 0.75, 1]">
+    <ng-template>
+      <div class="sheet">
+        <div class="sheet-header">
+          <p>Conta</p>
+        </div>
+        <div class="elements">
+          <div *ngFor="let card of cards" class="element" (click)="selectCard(card)">
+            <ion-icon *ngIf="!card.logo_url" name="wallet"></ion-icon>
+            <img *ngIf="card.logo_url" [src]="card.logo_url" alt="{{ card.nome }}" class="logo" />
+            <p>{{ card.nome }}</p>
+          </div>
+        </div>
+      </div>
+    </ng-template>
+  </ion-modal>
+
+  <ion-modal trigger="open-modal-categories" [initialBreakpoint]="0.75" [breakpoints]="[0, 0.75, 1]">
+    <ng-template>
+      <div class="sheet">
+        <div class="sheet-header">
+          <p>Categorias</p>
+        </div>
+        <div class="elements">
+          <div *ngFor="let category of categories" class="element" (click)="selectCategory(category)">
+            <fa-icon [icon]="category.icone"></fa-icon>
+            <p>{{ category.nome }}</p>
+          </div>
+        </div>
+      </div>
+    </ng-template>
+  </ion-modal>
+
+  <ion-modal trigger="open-modal-invoice" [initialBreakpoint]="0.5" [breakpoints]="[0, 0.5]">
+    <ng-template>
+      <div class="sheet">
+        <div class="sheet-header">
+          <p>Fatura</p>
+        </div>
+        <div class="elements">
+          <div *ngIf="invoices.length === 0">
+            <ion-label color="danger">Selecione o cartão</ion-label>
+          </div>
+          
+          <div class="element" *ngFor="let invoice of invoices" (click)="selectInvoice(invoice)">
+            <ion-label>{{ invoice.label }}</ion-label>
+          </div>
+        </div>
+      </div>
+    </ng-template>
+  </ion-modal>
+</ion-content>

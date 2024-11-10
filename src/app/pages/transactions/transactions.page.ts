@@ -14,6 +14,7 @@ import { ModalController } from '@ionic/angular';
 import { CardService } from 'src/app/services/card/card.service';
 import { Card } from 'src/app/models/card.model';
 import { EditExpenseComponent } from 'src/app/components/expenses/edit-expense/edit-expense.component';
+import { EditCardExpenseComponent } from 'src/app/components/card-expenses/edit-card-expense/edit-card-expense.component';
 
 @Component({
   selector: 'app-transactions',
@@ -126,9 +127,9 @@ export class TransactionsPage implements OnInit {
       // Extrair as informações da despesa associada
       const associatedExpenseData = associatedExpense ? {
         tipo: associatedExpense.tipo,
-        // descricao: associatedExpense.descricao,
         categoria_id: associatedExpense.categoria_id,
         cartao_id: associatedExpense.cartao_id,
+        is_parcelado: associatedExpense.is_parcelado
       } : null;
 
       // Retornar a parcela com a despesa associada separada
@@ -230,17 +231,31 @@ export class TransactionsPage implements OnInit {
   }
 
   async editExpense(despesa: Transacao) {
-    const modal = await this.modalController.create({
-      component: EditExpenseComponent,
-      componentProps: {despesa: despesa}
-    });
-    modal.onDidDismiss().then((data) => {
-      if (data.data) {
-        this.transactionService.notifyTransactionUpdate()
-      }
-    });
+    if(despesa.cartao_id) {
+      const modal = await this.modalController.create({
+        component: EditCardExpenseComponent,
+        componentProps: {despesa: despesa}
+      });
+      modal.onDidDismiss().then((data) => {
+        if (data.data) {
+          this.transactionService.notifyTransactionUpdate()
+        }
+      });
+      return await modal.present();
+    }
 
-    return await modal.present();
+    if (despesa.conta_id) {
+      const modal = await this.modalController.create({
+        component: EditExpenseComponent,
+        componentProps: {despesa: despesa}
+      });
+      modal.onDidDismiss().then((data) => {
+        if (data.data) {
+          this.transactionService.notifyTransactionUpdate()
+        }
+      });
+  
+      return await modal.present();
+    }
   }
-
 }

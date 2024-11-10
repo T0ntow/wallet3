@@ -11,6 +11,8 @@ import { MonthNavigationComponent } from 'src/app/components/month-navigation/mo
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { EditExpenseComponent } from 'src/app/components/expenses/edit-expense/edit-expense.component';
 import { ReactiveFormsModule } from '@angular/forms';
+import { EditCardExpenseComponent } from 'src/app/components/card-expenses/edit-card-expense/edit-card-expense.component';
+
 @NgModule({
   imports: [
     CommonModule,
@@ -23,7 +25,8 @@ import { ReactiveFormsModule } from '@angular/forms';
   declarations: [
     TransactionsPage,
     MonthNavigationComponent,
-    EditExpenseComponent
+    EditExpenseComponent,
+    EditCardExpenseComponent
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],  // Adicione esta linha
 })

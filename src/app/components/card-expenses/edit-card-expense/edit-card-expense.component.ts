@@ -1,21 +1,24 @@
-import { Component, inject, OnInit, ViewChild } from '@angular/core';
+import { Component, inject, Input, OnInit, ViewChild } from '@angular/core';
 import { IonToggle, ModalController, ToastController } from '@ionic/angular';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import * as moment from 'moment';
 import 'moment/locale/pt-br';  // Importa o locale para português
+import { Account } from 'src/app/models/account.model';
 import { Category } from 'src/app/models/category.model';
 import { CategoryLoaderService } from 'src/app/services/categories/category-loader-service.service';
+import { AccountService } from 'src/app/services/account/account.service';
 import { TransactionsService } from 'src/app/services/transactions/transactions.service';
 import { Card } from 'src/app/models/card.model';
 import { CardService } from 'src/app/services/card/card.service';
-
+import { Transacao } from 'src/app/models/transaction.model';
 
 @Component({
-  selector: 'app-add-card-expense',
-  templateUrl: './add-card-expense.component.html',
-  styleUrls: ['./add-card-expense.component.scss'],
+  selector: 'app-edit-card-expense',
+  templateUrl: './edit-card-expense.component.html',
+  styleUrls: ['./edit-card-expense.component.scss'],
 })
-export class AddCardExpenseComponent implements OnInit {
+export class EditCardExpenseComponent implements OnInit {
+
   transacaoForm: FormGroup;
   selectedCard: string = '';
   selectedCategory: string = '';
@@ -26,8 +29,6 @@ export class AddCardExpenseComponent implements OnInit {
 
   //toggle parcelado
   parcelado: boolean = false; // Estado para controle de "parcelado"
-  isParcelado: boolean = true;
-
 
   //Categorias
   categories: Category[] = [];
@@ -37,6 +38,9 @@ export class AddCardExpenseComponent implements OnInit {
   cardService = inject(CardService)
   transactionService = inject(TransactionsService)
   toastController = inject(ToastController)
+
+  @Input() despesa: Transacao | undefined;
+
 
   constructor(
     private formBuilder: FormBuilder,
@@ -61,6 +65,7 @@ export class AddCardExpenseComponent implements OnInit {
   }
 
   @ViewChild('popover') popover: { event: Event; } | undefined;
+  @ViewChild('mytoggle', { static: true }) mytoggle: IonToggle | undefined;
 
   isOpen = false;
 
@@ -68,12 +73,48 @@ export class AddCardExpenseComponent implements OnInit {
     this.popover!.event = e;
     this.isOpen = true;
   }
-  
 
   async ngOnInit() {
+    // Se `despesa` estiver definida, inicializa os valores do formulário com ela
+    if (this.despesa) {
+      console.log("Despesa Recebida", JSON.stringify(this.despesa));
+
+      this.transacaoForm.patchValue({
+        descricao: this.despesa.descricao,
+        cartao_id: this.despesa.cartao_id,
+        data: this.despesa.data_transacao,
+        valor: this.despesa.valor,
+        status: this.despesa.status,
+        num_parcelas: this.despesa.num_parcelas,
+        valor_parcela: this.despesa.valor_parcela,
+      });
+
+      this.transacaoForm.patchValue({
+        is_parcelado: this.despesa.is_parcelado === 1 ? true : false
+      });
+
+      // Sincroniza o estado do `ion-toggle` com o valor `is_parcelado` do formulário
+      if (this.mytoggle) {
+        this.mytoggle.checked = this.transacaoForm.get('is_parcelado')?.value;
+        this.parcelado = this.mytoggle.checked
+        this.mostrarParcelas(this.mytoggle.checked)
+      }
+    }
+
     try {
       this.categories = await this.categoryLoaderService.loadCategoriesByExpenses();
       this.cards = await this.cardService.getCards();
+
+      // Despesa titpo conta
+      if (this.despesa && this.despesa.cartao_id) {
+        this.getCategoryById(this.despesa?.categoria_id);
+        this.getCardById(this.despesa?.cartao_id);
+      }
+
+      if (this.despesa && this.despesa.mes_fatura) {
+        this.getInvoiceByDate(this.despesa.mes_fatura)
+      }
+
     } catch (error) {
       console.error('Error loading categories or accounts:', error);
     }
@@ -82,8 +123,8 @@ export class AddCardExpenseComponent implements OnInit {
       this.parcelado = isParcelado;
       const numParcelasControl = this.transacaoForm.get('num_parcelas');
       const valorParcela = this.transacaoForm.get('valor_parcela');
-      
-      
+
+
       if (this.parcelado) {
         numParcelasControl?.setValidators([Validators.required, Validators.min(2), Validators.max(100)]);
         valorParcela?.setValidators([Validators.required, Validators.min(0)]);
@@ -97,7 +138,7 @@ export class AddCardExpenseComponent implements OnInit {
         valorParcela?.clearValidators();  // Remove o validador
         valorParcela?.disable();  // Desabilita o campo
       }
-      
+
       numParcelasControl?.updateValueAndValidity();  // Atualiza a validade do campo
       valorParcela?.updateValueAndValidity();  // Atualiza a validade do campo
     });
@@ -107,9 +148,43 @@ export class AddCardExpenseComponent implements OnInit {
     this.modalController.dismiss();
   }
 
+  getCardById(id: number) {
+    const card = this.cards.find(card => card.cartao_id === id);
+    if (card)
+      this.selectAccountInitial(card);
+  }
+
+  getCategoryById(id: number) {
+    const category = this.categories.find(category => category.id === id);
+    if (category)
+      this.selectCategoryInitial(category);
+  }
+
+  getInvoiceByDate(date: string) {
+    const invoice = this.invoices.find(invoice => invoice.date.format('YYYY-MM-DD') === date);
+    if (invoice) {
+      this.selectInvoiceInitial(invoice);
+    }
+  }
+
+  async selectAccountInitial(card: Card) {
+    this.selectedCard = card.nome;
+    this.transacaoForm.patchValue({ cartao_id: card.cartao_id }); // Atualiza o valor do ícone no formulário
+  }
+
+  async selectCategoryInitial(category: Category) {
+    this.selectedCategory = category.nome;
+    this.transacaoForm.patchValue({ categoria_id: category.id }); // Atualiza o valor do ícone no formulário
+  }
+
+  async selectInvoiceInitial(invoice: { label: string, date: moment.Moment }) {
+    this.selectedInvoice = invoice.label;
+    this.transacaoForm.patchValue({ mes_fatura: invoice.date.format('YYYY-MM-DD') }); // Define o campo mes_fatura para SQLite
+  }
+
   async selectCard(card: Card) {
     this.selectedCard = card.nome;
-    this.transacaoForm.patchValue({ cartao_id: card.cartao_id }); 
+    this.transacaoForm.patchValue({ cartao_id: card.cartao_id });
     this.generateInvoiceOptions(card); // Gera opções de fatura para o cartão selecionado
     await this.modalController.dismiss();
   }
@@ -123,51 +198,49 @@ export class AddCardExpenseComponent implements OnInit {
   async selectInvoice(invoice: { label: string, date: moment.Moment }) {
     this.selectedInvoice = invoice.label;
     this.transacaoForm.patchValue({ mes_fatura: invoice.date.format('YYYY-MM-DD') }); // Define o campo mes_fatura para SQLite
-    console.log('Fatura selecionada:', invoice.label);
     await this.modalController.dismiss();
   }
-  
+
   toggleParcelado(event: CustomEvent) {
     const isChecked = event.detail.checked;
     this.parcelado = isChecked;
     this.transacaoForm.patchValue({ is_parcelado: isChecked });
-  
-    // Exemplo de lógica adicional (como desabilitar um campo dependendo do estado)
-    if (isChecked) {
+
+    this.mostrarParcelas(isChecked)
+  }
+
+  mostrarParcelas(isChecked: boolean) {
+    if (isChecked === true) {
       this.transacaoForm.get('num_parcelas')?.enable();
       this.transacaoForm.get('valor_parcela')?.enable();
       this.transacaoForm.get('valor')?.disable();
-      
     } else {
       // Desabilitar campos relacionados a parcelamento
       this.transacaoForm.get('num_parcelas')?.disable();
       this.transacaoForm.get('valor_parcela')?.disable();
       this.transacaoForm.get('valor')?.enable();
     }
-  
-    // Exibe o estado do campo parcelado no console
-    console.log('Parcelado:', this.parcelado);
   }
 
   generateInvoiceOptions(card: Card) {
     const dayDue = card.dia_fechamento; // Dia de vencimento do cartão
     const currentDate = moment();
-  
+
     // Calcula o mês anterior, considerando o dia de vencimento
     const previousMonthInvoice = moment().subtract(1, 'months').date(dayDue);
-  
+
     // Próximos três meses, considerando o dia de vencimento
     const nextMonthsInvoices = [0, 1, 2, 3].map(i => moment().add(i, 'months').date(dayDue));
-  
+
     // Limpa faturas antigas antes de adicionar novas
     this.invoices = [];
-  
+
     // Adiciona o mês anterior à lista de faturas
     this.invoices.push({
       label: `Fatura ${dayDue.toString().padStart(2, '0')} ${previousMonthInvoice.format('MMM YYYY')}`,
       date: previousMonthInvoice
     });
-  
+
     // Adiciona os próximos três meses à lista de faturas
     nextMonthsInvoices.forEach(month => {
       this.invoices.push({
@@ -177,41 +250,35 @@ export class AddCardExpenseComponent implements OnInit {
     });
   }
 
+
   submitTransacao() {
-    if (this.transacaoForm.invalid) {
-      // Marca todos os campos como tocados para exibir a validação
-      this.transacaoForm.markAllAsTouched();
-      return;
-    }
-    
     if (this.transacaoForm.valid) {
       const formData = this.transacaoForm.value;
+      const transacao_id = this.despesa?.transacao_id;
 
-      // Formatação dos dados
+      // Formatação dos dados da transação
       const transacao = {
         descricao: formData.descricao,
         conta_id: formData.conta_id || null,
         cartao_id: formData.cartao_id || null,
         categoria_id: formData.categoria_id,
-        tipo: formData.tipo,  // "despesa" ou "receita", deve ser parte do seu formulário
-        // Formatação da data usando moment
-        data: moment(formData.data).format('YYYY-MM-DD'), // Formato desejado
+        tipo: formData.tipo,  // "despesa" ou "receita", deve estar no formulário
+        data_transacao: moment(formData.data).format('YYYY-MM-DD'), // Formato para data de transação
         valor: formData.valor,
-        status: formData.status,  // Adicionando status, padrão como 'pendente'
+        status: formData.status, // Status padrão, como 'pendente'
         is_parcelado: formData.is_parcelado,
         num_parcelas: formData.num_parcelas || null,
+        valor_parcela: formData.valor_parcela || null,
         is_recorrente: formData.is_recorrente,
         quantidade_repetir: formData.quantidade_repetir || null,
         periodo: formData.periodo || null,
-        fk_parcelas_parcela_id: formData.fk_parcelas_parcela_id || null, // Caso aplicável
-        valor_parcela: formData.valor_parcela || null,
+        fk_parcelas_parcela_id: formData.fk_parcelas_parcela_id || null,
         mes_fatura: moment(formData.mes_fatura).format('YYYY-MM-DD') || null
       };
 
-      console.log("transacao", JSON.stringify(transacao));
-
-      // Chama o serviço para salvar a transação no banco de dados
-      this.transactionService.addTransaction(
+      // Chama o serviço para atualizar a transação no banco de dados
+      this.transactionService.updateTransaction(
+        transacao_id!,
         transacao.conta_id,
         transacao.cartao_id,
         transacao.categoria_id,
@@ -224,25 +291,25 @@ export class AddCardExpenseComponent implements OnInit {
         transacao.is_recorrente,
         transacao.quantidade_repetir,
         transacao.periodo,
-        transacao.status, // Enviando status para o método
+        transacao.status,
         transacao.fk_parcelas_parcela_id,
-        transacao.data, // Enviando data formatada
+        transacao.data_transacao,
         transacao.mes_fatura
       )
         .then(async () => {
-          console.log('Transação adicionada com sucesso');
-          await this.presentToast('Transação adicionada com sucesso!', 'success');
+          console.log('Transação editada com sucesso');
+          await this.presentToast('Transação editada com sucesso!', 'success');
           this.modalController.dismiss({ transacao: this.transacaoForm });
-
-          this.transacaoForm.reset(); // Reseta o formulário
+          this.transacaoForm.reset(); // Reseta o formulário após o sucesso
         })
         .catch(error => {
-          console.error('Erro ao adicionar transação:', error);
+          console.error('Erro ao editar transação:', error);
         });
     } else {
       console.log('Formulário inválido');
     }
   }
+
 
   async presentToast(message: string, color: string) {
     const toast = await this.toastController.create({
@@ -252,5 +319,4 @@ export class AddCardExpenseComponent implements OnInit {
     });
     toast.present();
   }
-
 }
