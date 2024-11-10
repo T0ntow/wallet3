@@ -66,7 +66,7 @@ export class DatabaseService {
       );
   `);
 
-      await this.db.execute(`DROP TABLE IF EXISTS parcelasTable`);
+      // await this.db.execute(`DROP TABLE IF EXISTS parcelasTable`);
 
       await this.db.execute(`
         CREATE TABLE IF NOT EXISTS parcelasTable (
@@ -80,7 +80,7 @@ export class DatabaseService {
         );
     `);
 
-      await this.db.execute(`DROP TABLE IF EXISTS transacoes`);
+      // await this.db.execute(`DROP TABLE IF EXISTS transacoes`);
 
       await this.db.execute(`
         CREATE TABLE IF NOT EXISTS transacoes (

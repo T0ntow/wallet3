@@ -130,7 +130,9 @@ export class TransactionsPage implements OnInit {
         descricao: associatedExpense.descricao,
         categoria_id: associatedExpense.categoria_id,
         cartao_id: associatedExpense.cartao_id,
-        is_parcelado: associatedExpense.is_parcelado
+        is_parcelado: associatedExpense.is_parcelado,
+        num_parcelas: associatedExpense.num_parcelas,
+        data_transacao: associatedExpense.data_transacao
       } : null;
 
       // Retornar a parcela com a despesa associada separada
