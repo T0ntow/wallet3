@@ -9,17 +9,21 @@ import { TransactionsPageRoutingModule } from './transactions-routing.module';
 import { TransactionsPage } from './transactions.page';
 import { MonthNavigationComponent } from 'src/app/components/month-navigation/month-navigation.component';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
+import { EditExpenseComponent } from 'src/app/components/expenses/edit-expense/edit-expense.component';
+import { ReactiveFormsModule } from '@angular/forms';
 @NgModule({
   imports: [
     CommonModule,
     FormsModule,
     IonicModule,
     TransactionsPageRoutingModule,
-    FontAwesomeModule
+    FontAwesomeModule,
+    ReactiveFormsModule
   ],
   declarations: [
     TransactionsPage,
     MonthNavigationComponent,
+    EditExpenseComponent
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],  // Adicione esta linha
 })

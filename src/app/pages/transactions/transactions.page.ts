@@ -13,6 +13,7 @@ import { faBus } from '@fortawesome/free-solid-svg-icons';
 import { ModalController } from '@ionic/angular';
 import { CardService } from 'src/app/services/card/card.service';
 import { Card } from 'src/app/models/card.model';
+import { EditExpenseComponent } from 'src/app/components/expenses/edit-expense/edit-expense.component';
 
 @Component({
   selector: 'app-transactions',
@@ -220,11 +221,26 @@ export class TransactionsPage implements OnInit {
     this.isModalOpen = true;
   }
 
+
   closeModal() {
     console.log("CLOSE MODAL");
 
     this.isModalOpen = false;
     this.selectedDespesa = null; // Limpa a despesa selecionada
+  }
+
+  async editExpense(despesa: Transacao) {
+    const modal = await this.modalController.create({
+      component: EditExpenseComponent,
+      componentProps: {despesa: despesa}
+    });
+    modal.onDidDismiss().then((data) => {
+      if (data.data) {
+        this.transactionService.notifyTransactionUpdate()
+      }
+    });
+
+    return await modal.present();
   }
 
 }

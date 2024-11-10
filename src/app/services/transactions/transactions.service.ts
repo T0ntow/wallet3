@@ -299,18 +299,95 @@ export class TransactionsService {
   }
 
 
-  // Atualizar uma transação
-  async updateTransaction(transacao_id: number, conta_id: number, cartao_id: number, categoria_id: number, tipo: string, valor: number, descricao: string, is_parcelado: boolean, num_parcelas: number, is_recorrente: boolean, quantidade_repetir: number, periodo: string, fk_parcelas_parcela_id: number) {
-    const sql = `UPDATE transacoes SET conta_id = ?, cartao_id = ?, categoria_id = ?, tipo = ?, valor = ?, descricao = ?, is_parcelado = ?, num_parcelas = ?, is_recorrente = ?, quantidade_repetir = ?, periodo = ?, fk_parcelas_parcela_id = ? WHERE transacao_id = ?`;
-
+  async updateTransaction(
+    transacao_id: number,
+    conta_id: number | null,
+    cartao_id: number | null,
+    categoria_id: number,
+    tipo: string,
+    valor: number,
+    descricao: string,
+    is_parcelado: boolean,
+    num_parcelas: number | null,
+    valor_parcela: number | null,
+    is_recorrente: boolean,
+    quantidade_repetir: number | null,
+    periodo: string | null,
+    status: string,
+    fk_parcelas_parcela_id: number | null,
+    data_transacao: string,
+    mes_fatura: string | null
+  ): Promise<void> {
+    const db = await this.databaseService.getDb();
+  
+    if (!db) {
+      console.error('Database is not initialized');
+      return;
+    }
+  
+    const sql = `UPDATE transacoes SET 
+                 conta_id = ?, cartao_id = ?, categoria_id = ?, tipo = ?, valor = ?, descricao = ?, 
+                 is_parcelado = ?, num_parcelas = ?, valor_parcela = ?, is_recorrente = ?, 
+                 quantidade_repetir = ?, periodo = ?, status = ?, 
+                 fk_parcelas_parcela_id = ?, data_transacao = ?, mes_fatura = ?
+                 WHERE transacao_id = ?`;
+  
     try {
-      await this.db!.run(sql, [conta_id, cartao_id, categoria_id, tipo, valor, descricao, is_parcelado, num_parcelas, is_recorrente, quantidade_repetir, periodo, fk_parcelas_parcela_id, transacao_id]);
+      await db.run(sql, [
+        conta_id,
+        cartao_id,
+        categoria_id,
+        tipo,
+        valor,
+        descricao,
+        is_parcelado,
+        num_parcelas,
+        valor_parcela,
+        is_recorrente,
+        quantidade_repetir,
+        periodo,
+        status,
+        fk_parcelas_parcela_id,
+        data_transacao,
+        mes_fatura,
+        transacao_id
+      ]);
       console.log("Transação atualizada com sucesso!");
+  
+      // Atualiza as parcelas se a transação for parcelada
+      if (is_parcelado && num_parcelas && valor_parcela && mes_fatura) {
+        // Apaga parcelas existentes para recriá-las com as novas informações
+        await db.run(`DELETE FROM parcelasTable WHERE transacao_id = ?`, [transacao_id]);
+  
+        for (let i = 0; i < num_parcelas; i++) {
+          const vencimento = this.calculateDueDate(mes_fatura, i); // Calcula a data de vencimento para cada parcela
+          const descricaoParcela = `${descricao} (${i + 1} de ${num_parcelas})`;
+  
+          const insertParcelaSql = `
+            INSERT INTO parcelasTable 
+            (transacao_id, valor_parcela, data_vencimento, status, descricao) 
+            VALUES (?, ?, ?, ?, ?)
+          `;
+  
+          await db.run(insertParcelaSql, [
+            transacao_id,
+            valor_parcela,
+            vencimento,
+            'pendente', // Define o status 'pendente' para a nova parcela
+            descricaoParcela
+          ]);
+        }
+        console.log(`${num_parcelas} parcelas atualizadas com sucesso!`);
+      } else {
+        // Caso a transação não seja parcelada, remove parcelas existentes
+        await db.run(`DELETE FROM parcelasTable WHERE transacao_id = ?`, [transacao_id]);
+        console.log("Parcelas removidas, pois a transação não é mais parcelada.");
+      }
     } catch (error) {
-      console.error("Erro ao atualizar transação: ", error);
+      console.error("Erro ao atualizar transação ou parcelas: ", error);
     }
   }
-
+  
   // Deletar uma transação
   async deleteTransaction(transacao_id: number) {
     const sql = `DELETE FROM transacoes WHERE transacao_id = ?`;

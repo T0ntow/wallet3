@@ -100,7 +100,7 @@
               </ion-row>
               <ion-row>
                 <ion-col class="buttons">
-                  <ion-button fill="outline" color="warning">Editar Despesa</ion-button>
+                  <ion-button fill="outline" color="warning" (click)="editExpense(selectedDespesa)">Editar Despesa</ion-button>
                   <ion-button fill="outline" color="success"
                     *ngIf="selectedDespesa?.status === 'pendente'">Pagar</ion-button>
                 </ion-col>
