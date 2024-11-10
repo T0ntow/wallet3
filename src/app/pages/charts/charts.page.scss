@@ -1,0 +1,17 @@
+
+ion-header {
+    box-shadow: none;
+    border-bottom: 1px solid var(--ion-contrast);
+  
+    ion-toolbar div {
+      display: flex;
+      flex-direction: row;
+      justify-content: space-between;
+      padding: 0 15px;
+  
+      ion-title {
+        padding: 0 !important;
+      }
+    }
+  }
+  

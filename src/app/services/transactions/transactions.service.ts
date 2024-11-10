@@ -399,4 +399,58 @@ export class TransactionsService {
       console.error("Erro ao deletar transação: ", error);
     }
   }
+
+  async payExpense(transacao_id: number) {
+    const db = this.databaseService.getDb();
+  
+    if (!db) {
+      console.error('Database is not initialized');
+      return;
+    }
+  
+    try {
+      // Atualizar o status da transação para "pago"
+      await db.run(`
+        UPDATE transacoes
+        SET status = 'pago'
+        WHERE transacao_id = ?
+      `, [transacao_id]);
+  
+      console.log(`Transação com ID ${transacao_id} foi marcada como paga.`);
+  
+      // Atualizar o status de todas as parcelas associadas a essa transação para "pago"
+      await db.run(`
+        UPDATE parcelasTable
+        SET status = 'pago'
+        WHERE transacao_id = ?
+      `, [transacao_id]);
+  
+      console.log(`Todas as parcelas associadas à transação com ID ${transacao_id} foram marcadas como pagas.`);
+    } catch (error) {
+      console.error(`Erro ao pagar a transação e suas parcelas: ${error}`);
+    }
+  }
+
+  async payInstallment(parcela_id: number) {
+    const db = this.databaseService.getDb();
+  
+    if (!db) {
+      console.error('Database is not initialized');
+      return;
+    }
+  
+    try {
+      // Atualizar o status da parcela para "pago"
+      await db.run(`
+        UPDATE parcelasTable
+        SET status = 'pago'
+        WHERE parcela_id = ?
+      `, [parcela_id]);
+  
+      console.log(`Parcela com ID ${parcela_id} foi marcada como paga.`);
+    } catch (error) {
+      console.error(`Erro ao pagar a parcela: ${error}`);
+    }
+  }
+  
 }

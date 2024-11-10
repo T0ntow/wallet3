@@ -17,5 +17,6 @@ export interface Transacao {
     data_transacao: string; // Data da transação
     mes_fatura?: string; // Para quando a despesa for em cartão
     descricao_parcela?: string;
+    parcela_id?: number  | null;
   }
   

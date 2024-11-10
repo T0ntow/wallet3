@@ -15,6 +15,7 @@ import { CardService } from 'src/app/services/card/card.service';
 import { Card } from 'src/app/models/card.model';
 import { EditExpenseComponent } from 'src/app/components/expenses/edit-expense/edit-expense.component';
 import { EditCardExpenseComponent } from 'src/app/components/card-expenses/edit-card-expense/edit-card-expense.component';
+import { Parcela } from 'src/app/models/parcela.model';
 
 @Component({
   selector: 'app-transactions',
@@ -261,4 +262,31 @@ export class TransactionsPage implements OnInit {
       return await modal.present();
     }
   }
+
+  async payExpense(despesa: Transacao) {
+    if (despesa.transacao_id) {
+      try {
+        await this.transactionService.payExpense(despesa.transacao_id);
+        await this.modalController.dismiss();
+        console.log(`Despesa com ID ${despesa.transacao_id} foi marcada como paga.`);
+      } catch (error) {
+        await this.modalController.dismiss();
+        console.error('Erro ao pagar a despesa:', error);
+      }
+    }
+  }
+  
+  async payInstallment(parcela: Parcela) {
+    if (parcela.parcela_id) {
+      try {
+        await this.transactionService.payInstallment(parcela.parcela_id);
+        await this.modalController.dismiss();
+        console.log(`Parcela com ID ${parcela.parcela_id} foi marcada como paga.`);
+      } catch (error) {
+        await this.modalController.dismiss();
+        console.error('Erro ao pagar a parcela:', error);
+      }
+    }
+  }
+  
 }

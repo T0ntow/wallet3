@@ -31,11 +31,11 @@
 
             <div>
               <!-- Descrição sem as parcelas (*PARCELAS*) -->
-              <h4 *ngIf="despesa.is_parcelado === 0">{{ despesa.descricao }}</h4> 
-              
+              <h4 *ngIf="despesa.is_parcelado === 0">{{ despesa.descricao }}</h4>
+
               <!-- Descrição com parcelas (*PARCELAS*) -->
               <h4 *ngIf="despesa.valor_parcela">{{ despesa.descricao_parcela }}</h4>
-              
+
               <p class="banco" *ngIf="despesa.conta_id">{{ getAccountNameById(despesa.conta_id) }}</p>
               <p class="banco" *ngIf="despesa.cartao_id">{{ getCardNameById(despesa.cartao_id) }}</p>
             </div>
@@ -105,9 +105,20 @@
               </ion-row>
               <ion-row>
                 <ion-col class="buttons">
-                  <ion-button fill="outline" color="warning" (click)="editExpense(selectedDespesa)">Editar Despesa</ion-button>
+                  <ion-button fill="outline" color="warning" (click)="editExpense(selectedDespesa)">Editar
+                    Despesa</ion-button>
+                  <!-- Botão para pagar a despesa completa -->
+                  <ion-button fill="outline" color="success" *ngIf="selectedDespesa?.status === 'pendente'"
+                    (click)="payExpense(selectedDespesa)">
+                    Pagar Despesa
+                  </ion-button>
+
+                  <!-- Botão para pagar uma parcela específica -->
                   <ion-button fill="outline" color="success"
-                    *ngIf="selectedDespesa?.status === 'pendente'">Pagar</ion-button>
+                    *ngIf="selectedDespesa?.status === 'pendente' && selectedDespesa?.is_parcelado === 1"
+                    (click)="payInstallment(selectedDespesa)">
+                    Pagar Parcela
+                  </ion-button>
                 </ion-col>
               </ion-row>
             </ion-grid>
