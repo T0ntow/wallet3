@@ -1,4 +1,4 @@
-@import '../../mixins/segment-mixin.scss';
+@import "../../mixins/segment-mixin.scss";
 
 @include segment-style;
 
@@ -9,16 +9,14 @@
 ion-header {
   box-shadow: none;
   border-bottom: 1px solid var(--ion-contrast);
+  padding: 0 25px;
+  height: 8vh;
 
-  ion-toolbar div {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-between;
-    padding: 0 15px;
+  display: flex;
+  align-items: center;
 
-    ion-title {
-      padding: 0 !important;
-    }
+  ion-title {
+    padding: 0 !important;
   }
 }
 
@@ -109,8 +107,6 @@ main {
             width: 15px;
             height: 15px;
           }
-
-          
         }
       }
 
@@ -159,12 +155,12 @@ ion-grid {
       flex-direction: column;
       align-items: flex-start;
       height: 55px;
-  
+
       ion-label {
         font-size: 14px;
         color: var(--ion-text-color2);
       }
-  
+
       span {
         font-size: 14px;
         font-weight: bold;

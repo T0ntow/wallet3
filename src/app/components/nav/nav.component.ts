@@ -15,7 +15,6 @@ export class NavComponent implements OnInit {
 
   transactionService = inject(TransactionsService);
 
-
   onTabChange(tab: string) {
     this.selectedTab = tab; // Atualiza a aba ativa
   }

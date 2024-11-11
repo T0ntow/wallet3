@@ -1,16 +1,16 @@
 <ion-header [translucent]="true">
-  <ion-toolbar>
     <div>
       <ion-title>Categorias</ion-title>
-      <ion-button slot="end" fill="clear" size="small" *ngIf="segmentValue === 'despesas'" (click)="addCategory('despesa')">
-        <ion-icon name="add-circle" color="light"></ion-icon>
-      </ion-button>
 
-      <ion-button slot="end" fill="clear" size="small" *ngIf="segmentValue === 'receitas'" (click)="addCategory('receita')">
-        <ion-icon name="add-circle" color="light"></ion-icon>
-      </ion-button>
+      <div>
+        <ion-button slot="end" fill="clear" size="small" *ngIf="segmentValue === 'despesas'" (click)="addCategory('despesa')">
+          <ion-icon name="add-circle" color="light"></ion-icon>
+        </ion-button>
+        <ion-button slot="end" fill="clear" size="small" *ngIf="segmentValue === 'receitas'" (click)="addCategory('receita')">
+          <ion-icon name="add-circle" color="light"></ion-icon>
+        </ion-button>
+      </div>
     </div>
-  </ion-toolbar>
 </ion-header>
 
 <ion-content [fullscreen]="true">

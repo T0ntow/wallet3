@@ -107,19 +107,15 @@ export class TransactionsPage implements OnInit {
   }
 
   async updateTransactionsByMonth(month: string) {
-    console.log("MES", month); // Formato 'YYYY-MM'
     this.currentMonth = moment(month); // Atualiza currentMonth com o novo mês
 
     // Obtém as despesas de cartão e conta
     const despesas = await this.transactionService.getAllTransactions();
     const despesasCartao = await this.transactionService.getDespesasCartaoByMonth(month);
     const despesasConta = await this.transactionService.getDespesasContaByMonth(month);
-    console.log("despesasCartao", JSON.stringify(despesasCartao));
-    console.log("despesasConta", JSON.stringify(despesasConta));
 
     // Obter parcelas pendentes para o mês
     const installmentsResult = await this.transactionService.getParcelasByMonth(month);
-    console.log("PARCELAS", JSON.stringify(installmentsResult));
 
     // Mapeia as parcelas para incluir detalhes da despesa associada
     const mappedInstallments = installmentsResult.map(installment => {
@@ -150,8 +146,6 @@ export class TransactionsPage implements OnInit {
       ...mappedInstallments // Inclui as parcelas mapeadas dentro do mês
     ];
 
-    // console.log("Despesas e Parcelas", JSON.stringify(this.despesasFiltradas));
-
     // Chama a função para separar e processar as despesas e receitas
     this.separarDespesasEReceitas();
   }
@@ -160,9 +154,6 @@ export class TransactionsPage implements OnInit {
     // Filtra as despesas do tipo 'cartão' e 'conta'
     this.despesasCartaoFiltradas = this.despesasFiltradas.filter(transacao => transacao.cartao_id);
     this.despesasContaFiltradas = this.despesasFiltradas.filter(transacao => !transacao.cartao_id);
-
-    // console.log("Despesas de Cartão", JSON.stringify(this.despesasCartaoFiltradas));
-    // console.log("Despesas de Conta", JSON.stringify(this.despesasContaFiltradas));
 
     // Filtra as receitas
     this.receitasFiltradas = this.despesasFiltradas.filter(transacao => transacao.tipo === 'receita');
@@ -218,14 +209,12 @@ export class TransactionsPage implements OnInit {
     return categoria ? categoria.nome : 'Categoria desconhecida';
   }
 
-
   openModal(despesa: any) {
     this.selectedDespesa = despesa;
     console.log("this.selectedDespesa", JSON.stringify(this.selectedDespesa));
 
     this.isModalOpen = true;
   }
-
 
   closeModal() {
     console.log("CLOSE MODAL");
