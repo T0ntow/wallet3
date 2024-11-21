@@ -97,7 +97,7 @@ export class TransactionsService {
             transacao_id,
             valor_parcela,
             vencimento,
-            'pendente',  // Status 'pendente' para a parcela
+            status,  // Status 'pendente' para a parcela
             descricaoParcela
           ]);
         }
@@ -166,7 +166,8 @@ export class TransactionsService {
             quantidade_repetir: row.quantidade_repetir,
             periodo: row.periodo,
             fk_parcelas_parcela_id: row.fk_parcelas_parcela_id,
-            data_transacao: row.data_transacao // caso precise
+            data_transacao: row.data_transacao,// caso precise
+            mes_fatura: row.mes_fatura
           } as Transacao;
         })
         : [];
@@ -319,19 +320,19 @@ export class TransactionsService {
     mes_fatura: string | null
   ): Promise<void> {
     const db = await this.databaseService.getDb();
-  
+
     if (!db) {
       console.error('Database is not initialized');
       return;
     }
-  
+
     const sql = `UPDATE transacoes SET 
                  conta_id = ?, cartao_id = ?, categoria_id = ?, tipo = ?, valor = ?, descricao = ?, 
                  is_parcelado = ?, num_parcelas = ?, valor_parcela = ?, is_recorrente = ?, 
                  quantidade_repetir = ?, periodo = ?, status = ?, 
                  fk_parcelas_parcela_id = ?, data_transacao = ?, mes_fatura = ?
                  WHERE transacao_id = ?`;
-  
+
     try {
       await db.run(sql, [
         conta_id,
@@ -353,27 +354,27 @@ export class TransactionsService {
         transacao_id
       ]);
       console.log("Transação atualizada com sucesso!");
-  
+
       // Atualiza as parcelas se a transação for parcelada
       if (is_parcelado && num_parcelas && valor_parcela && mes_fatura) {
         // Apaga parcelas existentes para recriá-las com as novas informações
         await db.run(`DELETE FROM parcelasTable WHERE transacao_id = ?`, [transacao_id]);
-  
+
         for (let i = 0; i < num_parcelas; i++) {
           const vencimento = this.calculateDueDate(mes_fatura, i); // Calcula a data de vencimento para cada parcela
           const descricaoParcela = `${descricao} (${i + 1} de ${num_parcelas})`;
-  
+
           const insertParcelaSql = `
             INSERT INTO parcelasTable 
             (transacao_id, valor_parcela, data_vencimento, status, descricao_parcela) 
             VALUES (?, ?, ?, ?, ?)
           `;
-  
+
           await db.run(insertParcelaSql, [
             transacao_id,
             valor_parcela,
             vencimento,
-            'pendente', // Define o status 'pendente' para a nova parcela
+            status,
             descricaoParcela
           ]);
         }
@@ -387,27 +388,15 @@ export class TransactionsService {
       console.error("Erro ao atualizar transação ou parcelas: ", error);
     }
   }
-  
-  // Deletar uma transação
-  async deleteTransaction(transacao_id: number) {
-    const sql = `DELETE FROM transacoes WHERE transacao_id = ?`;
-
-    try {
-      await this.db!.run(sql, [transacao_id]);
-      console.log("Transação deletada com sucesso!");
-    } catch (error) {
-      console.error("Erro ao deletar transação: ", error);
-    }
-  }
 
   async payExpense(transacao_id: number) {
     const db = this.databaseService.getDb();
-  
+
     if (!db) {
       console.error('Database is not initialized');
       return;
     }
-  
+
     try {
       // Atualizar o status da transação para "pago"
       await db.run(`
@@ -415,16 +404,16 @@ export class TransactionsService {
         SET status = 'pago'
         WHERE transacao_id = ?
       `, [transacao_id]);
-  
+
       console.log(`Transação com ID ${transacao_id} foi marcada como paga.`);
-  
+
       // Atualizar o status de todas as parcelas associadas a essa transação para "pago"
       await db.run(`
         UPDATE parcelasTable
         SET status = 'pago'
         WHERE transacao_id = ?
       `, [transacao_id]);
-  
+
       console.log(`Todas as parcelas associadas à transação com ID ${transacao_id} foram marcadas como pagas.`);
     } catch (error) {
       console.error(`Erro ao pagar a transação e suas parcelas: ${error}`);
@@ -433,12 +422,12 @@ export class TransactionsService {
 
   async payInstallment(parcela_id: number) {
     const db = this.databaseService.getDb();
-  
+
     if (!db) {
       console.error('Database is not initialized');
       return;
     }
-  
+
     try {
       // Atualizar o status da parcela para "pago"
       await db.run(`
@@ -446,11 +435,63 @@ export class TransactionsService {
         SET status = 'pago'
         WHERE parcela_id = ?
       `, [parcela_id]);
-  
+
       console.log(`Parcela com ID ${parcela_id} foi marcada como paga.`);
     } catch (error) {
       console.error(`Erro ao pagar a parcela: ${error}`);
     }
   }
+
+  // Deletar uma transação
+  async deleteTransaction(transacao_id: number) {
+    const db = this.databaseService.getDb();
   
+    if (!db) {
+      console.error('O banco de dados não está inicializado.');
+      return;
+    }
+  
+    try {
+      // Excluir parcelas associadas à transação
+      await db.run(`
+        DELETE FROM parcelasTable 
+        WHERE transacao_id = ?
+      `, [transacao_id]);
+  
+      console.log(`Parcelas associadas à transação com ID ${transacao_id} foram excluídas.`);
+  
+      // Excluir a transação
+      await db.run(`
+        DELETE FROM transacoes 
+        WHERE transacao_id = ?
+      `, [transacao_id]);
+  
+      console.log(`Transação com ID ${transacao_id} foi excluída com sucesso.`);
+    } catch (error) {
+      console.error(`Erro ao excluir a transação ou suas parcelas para o ID ${transacao_id}:`, error);
+    }
+  }
+
+  async deleteInstallment(parcela_id: number) {
+    const db = this.databaseService.getDb();
+
+    if (!db) {
+      console.error('O banco de dados não está inicializado.');
+      return;
+    }
+
+    try {
+      // Excluir a parcela com o ID especificado
+      await db.run(`
+        DELETE FROM parcelasTable 
+        WHERE parcela_id = ?
+      `, [parcela_id]);
+
+      console.log(`Parcela com ID ${parcela_id} foi excluída com sucesso.`);
+    } catch (error) {
+      console.error(`Erro ao excluir a parcela com ID ${parcela_id}:`, error);
+    }
+  }
+
+
 }

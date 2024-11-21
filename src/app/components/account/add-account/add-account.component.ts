@@ -67,7 +67,7 @@ export class AddAccountComponent implements OnInit {
         // Chama o método do serviço para adicionar a conta no banco de dados
         await this.accountService.addAccount(nome, tipo, instituicao, saldo, logo_url);
   
-        await this.presentToast('Conta criada com sucesso!', 'success');
+        await this.presentToast('Conta criada com sucesso!', 'light');
         this.modalCtrl.dismiss({ conta: this.accountForm.value }); // Dismiss modal com os valores do formulário
   
       } catch (error) {

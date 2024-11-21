@@ -57,7 +57,7 @@ export class AddCategoryComponent  implements OnInit {
         // Chama o método do serviço para adicionar a conta no banco de dados
         await this.categoriesService.addCategory(nome, icone, tipo);
   
-        await this.presentToast('Categoria criada com sucesso!', 'success');
+        await this.presentToast('Categoria criada com sucesso!', 'light');
         this.modalController.dismiss({ categoria: this.categoryForm });
   
         // Fecha o modal após o sucesso

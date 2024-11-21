@@ -64,7 +64,7 @@ export class AddCardComponent implements OnInit {
         await this.cardService.addCard(name,  institution, limit, logo_url, closing_day);
   
         // Show a success message
-        await this.presentToast('Cartão criada com sucesso!', 'success');
+        await this.presentToast('Cartão criada com sucesso!', 'light');
   
         // Dismiss the modal with the form values
         this.modalCtrl.dismiss({ cartao: this.cardForm.value });

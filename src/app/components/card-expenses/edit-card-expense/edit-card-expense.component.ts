@@ -151,7 +151,7 @@ export class EditCardExpenseComponent implements OnInit {
   getCardById(id: number) {
     const card = this.cards.find(card => card.cartao_id === id);
     if (card)
-      this.selectAccountInitial(card);
+      this.selectCardInitial(card);
   }
 
   getCategoryById(id: number) {
@@ -161,15 +161,22 @@ export class EditCardExpenseComponent implements OnInit {
   }
 
   getInvoiceByDate(date: string) {
-    const invoice = this.invoices.find(invoice => invoice.date.format('YYYY-MM-DD') === date);
+    console.log("getInvoiceByDate");
+    
+    const targetDate = moment(date, 'YYYY-MM-DD'); // Parse a data no formato correto
+    const invoice = this.invoices.find(invoice => 
+      moment(invoice.date, 'YYYY-MM-DD').isSame(targetDate, 'month') // Comparar apenas o mês
+    );
     if (invoice) {
       this.selectInvoiceInitial(invoice);
     }
   }
+  
 
-  async selectAccountInitial(card: Card) {
+  async selectCardInitial(card: Card) {
     this.selectedCard = card.nome;
     this.transacaoForm.patchValue({ cartao_id: card.cartao_id }); // Atualiza o valor do ícone no formulário
+    this.generateInvoiceOptions(card); // Gera opções de fatura para o cartão selecionado
   }
 
   async selectCategoryInitial(category: Category) {
@@ -178,7 +185,12 @@ export class EditCardExpenseComponent implements OnInit {
   }
 
   async selectInvoiceInitial(invoice: { label: string, date: moment.Moment }) {
+    console.log("FATURA INICIAL");
     this.selectedInvoice = invoice.label;
+
+    console.log("this.selectedInvoice", this.selectedInvoice);
+    
+    
     this.transacaoForm.patchValue({ mes_fatura: invoice.date.format('YYYY-MM-DD') }); // Define o campo mes_fatura para SQLite
   }
 
@@ -252,6 +264,12 @@ export class EditCardExpenseComponent implements OnInit {
 
 
   submitTransacao() {
+    if (this.transacaoForm.invalid) {
+      // Marca todos os campos como tocados para exibir a validação
+      this.transacaoForm.markAllAsTouched();
+      return;
+    }
+    
     if (this.transacaoForm.valid) {
       const formData = this.transacaoForm.value;
       const transacao_id = this.despesa?.transacao_id;
@@ -298,7 +316,7 @@ export class EditCardExpenseComponent implements OnInit {
       )
         .then(async () => {
           console.log('Transação editada com sucesso');
-          await this.presentToast('Transação editada com sucesso!', 'success');
+          await this.presentToast('Transação editada com sucesso!', 'light');
           this.modalController.dismiss({ transacao: this.transacaoForm });
           this.transacaoForm.reset(); // Reseta o formulário após o sucesso
         })
@@ -314,8 +332,9 @@ export class EditCardExpenseComponent implements OnInit {
   async presentToast(message: string, color: string) {
     const toast = await this.toastController.create({
       message,
-      duration: 2000,
-      color
+      duration: 1500,
+      color,
+      position: "top"
     });
     toast.present();
   }

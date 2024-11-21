@@ -6,9 +6,11 @@
   font-family: "Inria Sans";
 }
 
+
 ion-header {
   box-shadow: none;
   border-bottom: 1px solid var(--ion-contrast);
+  background-color: var(--ion-background-color);
   padding: 0 25px;
   height: 8vh;
 

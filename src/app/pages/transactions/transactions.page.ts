@@ -10,7 +10,7 @@ import { CategoriesService } from 'src/app/services/categories/categories.servic
 import { CategoryLoaderService } from 'src/app/services/categories/category-loader-service.service';
 import { IconDefinition } from '@fortawesome/free-solid-svg-icons';
 import { faBus } from '@fortawesome/free-solid-svg-icons';
-import { ModalController } from '@ionic/angular';
+import { AlertController, ModalController, ToastController } from '@ionic/angular';
 import { CardService } from 'src/app/services/card/card.service';
 import { Card } from 'src/app/models/card.model';
 import { EditExpenseComponent } from 'src/app/components/expenses/edit-expense/edit-expense.component';
@@ -38,13 +38,15 @@ export class TransactionsPage implements OnInit {
 
   isSheetVisible: boolean = false;
 
-
   transactionService = inject(TransactionsService);
   databaseService = inject(DatabaseService);
   accountService = inject(AccountService);
   categoriesService = inject(CategoryLoaderService);
   modalController = inject(ModalController)
   cardService = inject(CardService)
+  alertController = inject(AlertController)
+  toastController = inject(ToastController)
+
 
 
   currentMonth = moment(); // Inicializa com o mês atual
@@ -79,7 +81,6 @@ export class TransactionsPage implements OnInit {
       console.error('Erro ao carregar contas:', error);
     }
   }
-
 
   async ngOnInit() {
     try {
@@ -129,7 +130,8 @@ export class TransactionsPage implements OnInit {
         cartao_id: associatedExpense.cartao_id,
         is_parcelado: associatedExpense.is_parcelado,
         num_parcelas: associatedExpense.num_parcelas,
-        data_transacao: associatedExpense.data_transacao
+        data_transacao: associatedExpense.data_transacao,
+        mes_fatura: associatedExpense.mes_fatura
       } : null;
 
       // Retornar a parcela com a despesa associada separada
@@ -212,13 +214,11 @@ export class TransactionsPage implements OnInit {
   openModal(despesa: any) {
     this.selectedDespesa = despesa;
     console.log("this.selectedDespesa", JSON.stringify(this.selectedDespesa));
-
+    
     this.isModalOpen = true;
   }
 
   closeModal() {
-    console.log("CLOSE MODAL");
-
     this.isModalOpen = false;
     this.selectedDespesa = null; // Limpa a despesa selecionada
   }
@@ -258,6 +258,7 @@ export class TransactionsPage implements OnInit {
         await this.transactionService.payExpense(despesa.transacao_id);
         await this.modalController.dismiss();
         console.log(`Despesa com ID ${despesa.transacao_id} foi marcada como paga.`);
+        this.transactionService.notifyTransactionUpdate()
       } catch (error) {
         await this.modalController.dismiss();
         console.error('Erro ao pagar a despesa:', error);
@@ -271,11 +272,96 @@ export class TransactionsPage implements OnInit {
         await this.transactionService.payInstallment(parcela.parcela_id);
         await this.modalController.dismiss();
         console.log(`Parcela com ID ${parcela.parcela_id} foi marcada como paga.`);
+        this.transactionService.notifyTransactionUpdate()
+
       } catch (error) {
         await this.modalController.dismiss();
         console.error('Erro ao pagar a parcela:', error);
       }
     }
   }
+
+  async deleteExpense(despesa: Transacao) {
+    const alert = await this.alertController.create({
+      header: 'Confirmar Exclusão',
+      message: `Tem certeza de que deseja excluir a despesa?`,
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel',
+          handler: () => {
+            console.log('A exclusão da despesa foi cancelada.');
+          },
+        },
+        {
+          text: 'Excluir',
+          handler: async () => {
+            if (despesa.transacao_id) {
+              try {
+                await this.transactionService.deleteTransaction(despesa.transacao_id);
+                await this.modalController.dismiss();
+                console.log(`Despesa com ID ${despesa.transacao_id} foi deletada.`);
+                await this.presentToast('Despesa excluida com sucesso!', 'light');
+
+                this.transactionService.notifyTransactionUpdate();
+              } catch (error) {
+                await this.modalController.dismiss();
+                console.error('Erro ao excluir a despesa:', error);
+                await this.presentToast('Erro ao excluir a despesa', 'danger');
+
+              }
+            }
+          },
+        },
+      ],
+    });
+    await alert.present();
+  }
   
+  async deleteInstallment(parcela: Parcela) {
+    const alert = await this.alertController.create({
+      header: 'Confirmar Exclusão',
+      message: `Tem certeza de que deseja excluir a parcela?`,
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel',
+          handler: () => {
+            console.log('A exclusão da parcela foi cancelada.');
+          },
+        },
+        {
+          text: 'Excluir',
+          handler: async () => {
+            if (parcela.parcela_id) {
+              try {
+                await this.transactionService.deleteInstallment(parcela.parcela_id);
+                await this.modalController.dismiss();
+                console.log(`Parcela com ID ${parcela.parcela_id} foi deletada.`);
+                await this.presentToast('Parcela excluida com sucesso!', 'light');
+
+                this.transactionService.notifyTransactionUpdate();
+              } catch (error) {
+                await this.modalController.dismiss();
+                console.error('Erro ao excluir a parcela:', error);
+                await this.presentToast('Erro ao excluir parcela', 'danger');
+              }
+            }
+          },
+        },
+      ],
+    });
+  
+    await alert.present();
+  }
+
+  async presentToast(message: string, color: string) {
+    const toast = await this.toastController.create({
+      message,
+      duration: 1500,
+      color,
+      position: "top"
+    });
+    toast.present();
+  }
 }

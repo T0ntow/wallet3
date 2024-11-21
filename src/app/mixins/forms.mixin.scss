@@ -1,5 +1,29 @@
 // Mixin para o formulário
 @mixin form-style() {
+    ion-toggle {
+        --track-background: #8f8f8f;
+        --track-background-checked: #8f8f8f;
+
+        --handle-background: #585858;
+        --handle-background-checked: #0092e7;
+
+        --handle-width: 10px;
+        --handle-height: 15px;
+        --handle-max-height: auto;
+        --handle-spacing: 2px;
+
+        --handle-border-radius: 4px;
+        --handle-box-shadow: none;
+    }
+
+    ion-toggle::part(track) {
+        height: 10px;
+        width: 30px;
+
+        /* Required for iOS handle to overflow the height of the track */
+        overflow: visible;
+    }
+
     .container-item {
         display: flex;
         flex-direction: column;
@@ -24,6 +48,7 @@
             letter-spacing: 1px;
             text-indent: 3px;
             font-size: 15px;
+            border: 1px solid rgba(128, 128, 128, 0.233);
 
             p {
                 overflow: hidden;
@@ -73,7 +98,9 @@
             border-radius: 5px;
             background-color: var(--ion-item-background);
 
-            img, ion-icon, fa-icon {
+            img,
+            ion-icon,
+            fa-icon {
                 width: 22px;
                 height: 22px;
                 font-size: 16px;
@@ -85,7 +112,8 @@
                 justify-content: center;
             }
 
-            p, ion-label {
+            p,
+            ion-label {
                 font-size: 14px;
                 font-weight: bold;
                 color: #000;
@@ -95,7 +123,7 @@
 
         .element:hover {
             cursor: pointer;
-            transition: all .2s ease-in-out;
+            transition: all 0.2s ease-in-out;
             background-color: #a7a7a7;
         }
     }

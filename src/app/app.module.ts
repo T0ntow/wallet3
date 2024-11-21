@@ -8,10 +8,11 @@ import { AppComponent } from './app.component';
 import { AppRoutingModule } from './app-routing.module';
 import { NavComponent } from './components/nav/nav.component';
 import { BaseChartDirective } from 'ng2-charts';
+import { RouterModule } from '@angular/router';
 
 @NgModule({
   declarations: [AppComponent, NavComponent],
-  imports: [BrowserModule, IonicModule.forRoot(), AppRoutingModule, BaseChartDirective],
+  imports: [BrowserModule, IonicModule.forRoot(), AppRoutingModule, BaseChartDirective,  RouterModule.forRoot([])],
   providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy }],
   bootstrap: [AppComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],  // Adicione esta linha

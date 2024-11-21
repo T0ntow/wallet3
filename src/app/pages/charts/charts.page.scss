@@ -5,6 +5,7 @@ ion-header {
   height: 8vh;
   display: flex;
   align-items: center;
+  background-color: var(--ion-background-color);
 
   ion-title {
     padding: 0 !important;

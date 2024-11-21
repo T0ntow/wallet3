@@ -188,7 +188,7 @@ export class EditExpenseComponent implements OnInit {
       )
         .then(async () => {
           console.log('Transação editada com sucesso');
-          await this.presentToast('Transação editada com sucesso!', 'success');
+          await this.presentToast('Transação editada com sucesso!', 'light');
           this.modalController.dismiss({ transacao: this.transacaoForm });
           this.transacaoForm.reset(); // Reseta o formulário após o sucesso
         })
@@ -203,8 +203,9 @@ export class EditExpenseComponent implements OnInit {
   async presentToast(message: string, color: string) {
     const toast = await this.toastController.create({
       message,
-      duration: 2000,
-      color
+      duration: 1500,
+      color,
+      position: "top"
     });
     toast.present();
   }
