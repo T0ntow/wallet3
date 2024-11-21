@@ -47,9 +47,17 @@ main {
 }
 
 .despesas {
-  display: flex;
-  flex-direction: column;
-  gap: 13px;
+
+  .titulo-grupo-data {
+    font-size: 15px;
+    border-bottom: 1px solid black;
+  }
+
+  .grupo-despesas {
+    display: flex;
+    flex-direction: column;
+    gap: 13px;
+  }
 
   .despesa-item {
     border-radius: 5px;

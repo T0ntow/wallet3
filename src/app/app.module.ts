@@ -1,4 +1,4 @@
-import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { NgModule, CUSTOM_ELEMENTS_SCHEMA, LOCALE_ID } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { RouteReuseStrategy } from '@angular/router';
 
@@ -10,10 +10,15 @@ import { NavComponent } from './components/nav/nav.component';
 import { BaseChartDirective } from 'ng2-charts';
 import { RouterModule } from '@angular/router';
 
+import { registerLocaleData } from '@angular/common';
+import localePt from '@angular/common/locales/pt';
+registerLocaleData(localePt, 'pt');
+
+
 @NgModule({
   declarations: [AppComponent, NavComponent],
   imports: [BrowserModule, IonicModule.forRoot(), AppRoutingModule, BaseChartDirective,  RouterModule.forRoot([])],
-  providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy }],
+  providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy }, { provide: LOCALE_ID, useValue: 'pt' }],
   bootstrap: [AppComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],  // Adicione esta linha
 })

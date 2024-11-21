@@ -27,6 +27,7 @@ export class TransactionsPage implements OnInit {
 
   despesasFiltradas: Transacao[] = []; // Array de despesas filtradas
   receitasFiltradas: Transacao[] = []; // Array de receitas filtradas
+
   despesasContaFiltradas: Transacao[] = [];
   despesasCartaoFiltradas: Transacao[] = [];
 
@@ -47,14 +48,15 @@ export class TransactionsPage implements OnInit {
   alertController = inject(AlertController)
   toastController = inject(ToastController)
 
-
-
   currentMonth = moment(); // Inicializa com o mês atual
 
   faBus = faBus;
 
   isModalOpen = false;
   selectedDespesa: any = null;
+  
+  despesasAgrupadas: { data: string; transacoes: Transacao[]; }[] | undefined;
+  receitasAgrupadas: { data: string; transacoes: Transacao[]; }[] | undefined;
 
   constructor() { }
 
@@ -160,24 +162,44 @@ export class TransactionsPage implements OnInit {
   }
 
   separarDespesasEReceitas() {
-    // Filtra as despesas do tipo 'cartão' e 'conta'
-    this.despesasCartaoFiltradas = this.despesasFiltradas.filter(transacao => transacao.cartao_id);
-    this.despesasContaFiltradas = this.despesasFiltradas.filter(transacao => !transacao.cartao_id);
+    // Agrupa despesas e receitas por data
+    const despesasAgrupadas: Record<string, Transacao[]> = {}; // Objeto para armazenar as transações agrupadas
+    const receitasAgrupadas: Record<string, Transacao[]> = {}; // Objeto para armazenar as transações agrupadas
 
-    // Filtra as receitas
-    this.receitasFiltradas = this.despesasFiltradas.filter(transacao => transacao.tipo === 'receita');
-
-    // Ordena as despesas de cartão, conta e receitas por data
-    this.despesasCartaoFiltradas.sort((a, b) => moment(b.mes_fatura).diff(moment(a.mes_fatura)));
-    this.despesasContaFiltradas.sort((a, b) => moment(b.data_transacao).diff(moment(a.data_transacao)));
-    this.receitasFiltradas.sort((a, b) => moment(b.data_transacao).diff(moment(a.data_transacao)));
-
-    // Combina as despesas de cartão e conta para o mês atual
-    this.despesasFiltradas = [
-      ...this.despesasCartaoFiltradas,
-      ...this.despesasContaFiltradas
-    ];
+    // Filtra despesas e receitas
+    const despesas = this.despesasFiltradas.filter(transacao => transacao.tipo === 'despesa');
+    const receitas = this.despesasFiltradas.filter(transacao => transacao.tipo === 'receita');
+  
+    // Agrupa despesas por data
+    despesas.forEach(despesa => {
+      const data = moment(despesa.data_transacao).format('YYYY-MM-DD');
+      if (!despesasAgrupadas[data]) {
+        despesasAgrupadas[data] = [];
+      }
+      despesasAgrupadas[data].push(despesa);
+    });
+  
+    // Agrupa receitas por data
+    receitas.forEach(receita => {
+      const data = moment(receita.data_transacao).format('YYYY-MM-DD');
+      if (!receitasAgrupadas[data]) {
+        receitasAgrupadas[data] = [];
+      }
+      receitasAgrupadas[data].push(receita);
+    });
+  
+    // Salva os grupos ordenados
+    this.despesasAgrupadas = this.ordenarGruposPorData(despesasAgrupadas);
+    this.receitasAgrupadas = this.ordenarGruposPorData(receitasAgrupadas);
   }
+  
+  // Função para ordenar os grupos por data
+  ordenarGruposPorData(grupos: Record<string, any[]>) {
+    return Object.keys(grupos)
+      .sort((a, b) => moment(b).diff(moment(a))) // Ordena as datas de forma decrescente
+      .map(data => ({ data, transacoes: grupos[data] }));
+  }
+  
 
   calcularTotalDespesas(): number {
     return this.despesasFiltradas.reduce((total, despesa) => {
