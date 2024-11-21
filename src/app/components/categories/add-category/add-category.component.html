@@ -41,29 +41,38 @@
     <div class="container-item" id="open-modal-icon" expand="block">
       <label position="stacked">Icone</label>
       <div class="custom-input" style="display: flex; align-items: center;">
-        <p style="margin: 0;">{{ selectedIcon || 'Selecione um icone' }}</p>
+        <!-- Exibe o ícone selecionado -->
+        <fa-icon *ngIf="selectedIcon" [icon]="getSelectedIcon()" class="icon-category"></fa-icon>
+        <!-- Texto de fallback -->
+        <p style="margin: 0;" *ngIf="!selectedIcon">Selecione um ícone</p>
       </div>
     </div>
+    
 
     <button [disabled]="categoryForm.invalid" (click)="submitCategory()" class="submit-button">Adicionar
       Categoria</button>
   </form>
 
-  <ion-modal trigger="open-modal-icon" [initialBreakpoint]="0.75" [breakpoints]="[0, 0.75, 1]">
+  <ion-modal trigger="open-modal-icon" [initialBreakpoint]="1" [breakpoints]="[1]" class="modal-icons">
     <ng-template>
       <div class="sheet">
         <div class="sheet-header">
-          <p>Icones</p>
+          <p>Ícones</p>
         </div>
         <div class="sheet-content">
-          <!-- LISTAR ICONES do Font Awesome -->
-          <div *ngFor="let icon of icons" class="icon-item" (click)="selectIcon(icon.icon)">
-            <fa-icon [icon]="icon.icon"></fa-icon>
+          <div *ngFor="let group of iconsGrouped" class="icon-group">
+            <h3>{{ group.title }}</h3>
+            <div class="icon-items">
+              <div *ngFor="let icon of group.items" class="icon-item" (click)="selectIcon(icon)">
+                <fa-icon [icon]="icon.icon"></fa-icon>
+              </div>
+            </div>
           </div>
         </div>
       </div>
     </ng-template>
   </ion-modal>
+  
 
 
 

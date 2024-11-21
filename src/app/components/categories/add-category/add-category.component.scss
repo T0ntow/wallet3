@@ -1,4 +1,4 @@
-@import '../../../mixins/forms.mixin.scss';
+@import "../../../mixins/forms.mixin.scss";
 
 * {
     font-family: "Inria Sans";
@@ -32,7 +32,6 @@ ion-grid {
 
 ion-segment {
     height: 100% !important;
-
 }
 
 .segment-button {
@@ -40,27 +39,50 @@ ion-segment {
     font-size: 14px;
 }
 
-.segment-button:hover ion-label{
+.segment-button:hover ion-label {
     color: #000;
     font-weight: bolder;
 }
 
+.icon-category {
+  font-size: 18px;
+}
 // Para os icones
 .sheet-content {
     display: flex;
+    overflow: auto;
     gap: 10px;
-    flex-wrap: wrap;
-    padding: 20px 10px;
+    padding: 5px 10px;
+    flex-direction: column;
+    height: 100%;
+
+    //TITULO DA CATEGORIA
+    h3 {
+        font-size: 15px;
+        font-weight: bold;
+        letter-spacing: 1px;
+    }
+    
+    .icon-items {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
+
+    .icon-item:hover {
+        border-color: var(--ion-color-primary);
+    }
+
     .icon-item {
-        width: 35px;
-        height: 35px;
-    
+        width: 40px;
+        height: 40px;
+
         background-color: var(--ion-item-background);
-    
+
         display: flex;
         align-items: center;
         justify-content: center;
-    
+
         border-radius: 50%;
     }
 }

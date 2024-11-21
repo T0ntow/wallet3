@@ -77,6 +77,8 @@ export class TransactionsPage implements OnInit {
   async loadCategories() {
     try {
       this.categorias = await this.categoriesService.loadCategories(); // Carrega todas as contas
+      console.log("CATEGORIAS");
+      
     } catch (error) {
       console.error('Erro ao carregar contas:', error);
     }
@@ -84,12 +86,7 @@ export class TransactionsPage implements OnInit {
 
   async ngOnInit() {
     try {
-      await this.databaseService.createDatabaseConnection();
-
-      // Sequential loading of accounts and categories with individual error handling
-      await this.loadAccounts().catch(error => console.error("Error loading accounts:", error));
-      await this.loadCategories().catch(error => console.error("Error loading categories:", error));
-      await this.loadCards().catch(error => console.error("Error loading cards:", error));
+      await this.initApp();
 
       // Load initial transactions by the current month
       await this.updateTransactionsByMonth(this.currentMonth.format('YYYY-MM'));
@@ -107,9 +104,19 @@ export class TransactionsPage implements OnInit {
     });
   }
 
-  async updateTransactionsByMonth(month: string) {
-    this.currentMonth = moment(month); // Atualiza currentMonth com o novo mês
+  async initApp() {
+    await this.databaseService.createDatabaseConnection();
 
+    // Sequential loading of accounts and categories with individual error handling
+    await this.loadAccounts().catch(error => console.error("Error loading accounts:", error));
+    await this.loadCategories().catch(error => console.error("Error loading categories:", error));
+    await this.loadCards().catch(error => console.error("Error loading cards:", error));
+  }
+
+  async updateTransactionsByMonth(month: string) {
+    await this.initApp();
+    
+    this.currentMonth = moment(month); // Atualiza currentMonth com o novo mês
     // Obtém as despesas de cartão e conta
     const despesas = await this.transactionService.getAllTransactions();
     const despesasCartao = await this.transactionService.getDespesasCartaoByMonth(month);
@@ -176,21 +183,21 @@ export class TransactionsPage implements OnInit {
     return this.despesasFiltradas.reduce((total, despesa) => {
       // Garantir que tanto valor quanto valor_parcela sejam números válidos
       const valor = Number(despesa.valor) || 0;
-      const valorParcela = Number(despesa.valor_parcela) || 0; 
+      const valorParcela = Number(despesa.valor_parcela) || 0;
       return total + valor + valorParcela;
     }, 0);
   }
-  
+
   calcularTotalPendentes(): number {
     return this.despesasFiltradas
       .filter(despesa => despesa.status === 'pendente')
       .reduce((total, despesa) => {
-        const valor = Number(despesa.valor) || 0; 
-        const valorParcela = Number(despesa.valor_parcela) || 0; 
+        const valor = Number(despesa.valor) || 0;
+        const valorParcela = Number(despesa.valor_parcela) || 0;
         return total + valor + valorParcela;
       }, 0);
   }
-  
+
   getAccountNameById(conta_id: number): string {
     const conta = this.contas.find(account => account.conta_id === conta_id);
     return conta ? conta.nome : 'Conta desconhecida'; // Retorna o nome ou uma string padrão
@@ -214,7 +221,7 @@ export class TransactionsPage implements OnInit {
   openModal(despesa: any) {
     this.selectedDespesa = despesa;
     console.log("this.selectedDespesa", JSON.stringify(this.selectedDespesa));
-    
+
     this.isModalOpen = true;
   }
 
@@ -224,10 +231,10 @@ export class TransactionsPage implements OnInit {
   }
 
   async editExpense(despesa: Transacao) {
-    if(despesa.cartao_id) {
+    if (despesa.cartao_id) {
       const modal = await this.modalController.create({
         component: EditCardExpenseComponent,
-        componentProps: {despesa: despesa}
+        componentProps: { despesa: despesa }
       });
       modal.onDidDismiss().then((data) => {
         if (data.data) {
@@ -240,14 +247,14 @@ export class TransactionsPage implements OnInit {
     if (despesa.conta_id) {
       const modal = await this.modalController.create({
         component: EditExpenseComponent,
-        componentProps: {despesa: despesa}
+        componentProps: { despesa: despesa }
       });
       modal.onDidDismiss().then((data) => {
         if (data.data) {
           this.transactionService.notifyTransactionUpdate()
         }
       });
-  
+
       return await modal.present();
     }
   }
@@ -265,7 +272,7 @@ export class TransactionsPage implements OnInit {
       }
     }
   }
-  
+
   async payInstallment(parcela: Parcela) {
     if (parcela.parcela_id) {
       try {
@@ -317,7 +324,7 @@ export class TransactionsPage implements OnInit {
     });
     await alert.present();
   }
-  
+
   async deleteInstallment(parcela: Parcela) {
     const alert = await this.alertController.create({
       header: 'Confirmar Exclusão',
@@ -351,7 +358,7 @@ export class TransactionsPage implements OnInit {
         },
       ],
     });
-  
+
     await alert.present();
   }
 
