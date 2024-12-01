@@ -1,4 +1,4 @@
-import { NgModule,CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
+import { NgModule, CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormControlName, FormsModule } from '@angular/forms';
 
@@ -30,6 +30,6 @@ import { ChartsComponent } from 'src/app/components/charts/charts.component';
     EditCardExpenseComponent,
     ChartsComponent
   ],
-  schemas: [CUSTOM_ELEMENTS_SCHEMA],  // Adicione esta linha
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
 export class TransactionsPageModule {}

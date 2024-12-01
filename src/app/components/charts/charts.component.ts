@@ -46,9 +46,12 @@ export class ChartsComponent implements OnChanges {
       this.despesas
         .filter(despesa =>
           despesa.categoria_id === categoria.id &&
-          (this.exibirPendentes ? despesa.status === 'pendente' : despesa.status === 'pago')
+          (this.exibirPendentes
+            //CASO SEJA OS PENDENTES mostrar o 'gasto pendente' se não 'total gasto'(somando tudo)
+            ? despesa.status === 'pendente'
+            : despesa.status === 'pago' || despesa.status === 'pendente' ) // Considera 'pago' se não for pendente
         )
-        .reduce((total, despesa) => total + (despesa.valor || 0) + (despesa.valor_parcela || 0), 0)
+        .reduce((total, despesa) => total + (despesa.valor || 0) + (despesa.valor_parcela || 0), 0) // Soma o valor total
     );
   
     // Filtra as categorias e valores para exibir apenas as que têm valores maiores que zero (no caso de pendentes ou pagos)

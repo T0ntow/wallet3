@@ -4,6 +4,7 @@ import { CategoryLoaderService } from 'src/app/services/categories/category-load
 import { ModalController } from '@ionic/angular';
 import { AddCategoryComponent } from 'src/app/components/categories/add-category/add-category.component';
 import { DatabaseService } from 'src/app/services/database.service';
+import { EditCategoryComponent } from 'src/app/components/categories/edit-category/edit-category.component';
 
 @Component({
   selector: 'app-categories',
@@ -13,7 +14,6 @@ import { DatabaseService } from 'src/app/services/database.service';
 
 export class CategoriesPage implements OnInit {
   segmentValue: string = 'despesas';  // Valor padrão do segmento
-  selectedCategory: string = '';
 
   categories: Category[] = [];
   expenseCategories: Category[] = [];
@@ -22,13 +22,24 @@ export class CategoriesPage implements OnInit {
   categoryLoaderService = inject(CategoryLoaderService)
   databaseService = inject(DatabaseService)
 
+  isModalOpen = false;
+  selectedCategory: Category | undefined;
+
+
   constructor(
     private modalCtrl: ModalController,
   ) { }
 
   async ngOnInit() {
     await this.databaseService.createDatabaseConnection();
-    await this.getCatgories();
+
+    // Subscription to handle transaction updates
+    this.categoryLoaderService.categoriesUpdated$.subscribe({
+      next: async () => {
+        await this.getCatgories();
+      },
+      error: err => console.error("Subscription error:", err)
+    });
   }
 
   async getCatgories() {
@@ -54,6 +65,33 @@ export class CategoriesPage implements OnInit {
     modal.onDidDismiss().then((data) => {
       if (data.data) {
         this.getCatgories()
+      }
+    });
+
+    return await modal.present();
+  }
+
+  openModal(categoria: Category) {
+    this.selectedCategory = categoria;
+    console.log("this.selectedCategory", JSON.stringify(this.selectedCategory));
+
+    this.isModalOpen = true;
+  }
+
+  closeModal() {
+    this.isModalOpen = false;
+    this.selectedCategory = undefined; // Limpa a despesa selecionada
+  }
+
+  async editCategory(categoria: Category | undefined) {
+    const modal = await this.modalCtrl.create({
+      component: EditCategoryComponent,
+      componentProps: { categoria: categoria }
+    });
+    modal.onDidDismiss().then((data) => {
+      if (data.data) {
+        this.categoryLoaderService.notifyCategoriesUpdate()
+        this.closeModal();
       }
     });
 

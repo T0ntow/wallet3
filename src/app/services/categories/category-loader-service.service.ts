@@ -31,11 +31,19 @@ import {
   faUser,
   faTruckFast
 } from '@fortawesome/free-solid-svg-icons';
+import { BehaviorSubject } from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
 })
 export class CategoryLoaderService {
+  private categoriesUpdatedSource = new BehaviorSubject<void>(undefined);
+  categoriesUpdated$ = this.categoriesUpdatedSource.asObservable();
+
+  notifyCategoriesUpdate() {
+    this.categoriesUpdatedSource.next();
+  }
+
   private icons = [
     {
       title: 'Compras',

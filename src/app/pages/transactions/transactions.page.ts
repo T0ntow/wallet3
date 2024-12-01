@@ -261,6 +261,7 @@ export class TransactionsPage implements OnInit {
       modal.onDidDismiss().then((data) => {
         if (data.data) {
           this.transactionService.notifyTransactionUpdate()
+          this.closeModal();
         }
       });
       return await modal.present();
@@ -274,6 +275,7 @@ export class TransactionsPage implements OnInit {
       modal.onDidDismiss().then((data) => {
         if (data.data) {
           this.transactionService.notifyTransactionUpdate()
+          this.closeModal();
         }
       });
 
@@ -285,11 +287,11 @@ export class TransactionsPage implements OnInit {
     if (despesa.transacao_id) {
       try {
         await this.transactionService.payExpense(despesa.transacao_id);
-        await this.modalController.dismiss();
+        this.closeModal();
         console.log(`Despesa com ID ${despesa.transacao_id} foi marcada como paga.`);
         this.transactionService.notifyTransactionUpdate()
       } catch (error) {
-        await this.modalController.dismiss();
+        this.closeModal();
         console.error('Erro ao pagar a despesa:', error);
       }
     }
@@ -299,12 +301,12 @@ export class TransactionsPage implements OnInit {
     if (parcela.parcela_id) {
       try {
         await this.transactionService.payInstallment(parcela.parcela_id);
-        await this.modalController.dismiss();
+        this.closeModal();
         console.log(`Parcela com ID ${parcela.parcela_id} foi marcada como paga.`);
         this.transactionService.notifyTransactionUpdate()
 
       } catch (error) {
-        await this.modalController.dismiss();
+        this.closeModal();
         console.error('Erro ao pagar a parcela:', error);
       }
     }
@@ -328,13 +330,13 @@ export class TransactionsPage implements OnInit {
             if (despesa.transacao_id) {
               try {
                 await this.transactionService.deleteTransaction(despesa.transacao_id);
-                await this.modalController.dismiss();
+                this.closeModal();
                 console.log(`Despesa com ID ${despesa.transacao_id} foi deletada.`);
                 await this.presentToast('Despesa excluida com sucesso!', 'light');
 
                 this.transactionService.notifyTransactionUpdate();
               } catch (error) {
-                await this.modalController.dismiss();
+                this.closeModal();
                 console.error('Erro ao excluir a despesa:', error);
                 await this.presentToast('Erro ao excluir a despesa', 'danger');
 
@@ -365,13 +367,13 @@ export class TransactionsPage implements OnInit {
             if (parcela.parcela_id) {
               try {
                 await this.transactionService.deleteInstallment(parcela.parcela_id);
-                await this.modalController.dismiss();
+                this.closeModal();
                 console.log(`Parcela com ID ${parcela.parcela_id} foi deletada.`);
                 await this.presentToast('Parcela excluida com sucesso!', 'light');
 
                 this.transactionService.notifyTransactionUpdate();
               } catch (error) {
-                await this.modalController.dismiss();
+                this.closeModal();
                 console.error('Erro ao excluir a parcela:', error);
                 await this.presentToast('Erro ao excluir parcela', 'danger');
               }

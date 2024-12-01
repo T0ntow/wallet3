@@ -20,8 +20,8 @@
     <ion-segment-content *ngIf="segmentValue === 'despesas'" id="despesas">
       <main>
         <div class="resumo">
-          <p>Gasto em {{ currentMonth.format('MMMM YYYY') }}: {{ calcularTotalDespesas() | currency }}</p>
-          <p>Pendente: {{ calcularTotalPendentes() | currency }}</p>
+          <p>Gasto em {{ currentMonth.format('MMMM YYYY') }}: {{ calcularTotalDespesas() | currency:'BRL':'symbol':'1.2-2'  }}</p>
+          <p>Pendente: {{ calcularTotalPendentes() | currency:'BRL':'symbol':'1.2-2'  }}</p>
         </div>
         <div>
           <app-charts [despesas]="despesasFiltradas" [categorias]="categorias"></app-charts>
@@ -55,47 +55,6 @@
             </div>
           </div>
         </div>
-
-
-        <!-- <div class="despesas">
-          <div >
-            <h4 class="titulo-grupo-data">20 nove</h4>
-            <div class="grupo-despesas">
-              <div  class="despesa-item" >
-                <div class="despesa-info">
-                  <div class="esquerda">
-                    <div>
-                      <p>NUBAS</p>
-                    </div>
-                  </div>
-                  <div class="direita">
-                    <h5 >30</h5>
-                    <div class="details">
-                      <ion-icon  name="checkmark-circle"></ion-icon>
-                    </div>
-                  </div>
-                </div>
-              </div>
-              
-              <div  class="despesa-item" >
-                <div class="despesa-info">
-                  <div class="esquerda">
-                    <div>
-                      <p>NUBAS</p>
-                    </div>
-                  </div>
-                  <div class="direita">
-                    <h5 >30</h5>
-                    <div class="details">
-                      <ion-icon  name="checkmark-circle"></ion-icon>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div> -->
-        
       </main>
 
       <!-- Modal for expense details -->
