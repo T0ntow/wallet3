@@ -46,25 +46,25 @@ main {
   color: #0099ffc4;
 }
 
-.despesas {
+.transacoes {
 
   .titulo-grupo-data {
     font-size: 15px;
     border-bottom: 1px solid black;
   }
 
-  .grupo-despesas {
+  .grupo-transacoes {
     display: flex;
     flex-direction: column;
     gap: 13px;
   }
 
-  .despesa-item {
+  .transacao-item {
     border-radius: 5px;
     height: 45px;
     background-color: var(--ion-item-background);
 
-    .despesa-info {
+    .transacao-info {
       display: flex;
       flex-direction: row;
       align-items: center;

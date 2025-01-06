@@ -26,12 +26,12 @@
         <div>
           <app-charts [despesas]="despesasFiltradas" [categorias]="categorias"></app-charts>
         </div>
-        <div class="despesas">
+        <div class="transacoes">
           <div *ngFor="let grupo of despesasAgrupadas">
             <h4 class="titulo-grupo-data">{{ grupo.data | date: 'dd MMMM' }}</h4>
-            <div class="grupo-despesas">
-              <div *ngFor="let despesa of grupo.transacoes" class="despesa-item" (click)="openModal(despesa)">
-                <div class="despesa-info">
+            <div class="grupo-transacoes">
+              <div *ngFor="let despesa of grupo.transacoes" class="transacao-item" (click)="openModalDespesa(despesa)">
+                <div class="transacao-info">
                   <div class="esquerda">
                     <fa-icon *ngIf="getIconByCategoryId(despesa.categoria_id) as icon" [icon]="icon" class="icon"></fa-icon>
                     <div>
@@ -58,8 +58,8 @@
       </main>
 
       <!-- Modal for expense details -->
-      <ion-modal #modal [isOpen]="isModalOpen" [componentProps]="{ despesa: selectedDespesa }"
-      [initialBreakpoint]="0.5" [breakpoints]="[0, 0.5]" (ionModalDidDismiss)="closeModal()">
+      <ion-modal #modal [isOpen]="isModalDespesaOpen" [componentProps]="{ despesa: selectedDespesa }"
+      [initialBreakpoint]="0.5" [breakpoints]="[0, 0.5]" (ionModalDidDismiss)="closeModalDespesa()">
       <ng-template>
         <ion-content>
           <ion-grid>
@@ -138,9 +138,75 @@
     </ion-segment-content>
   </ion-segment-view>
 
+  <!-- Segment Receitas -->
   <ion-segment-view>
     <ion-segment-content *ngIf="segmentValue === 'receitas'" id="receitas">
-      <!-- Conteúdo de receitas aqui -->
+      <main>
+        <div class="resumo">
+          <p>Receita em {{ currentMonth.format('MMMM YYYY') }}: {{ calcularTotalReceitas() | currency:'BRL':'symbol':'1.2-2' }}</p>
+        </div>
+        <div>
+          <app-charts [receitas]="receitasFiltradas" [categorias]="categorias"></app-charts>
+        </div>
+        <div class="transacoes">
+          <div *ngFor="let grupo of receitasAgrupadas">
+            <h4 class="titulo-grupo-data">{{ grupo.data | date: 'dd MMMM' }}</h4>
+            <div class="grupo-transacoes">
+              <div *ngFor="let receita of grupo.transacoes" class="transacao-item" (click)="openModalReceita(receita)">
+                <div class="transacao-info">
+                  <div class="esquerda">
+                    <fa-icon *ngIf="getIconByCategoryId(receita.categoria_id) as icon" [icon]="icon" class="icon"></fa-icon>
+                    <div>
+                      <h4>{{ receita.descricao }}</h4>
+                      <p class="banco" *ngIf="receita.conta_id">{{ getAccountNameById(receita.conta_id) }}</p>
+                    </div>
+                  </div>
+                  <div class="direita">
+                    <h5>{{ receita.valor | currency:'BRL':'symbol':'1.2-2' }}</h5>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </main>
+
+      <!-- Modal para detalhes da receita -->
+      <ion-modal #modalReceita [isOpen]="isModalReceitaOpen" [componentProps]="{ receita: selectedReceita }"
+        [initialBreakpoint]="0.5" [breakpoints]="[0, 0.5]" (ionModalDidDismiss)="closeModalReceita()">
+        <ng-template>
+          <ion-content>
+            <ion-grid>
+              <ion-row>
+                <ion-col>
+                  <ion-label>Descrição:</ion-label>
+                  <span>{{ selectedReceita?.descricao }}</span>
+                </ion-col>
+                <ion-col>
+                  <ion-label>Valor:</ion-label>
+                  <span>{{ selectedReceita?.valor | currency }}</span>
+                </ion-col>
+              </ion-row>
+              <ion-row>
+                <ion-col>
+                  <ion-label>Conta:</ion-label>
+                  <span>{{ getAccountNameById(selectedReceita?.conta_id) }}</span>
+                </ion-col>
+                <ion-col>
+                  <ion-label>Categoria:</ion-label>
+                  <span>{{ getCategoryNameById(selectedReceita?.categoria_id) }}</span>
+                </ion-col>
+              </ion-row>
+              <ion-row>
+                <ion-col class="buttons">
+                  <ion-button fill="outline" color="warning" (click)="editIncome(selectedReceita)">Editar Receita</ion-button>
+                  <ion-button fill="outline" color="danger" (click)="deleteIncome(selectedReceita)">Excluir Receita</ion-button>
+                </ion-col>
+              </ion-row>
+            </ion-grid>
+          </ion-content>
+        </ng-template>
+      </ion-modal>
     </ion-segment-content>
   </ion-segment-view>
 

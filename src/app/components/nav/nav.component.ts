@@ -3,6 +3,7 @@ import { ModalController } from '@ionic/angular';
 import { AddExpenseComponent } from '../expenses/add-expense/add-expense.component';
 import { AddCardExpenseComponent } from '../card-expenses/add-card-expense/add-card-expense.component';
 import { TransactionsService } from 'src/app/services/transactions/transactions.service';
+import { AddReceiveComponent } from '../receives/add-receive/add-receive.component';
 @Component({
   selector: 'app-nav',
   templateUrl: './nav.component.html',
@@ -34,6 +35,20 @@ export class NavComponent implements OnInit {
   async addExpense() {
     const modal = await this.modalCtrl.create({
       component: AddExpenseComponent,
+    });
+    modal.onDidDismiss().then((data) => {
+      if (data.data) {
+        this.transactionService.notifyTransactionUpdate()
+      }
+    });
+
+    this.closeSheet()
+    return await modal.present();
+  }
+
+  async addReceive() {
+    const modal = await this.modalCtrl.create({
+      component: AddReceiveComponent,
     });
     modal.onDidDismiss().then((data) => {
       if (data.data) {

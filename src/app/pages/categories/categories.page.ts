@@ -14,7 +14,6 @@ import { EditCategoryComponent } from 'src/app/components/categories/edit-catego
 
 export class CategoriesPage implements OnInit {
   segmentValue: string = 'despesas';  // Valor padrão do segmento
-
   categories: Category[] = [];
   expenseCategories: Category[] = [];
   incomeCategories: Category[] = [];
@@ -24,7 +23,6 @@ export class CategoriesPage implements OnInit {
 
   isModalOpen = false;
   selectedCategory: Category | undefined;
-
 
   constructor(
     private modalCtrl: ModalController,
@@ -45,7 +43,6 @@ export class CategoriesPage implements OnInit {
   async getCatgories() {
     const allCategories = await this.categoryLoaderService.loadCategories();
 
-    // Separa as categorias em despesas e receitas
     this.expenseCategories = allCategories.filter(category => category.tipo === 'despesa');
     this.incomeCategories = allCategories.filter(category => category.tipo === 'receita');
   }

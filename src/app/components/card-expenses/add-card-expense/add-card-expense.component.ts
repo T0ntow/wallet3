@@ -72,6 +72,12 @@ export class AddCardExpenseComponent implements OnInit {
     try {
       this.categories = await this.categoryLoaderService.loadCategoriesByExpenses();
       this.cards = await this.cardService.getCards();
+
+      if (this.cards.length > 0) {
+        const firstAccount = this.cards[0];
+        this.selectedCard = firstAccount.nome; // Atualiza o nome da conta selecionada
+        this.transacaoForm.patchValue({ cartao_id: firstAccount.cartao_id }); // Atualiza o ID da conta no formulário
+      }
     } catch (error) {
       console.error('Error loading categories or accounts:', error);
     }

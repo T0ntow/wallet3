@@ -12,7 +12,6 @@ import { TransactionsService } from 'src/app/services/transactions/transactions.
 import * as moment from 'moment';
 
 import { AbstractControl, ValidatorFn } from '@angular/forms';
-
 export function atLeastOneRequiredValidator(): ValidatorFn {
   return (control: AbstractControl): { [key: string]: boolean } | null => {
     const valor = control.get('valor')?.value;
@@ -34,11 +33,11 @@ export function atLeastOneRequiredValidator(): ValidatorFn {
 }
 
 @Component({
-  selector: 'app-add-expense',
-  templateUrl: './add-expense.component.html',
-  styleUrls: ['./add-expense.component.scss'],
+  selector: 'app-add-receive',
+  templateUrl: './add-receive.component.html',
+  styleUrls: ['./add-receive.component.scss'],
 })
-export class AddExpenseComponent implements OnInit {
+export class AddReceiveComponent implements OnInit {
   transacaoForm: FormGroup;
   selectedAccount: string = '';
   selectedCategory: string = '';
@@ -70,7 +69,7 @@ export class AddExpenseComponent implements OnInit {
       valor: ['', Validators.required],
       valor_parcela: [{ value: '', disabled: true }], // Inicialmente desabilitado
       status: ['pago', Validators.required],
-      tipo: ['despesa'],
+      tipo: ['receita'],
       is_parcelado: [false],
       num_parcelas: [null],
       is_recorrente: [false],
@@ -78,7 +77,7 @@ export class AddExpenseComponent implements OnInit {
       periodo: [null],
       mes_fatura: [null]
     }, { validators: atLeastOneRequiredValidator() }); // Adicionando o validador personalizado
-    
+
     // No seu ngOnInit ou no construtor
     this.transacaoForm.get('is_parcelado')?.valueChanges.subscribe((isParcelado: boolean) => {
       if (isParcelado) {
@@ -93,7 +92,6 @@ export class AddExpenseComponent implements OnInit {
   @ViewChild('popover') popover: { event: Event; } | undefined;
 
   isOpen = false;
-
   presentPopover(e: Event) {
     this.popover!.event = e;
     this.isOpen = true;
@@ -101,11 +99,9 @@ export class AddExpenseComponent implements OnInit {
 
   async ngOnInit() {
     try {
-      // Carregar categorias e contas
-      this.categories = await this.categoryLoaderService.loadCategoriesByExpenses();
+      this.categories = await this.categoryLoaderService.loadCategoriesByReceveis();
       this.accounts = await this.accountService.getAccounts();
-  
-      // Selecionar a primeira conta automaticamente, se disponível
+
       if (this.accounts.length > 0) {
         const firstAccount = this.accounts[0];
         this.selectedAccount = firstAccount.nome; // Atualiza o nome da conta selecionada
@@ -115,7 +111,7 @@ export class AddExpenseComponent implements OnInit {
       console.error('Error loading categories or accounts:', error);
     }
   }
-  
+
   dismissModal() {
     this.modalController.dismiss();
   }
@@ -210,5 +206,4 @@ export class AddExpenseComponent implements OnInit {
     });
     toast.present();
   }
-
 }

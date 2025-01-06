@@ -1,0 +1,33 @@
+@import '../../../mixins/forms.mixin.scss';
+
+* {
+    font-family: "Inria Sans";
+}
+
+ion-title {
+    font-size: 18px;
+    color: #000;
+    font-weight: bold;
+    padding: 0;
+}
+
+ion-header,
+ion-toolbar {
+    --background: var(--ion-item-background);
+}
+
+ion-grid {
+    margin: 0;
+    padding: 0;
+
+    ion-row {
+        gap: 10px;
+        justify-content: space-between;
+        text-wrap: nowrap;
+        margin-bottom: 10px;
+    }
+
+    ion-col {
+        padding: 0;
+    }
+}

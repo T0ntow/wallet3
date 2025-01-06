@@ -52,9 +52,12 @@ export class TransactionsPage implements OnInit {
 
   faBus = faBus;
 
-  isModalOpen = false;
-  selectedDespesa: any = null;
-  
+  isModalDespesaOpen = false;
+  isModalReceitaOpen = false;
+
+  selectedDespesa: any = null;  
+  selectedReceita: any = null;
+
   despesasAgrupadas: { data: string; transacoes: Transacao[]; }[] | undefined;
   receitasAgrupadas: { data: string; transacoes: Transacao[]; }[] | undefined;
 
@@ -120,9 +123,11 @@ export class TransactionsPage implements OnInit {
     
     this.currentMonth = moment(month); // Atualiza currentMonth com o novo mês
     // Obtém as despesas de cartão e conta
-    const despesas = await this.transactionService.getAllTransactions();
+    const despesas = await this.transactionService.getAllTransactions(); //todas as despesas
     const despesasCartao = await this.transactionService.getDespesasCartaoByMonth(month);
     const despesasConta = await this.transactionService.getDespesasContaByMonth(month);
+
+    const receitas = await this.transactionService.getReceitasByMonth(month);
 
     // Obter parcelas pendentes para o mês
     const installmentsResult = await this.transactionService.getParcelasByMonth(month);
@@ -157,6 +162,9 @@ export class TransactionsPage implements OnInit {
       ...mappedInstallments // Inclui as parcelas mapeadas dentro do mês
     ];
 
+    this.receitasFiltradas = [...receitas];
+    console.log("this.receitasFiltradas", this.receitasFiltradas);
+    
     // Chama a função para separar e processar as despesas e receitas
     this.separarDespesasEReceitas();
   }
@@ -168,7 +176,7 @@ export class TransactionsPage implements OnInit {
 
     // Filtra despesas e receitas
     const despesas = this.despesasFiltradas.filter(transacao => transacao.tipo === 'despesa');
-    const receitas = this.despesasFiltradas.filter(transacao => transacao.tipo === 'receita');
+    const receitas = this.receitasFiltradas.filter(transacao => transacao.tipo === 'receita');
   
     // Agrupa despesas por data
     despesas.forEach(despesa => {
@@ -210,6 +218,13 @@ export class TransactionsPage implements OnInit {
     }, 0);
   }
 
+  calcularTotalReceitas(): number {
+    return this.receitasFiltradas.reduce((total, receita) => {
+      const valor = Number(receita.valor) || 0;
+      return total + valor;
+    }, 0);
+  }
+
   calcularTotalPendentes(): number {
     return this.despesasFiltradas
       .filter(despesa => despesa.status === 'pendente')
@@ -240,16 +255,28 @@ export class TransactionsPage implements OnInit {
     return categoria ? categoria.nome : 'Categoria desconhecida';
   }
 
-  openModal(despesa: any) {
+  openModalDespesa(despesa: any) {
     this.selectedDespesa = despesa;
     console.log("this.selectedDespesa", JSON.stringify(this.selectedDespesa));
 
-    this.isModalOpen = true;
+    this.isModalDespesaOpen = true;
   }
 
-  closeModal() {
-    this.isModalOpen = false;
+  openModalReceita(receita: any) {
+    this.selectedReceita = receita;
+    console.log("this.selectedDespesa", JSON.stringify(this.selectedDespesa));
+
+    this.isModalDespesaOpen = true;
+  }
+
+  closeModalDespesa() {
+    this.isModalDespesaOpen = false;
     this.selectedDespesa = null; // Limpa a despesa selecionada
+  }
+
+  closeModalReceita() {
+    this.isModalReceitaOpen = false;
+    this.selectedReceita = null; // Limpa a receita selecionada
   }
 
   async editExpense(despesa: Transacao) {
@@ -261,7 +288,7 @@ export class TransactionsPage implements OnInit {
       modal.onDidDismiss().then((data) => {
         if (data.data) {
           this.transactionService.notifyTransactionUpdate()
-          this.closeModal();
+          this.closeModalDespesa();
         }
       });
       return await modal.present();
@@ -275,7 +302,7 @@ export class TransactionsPage implements OnInit {
       modal.onDidDismiss().then((data) => {
         if (data.data) {
           this.transactionService.notifyTransactionUpdate()
-          this.closeModal();
+          this.closeModalDespesa();
         }
       });
 
@@ -283,15 +310,32 @@ export class TransactionsPage implements OnInit {
     }
   }
 
+  async editIncome(receita: Transacao) {
+    // if (receita.conta_id) {
+    //   const modal = await this.modalController.create({
+    //     component: EditExpenseComponent,
+    //     componentProps: { receita: receita }
+    //   });
+    //   modal.onDidDismiss().then((data) => {
+    //     if (data.data) {
+    //       this.transactionService.notifyTransactionUpdate()
+    //       this.closeModalDespesa();
+    //     }
+    //   });
+
+    //   return await modal.present();
+    // }
+  }
+
   async payExpense(despesa: Transacao) {
     if (despesa.transacao_id) {
       try {
         await this.transactionService.payExpense(despesa.transacao_id);
-        this.closeModal();
+        this.closeModalDespesa();
         console.log(`Despesa com ID ${despesa.transacao_id} foi marcada como paga.`);
         this.transactionService.notifyTransactionUpdate()
       } catch (error) {
-        this.closeModal();
+        this.closeModalDespesa();
         console.error('Erro ao pagar a despesa:', error);
       }
     }
@@ -301,12 +345,12 @@ export class TransactionsPage implements OnInit {
     if (parcela.parcela_id) {
       try {
         await this.transactionService.payInstallment(parcela.parcela_id);
-        this.closeModal();
+        this.closeModalDespesa();
         console.log(`Parcela com ID ${parcela.parcela_id} foi marcada como paga.`);
         this.transactionService.notifyTransactionUpdate()
 
       } catch (error) {
-        this.closeModal();
+        this.closeModalDespesa();
         console.error('Erro ao pagar a parcela:', error);
       }
     }
@@ -330,13 +374,13 @@ export class TransactionsPage implements OnInit {
             if (despesa.transacao_id) {
               try {
                 await this.transactionService.deleteTransaction(despesa.transacao_id);
-                this.closeModal();
+                this.closeModalDespesa();
                 console.log(`Despesa com ID ${despesa.transacao_id} foi deletada.`);
                 await this.presentToast('Despesa excluida com sucesso!', 'light');
 
                 this.transactionService.notifyTransactionUpdate();
               } catch (error) {
-                this.closeModal();
+                this.closeModalDespesa();
                 console.error('Erro ao excluir a despesa:', error);
                 await this.presentToast('Erro ao excluir a despesa', 'danger');
 
@@ -347,6 +391,43 @@ export class TransactionsPage implements OnInit {
       ],
     });
     await alert.present();
+  }
+
+  async deleteIncome(despesa: Transacao) {
+    // const alert = await this.alertController.create({
+    //   header: 'Confirmar Exclusão',
+    //   message: `Tem certeza de que deseja excluir a despesa?`,
+    //   buttons: [
+    //     {
+    //       text: 'Cancelar',
+    //       role: 'cancel',
+    //       handler: () => {
+    //         console.log('A exclusão da despesa foi cancelada.');
+    //       },
+    //     },
+    //     {
+    //       text: 'Excluir',
+    //       handler: async () => {
+    //         if (despesa.transacao_id) {
+    //           try {
+    //             await this.transactionService.deleteTransaction(despesa.transacao_id);
+    //             this.closeModalDespesa();
+    //             console.log(`Despesa com ID ${despesa.transacao_id} foi deletada.`);
+    //             await this.presentToast('Despesa excluida com sucesso!', 'light');
+
+    //             this.transactionService.notifyTransactionUpdate();
+    //           } catch (error) {
+    //             this.closeModalDespesa();
+    //             console.error('Erro ao excluir a despesa:', error);
+    //             await this.presentToast('Erro ao excluir a despesa', 'danger');
+
+    //           }
+    //         }
+    //       },
+    //     },
+    //   ],
+    // });
+    // await alert.present();
   }
 
   async deleteInstallment(parcela: Parcela) {
@@ -367,13 +448,13 @@ export class TransactionsPage implements OnInit {
             if (parcela.parcela_id) {
               try {
                 await this.transactionService.deleteInstallment(parcela.parcela_id);
-                this.closeModal();
+                this.closeModalDespesa();
                 console.log(`Parcela com ID ${parcela.parcela_id} foi deletada.`);
                 await this.presentToast('Parcela excluida com sucesso!', 'light');
 
                 this.transactionService.notifyTransactionUpdate();
               } catch (error) {
-                this.closeModal();
+                this.closeModalDespesa();
                 console.error('Erro ao excluir a parcela:', error);
                 await this.presentToast('Erro ao excluir parcela', 'danger');
               }

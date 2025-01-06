@@ -13,7 +13,7 @@ import { EditExpenseComponent } from 'src/app/components/expenses/edit-expense/e
 import { ReactiveFormsModule } from '@angular/forms';
 import { EditCardExpenseComponent } from 'src/app/components/card-expenses/edit-card-expense/edit-card-expense.component';
 import { ChartsComponent } from 'src/app/components/charts/charts.component';
-
+import { AddReceiveComponent } from 'src/app/components/receives/add-receive/add-receive.component';
 @NgModule({
   imports: [
     CommonModule,
@@ -28,7 +28,8 @@ import { ChartsComponent } from 'src/app/components/charts/charts.component';
     MonthNavigationComponent,
     EditExpenseComponent,
     EditCardExpenseComponent,
-    ChartsComponent
+    ChartsComponent,
+    AddReceiveComponent
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })

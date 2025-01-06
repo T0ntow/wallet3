@@ -12,6 +12,9 @@ export class ChartsComponent implements OnChanges {
   @Input() despesas: Transacao[] = []; // Recebe as despesas do componente pai
   @Input() categorias: Category[] = []; // Recebe as categorias do componente pai
 
+  @Input() receitas: Transacao[] = []; // Recebe as despesas do componente pai
+  
+
   private chart: Chart | null = null; // Armazena a instância do gráfico
   private exibirPendentes: boolean = false; // Alterna entre Total Gasto e Gasto Pendente
   isMinimized: boolean = false; // Controla o estado do card (minimizado ou visível)

@@ -277,6 +277,32 @@ export class TransactionsService {
     }
   }
 
+  async getReceitasByMonth(month: string): Promise<Transacao[]> {
+    const db = await this.databaseService.getDb();
+
+    if (!db) {
+      console.error('Database is not initialized');
+      return [];
+    }
+
+    // Define o intervalo do mês para o filtro no formato 'YYYY-MM-DD'
+    const startOfMonth = moment(month, 'YYYY-MM').startOf('month').format('YYYY-MM-DD');
+    const endOfMonth = moment(month, 'YYYY-MM').endOf('month').format('YYYY-MM-DD');
+
+    const sql = `
+    SELECT * FROM transacoes
+    WHERE tipo = 'receita' AND data_transacao BETWEEN ? AND ?
+  `;
+
+    try {
+      const result = await db.query(sql, [startOfMonth, endOfMonth]);
+      return Array.isArray(result.values) ? result.values.map(this.mapRowToTransacao) : [];
+    } catch (error) {
+      console.error('Erro ao obter receitas de conta: ', error);
+      return [];
+    }
+  }
+
   private mapRowToTransacao(row: any): Transacao {
     return {
       transacao_id: row.transacao_id,
