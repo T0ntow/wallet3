@@ -1,10 +1,24 @@
 <div class="saldo-container">
-  <!-- Exibição do mês e ano atual com clique -->
-  <div class="saldo" (click)="toggleDatePicker()">
-    <span>Saldo <strong id="mes">{{ nomeMes}}/{{ anoSelecionado }}</strong>:</span>
+  <div class="saldo">
+    <span style="display: flex; align-items: center; width: 100%; justify-content: center;" (click)="toggleDatePicker()">
+      <strong id="mes">{{ nomeMes }} / {{ anoSelecionado }}</strong>
+      <ion-icon 
+        style="margin: 0 5px;"
+        [name]="mostrarDatePicker ? 'chevron-up-outline' : 'chevron-down-outline'">
+      </ion-icon>
+    </span>
+
     <ion-text class="valor-saldo" [color]="calcularDiferencaSaldo() >= 0 ? 'success' : 'danger'">
-      <p>{{ calcularDiferencaSaldo() | currency:'BRL':'symbol':'1.2-2'  }}</p>
+      <span>Saldo em contas</span>
+      <p *ngIf="mostrarValores">{{ calcularDiferencaSaldo() | currency:'BRL':'symbol':'1.2-2' }}</p>
+      <p *ngIf="!mostrarValores">******</p>
     </ion-text>
+
+    <ion-icon 
+      [name]="mostrarValores ? 'eye-off-outline' : 'eye-outline'" 
+      id="eye" 
+      (click)="toggleValores()">
+    </ion-icon>
   </div>
 
   <div *ngIf="mostrarDatePicker">
@@ -16,7 +30,10 @@
           <ion-icon name="chevron-forward-outline" (click)="mudarAno(1)"></ion-icon>
         </div>
         <div class="month-list">
-          <div class="month-item" *ngFor="let mes of meses; let i = index" (click)="selecionarMes(i)"
+          <div 
+            class="month-item" 
+            *ngFor="let mes of mesesAbreviados; let i = index" 
+            (click)="selecionarMes(i)"
             [class.selected]="mesSelecionado === i">
             {{ mes }}
           </div>
@@ -36,7 +53,8 @@
       <ion-icon color="success" name="cash"></ion-icon>
       <div>
         <ion-label>Receita</ion-label>
-        <p>{{ calcularTotalReceitas() | currency:'BRL':'symbol':'1.2-2'  }}</p>
+        <p *ngIf="mostrarValores">{{ calcularTotalReceitas() | currency:'BRL':'symbol':'1.2-2' }}</p>
+        <p *ngIf="!mostrarValores">******</p>
       </div>
     </ion-chip>
 
@@ -44,7 +62,8 @@
       <ion-icon color="danger" name="cash"></ion-icon>
       <div>
         <ion-label>Despesa</ion-label>
-        <p>{{ calcularTotalDespesas() | currency:'BRL':'symbol':'1.2-2'  }}</p>
+        <p *ngIf="mostrarValores">{{ calcularTotalDespesas() | currency:'BRL':'symbol':'1.2-2' }}</p>
+        <p *ngIf="!mostrarValores">******</p>
       </div>
     </ion-chip>
   </div>

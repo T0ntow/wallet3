@@ -12,19 +12,26 @@ import { TransactionsService } from 'src/app/services/transactions/transactions.
 export class BalanceComponent implements OnInit {
   mostrarDatePicker: boolean = false;
   anoSelecionado: number = moment().year();
-  mesSelecionado: number | null = null;
+  mesSelecionado!: number;
   saldo: number = 0.00;
   receita: number = 0.00;
   despesa: number = 0.00;
+  mostrarValores = true; // Estado inicial: mostrar valores
 
   despesasFiltradas: Transacao[] = [];
   receitasFiltradas: Transacao[] = [];
+  
+  mesesCompletos: string[] = [
+    'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+    'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+  ];
 
-  meses: string[] = [
+  mesesAbreviados: string[] = [
     'JAN.', 'FEV.', 'MAR.', 'ABR.', 'MAI.', 'JUN.',
     'JUL.', 'AGO.', 'SET.', 'OUT.', 'NOV.', 'DEZ.'
   ];
-  nomeMes: string = this.meses[moment().month()];
+  nomeMes: string = '';
+  meses: any;
 
   constructor(
     private elRef: ElementRef,
@@ -33,13 +40,21 @@ export class BalanceComponent implements OnInit {
   ) {}
 
   ngOnInit() {
+    const now = moment();
+    this.mesSelecionado = now.month(); // Inicializa com o mês atual
+    this.nomeMes = this.mesesCompletos[this.mesSelecionado]; // Nome completo do mês atual
+  
     this.atualizarSaldo();
-
+  
     this.renderer.listen('document', 'click', (event: MouseEvent) => {
       if (this.mostrarDatePicker && !this.elRef.nativeElement.contains(event.target)) {
         this.toggleDatePicker();
       }
     });
+  }
+  
+  toggleValores(): void {
+    this.mostrarValores = !this.mostrarValores;
   }
 
   toggleDatePicker() {
@@ -53,7 +68,7 @@ export class BalanceComponent implements OnInit {
 
   selecionarMes(indice: number) {
     this.mesSelecionado = indice;
-    this.nomeMes = this.meses[indice];
+    this.nomeMes = this.mesesCompletos[indice]; // Use os meses completos aqui
     console.log(`Mês selecionado: ${this.nomeMes} de ${this.anoSelecionado}`);
     this.atualizarSaldo();
     this.toggleDatePicker();
@@ -62,12 +77,13 @@ export class BalanceComponent implements OnInit {
   mesAtual() {
     const now = moment();
     this.mesSelecionado = now.month();
-    this.nomeMes = this.meses[this.mesSelecionado];
+    this.nomeMes = this.mesesCompletos[this.mesSelecionado]; // Use meses completos
     this.anoSelecionado = now.year();
     console.log(`Mês atual selecionado: ${this.nomeMes} de ${this.anoSelecionado}`);
     this.atualizarSaldo();
     this.toggleDatePicker();
   }
+  
 
   cancelar() {
     this.toggleDatePicker();

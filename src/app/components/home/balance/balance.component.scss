@@ -3,26 +3,50 @@
 }
 .saldo-container {
   border-radius: 10px;
-  margin: 10px 0;
+  margin-bottom: 10px;
 
   .saldo {
     display: flex;
     justify-content: space-between;
+    flex-direction: column;
     align-items: center;
-    background-color: var(--ion-item-background);
+    background-color: #ffff;
     padding: 10px;
-    border-radius: 10px;
+    border-radius: 0 0 15px 15px;
     margin-bottom: 10px;
     font-weight: 700;
+    border-bottom: 1px solid #d4d4d4;
+    border-left: 1px solid #d4d4d4;
+    border-right: 1px solid #d4d4d4;
+
+    box-shadow: 0px 0px 5px 0px #a5a5a5;
+
+    ion-text {
+      margin-top: 15px;
+      text-align: center;
+      span {
+        font-size: 14px;
+        color: var(--ion-text-color2);
+      }
+      p {
+        font-size: 22px;
+        margin: 0;
+      }
+    }
 
     span {
-      color: var(--ion-text-color2);
+      color: var(--ion-text-color);
       font-size: 16px;
 
       #mes {
-  font-size: 15px;
+        font-size: 17px;
         color: var(--ion-text-color);
       }
+    }
+
+    #eye {
+      margin-top: 10px;
+      font-size: 22px;
     }
   }
 
@@ -30,11 +54,16 @@
     display: flex;
     justify-content: space-between;
     gap: 15px;
+    padding: 0 15px;
     ion-chip {
-      background-color: var(--ion-item-background);
+      background-color: #fff;
       border-radius: 10px;
       width: 160px;
       margin: 0;
+
+      ion-icon {
+        font-size: 25px;
+      }
 
       div {
         display: flex;
@@ -46,13 +75,13 @@
 
         ion-label {
           color: var(--ion-text-color2);
-          font-size: 15px;
+          font-size: 17px;
         }
 
         // valor da despesa/receita
         p {
           margin: 0;
-          font-size: 14px;
+          font-size: 16px;
           color: var(--ion-text-color);
         }
       }
@@ -64,18 +93,35 @@
   font-weight: bold;
 }
 
+@keyframes show-date-picker {
+  0% {
+    opacity: 0;
+    transform: translate(-50%, -100px); /* Centraliza horizontalmente e inicia o movimento do topo */
+  }
+
+  100% {
+    opacity: 1;
+    transform: translate(-50%, 0); /* Move até a posição final, centralizado */
+  }
+}
+
+
 .date-picker-container {
+  animation: show-date-picker .25s ease-in;
+
   background-color: #f9f9f9;
   border-radius: 12px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  margin: 16px auto;
+  margin: 0 auto;
 
   width: 320px;
 
   position: absolute;
   z-index: 1000;
   left: 50%; /* Centraliza horizontalmente */
-  transform: translateX(-50%); /* Ajusta o deslocamento para garantir que o elemento seja centralizado */
+  top: 50px; /* Define a posição inicial no eixo Y */
+  transform: translateX(-50%); /* Garante a centralização no eixo X */
+
 
   .date-picker {
     display: flex;
