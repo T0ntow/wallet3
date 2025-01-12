@@ -1,60 +1,182 @@
+* {
+  font-family: "Inria Sans";
+}
 .saldo-container {
+  border-radius: 10px;
+  margin: 10px 0;
+
+  .saldo {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: var(--ion-item-background);
+    padding: 10px;
     border-radius: 10px;
-    font-size: 15px;
+    margin-bottom: 10px;
+    font-weight: 700;
 
-    .saldo {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        background-color: var(--ion-item-background);
-        padding: 10px;
-        border-radius: 10px;
-        margin-bottom: 10px;
-        font-weight: 700;
+    span {
+      color: var(--ion-text-color2);
+      font-size: 16px;
 
-        span {
-            color: var(--ion-text-color2);
-
-            #mes {
-                color: var(--ion-text-color);
-            }
-        }
+      #mes {
+  font-size: 15px;
+        color: var(--ion-text-color);
+      }
     }
+  }
 
-    .detalhes-financeiros {
+  .detalhes-financeiros {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    ion-chip {
+      background-color: var(--ion-item-background);
+      border-radius: 10px;
+      width: 160px;
+      margin: 0;
+
+      div {
         display: flex;
-        justify-content: space-between;
-        gap: 15px;
-        ion-chip {
-            background-color: var(--ion-item-background);
-            border-radius: 10px;
-            width: 160px;
-            margin: 0;
+        flex-direction: column;
+        align-items: left;
+        gap: 5px;
+        font-family: "Inria Sans";
+        font-weight: bold;
 
-            div {
-                display: flex;
-                flex-direction: column;
-                align-items: left;
-                gap: 5px;
-                font-family: "Inria Sans";
-                font-weight: bold;
-
-                ion-label {
-                    color: var(--ion-text-color2);
-                    font-size: 15px;
-                }
-
-                // valor da despesa/receita
-                p {
-                    margin: 0;  
-                    font-size: 14px;
-                    color: var(--ion-text-color);
-                }
-            }
+        ion-label {
+          color: var(--ion-text-color2);
+          font-size: 15px;
         }
+
+        // valor da despesa/receita
+        p {
+          margin: 0;
+          font-size: 14px;
+          color: var(--ion-text-color);
+        }
+      }
     }
+  }
 }
 
 .valor-saldo {
+  font-weight: bold;
+}
+
+.date-picker-container {
+  background-color: #f9f9f9;
+  border-radius: 12px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin: 16px auto;
+
+  width: 320px;
+
+  position: absolute;
+  z-index: 1000;
+  left: 50%; /* Centraliza horizontalmente */
+  transform: translateX(-50%); /* Ajusta o deslocamento para garantir que o elemento seja centralizado */
+
+  .date-picker {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .date-picker-footer {
+    display: flex;
+    flex-direction: row;
+    align-items: flex-end;
+    justify-content: flex-end;
+
+    padding: 10px;
+
+    color: #333333;
     font-weight: bold;
+    font-size: 14px;
+    margin: 0 10px;
+
+    #cancel {
+      margin: 0 10px;
+    }
+
+    .button {
+      cursor: pointer;
+    }
+  }
+
+  .year-selector {
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
+    width: 100%;
+    font-size: 15px;
+    font-weight: bold;
+    color: #fff;
+    margin-bottom: 16px;
+
+    border-radius: 12px;
+    background-color: #333333;
+    height: 40px;
+
+    ion-icon {
+      font-size: 1.6rem;
+      color: #fff;
+      cursor: pointer;
+      transition: transform 0.2s;
+    }
+
+    ion-icon:hover {
+      transform: scale(1.1);
+    }
+  }
+
+  .month-list {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 6px;
+    width: 100%;
+    max-width: 300px;
+  }
+
+  .month-item {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 8px;
+    padding: 2px;
+    font-size: 13px;
+    font-weight: bold;
+    color: #4a4a4a;
+    cursor: pointer;
+    transition:
+      background-color 0.2s,
+      color 0.2s;
+  }
+
+  .month-item:hover {
+    background-color: #474747;
+    color: #ffffff;
+  }
+
+  .month-item.selected {
+    background-color: #474747;
+    color: #ffffff;
+  }
+}
+
+.back {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 200;
+  background-color: #32323261;
+
+  width: 100vw;
+  height: 100vh;
+  transition: opacity 0.3s ease-in-out;
 }

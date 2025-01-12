@@ -1,0 +1,139 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="dismissModal()">
+        <ion-icon slot="icon-only" name="arrow-back-circle"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title>Editar Receita</ion-title>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content>
+  <form [formGroup]="transacaoForm">
+    <!-- Descrição -->
+    <div class="container-item">
+      <label position="stacked">Descrição</label>
+      <ion-input type="text" formControlName="descricao" class="custom-input"></ion-input>
+    </div>
+
+    <!-- Seleção de Conta ou Cartão -->
+    <div class="container-item" id="open-modal-account" expand="block">
+      <label position="stacked">Conta</label>
+      <div class="custom-input" style="display: flex; align-items: center;">
+        <p style="margin: 0;"> {{ selectedAccount || 'Selecione uma conta' }} </p>
+      </div>
+    </div>
+
+    <!-- Seleção de Categoria -->
+    <div class="container-item" id="open-modal-categories" expand="block">
+      <label position="stacked">Categoria</label>
+      <div class="custom-input" style="display: flex; align-items: center;">
+        <p style="margin: 0;"> {{ selectedCategory || 'Selecione uma categoria' }}</p>
+      </div>
+    </div>
+
+    <!-- Data -->
+    <ion-grid>
+      <ion-row>
+        <ion-col size="5">
+          <div class="container-item">
+            <label position="stacked">Data</label>
+            <ion-input type="date" formControlName="data" class="custom-input"></ion-input>
+          </div>
+        </ion-col>
+
+        <!-- Valor -->
+        <ion-col size="5">
+          <div class="container-item">
+            <label position="stacked">Valor</label>
+            <ion-input type="text" formControlName="valor" class="custom-input"></ion-input>
+          </div>
+        </ion-col>
+      </ion-row>
+
+      <!-- Repetição (se for Recorrente) -->
+      <ion-row>
+        <ion-col size="5">
+          <div class="container-item">
+            <label position="stacked">Detalhes</label>
+            <ion-toggle slot="start" (ionChange)="toggleRecorrente($event)" class="custom-input">Repetir</ion-toggle>
+          </div>
+        </ion-col>
+      </ion-row>
+
+      <ion-row *ngIf="recorrente">
+        <ion-col size="5">
+          <div class="container-item">
+            <label position="stacked">Quantidade de Repetições</label>
+            <ion-input type="number" formControlName="quantidade_repetir" min="1" max="99" class="custom-input"
+              placeholder="máximo 99"></ion-input>
+          </div>
+        </ion-col>
+        <ion-col size="5">
+          <div class="container-item" (click)="presentPopover($event)">
+            <label position="stacked">Período</label>
+            <div class="custom-input" style="display: flex; align-items: center;">
+              <p style="margin: 0;"> {{ periodo || 'Selecione o período' }} </p>
+            </div>
+          </div>
+        </ion-col>
+      </ion-row>
+
+      <ion-popover #popover [isOpen]="isOpen" (didDismiss)="isOpen = false">
+        <ng-template>
+          <ion-content>
+            <ion-list>
+              <ion-item button (click)="selectPeriod('Mensal')">
+                <ion-label>Mensal</ion-label>
+              </ion-item>
+              <ion-item button (click)="selectPeriod('Semanal')">
+                <ion-label>Semanal</ion-label>
+              </ion-item>
+              <ion-item button (click)="selectPeriod('Diário')">
+                <ion-label>Diário</ion-label>
+              </ion-item>
+            </ion-list>
+          </ion-content>
+        </ng-template>
+      </ion-popover>
+    </ion-grid>
+
+    <button [disabled]="transacaoForm.invalid" (click)="submitTransacao()" class="submit-button">
+      Editar Receita
+    </button>
+  </form>
+
+  <ion-modal trigger="open-modal-account" [initialBreakpoint]="0.75" [breakpoints]="[0, 0.75, 1]">
+    <ng-template>
+      <div class="sheet">
+        <div class="sheet-header">
+          <p>Conta</p>
+        </div>
+        <div class="elements">
+          <div *ngFor="let account of accounts" class="element" (click)="selectAccount(account)">
+            <ion-icon *ngIf="!account.logo_url" name="wallet"></ion-icon>
+            <img *ngIf="account.logo_url" [src]="account.logo_url" alt="{{ account.nome }}" class="logo" />
+            <p>{{ account.nome }}</p>
+          </div>
+        </div>
+      </div>
+    </ng-template>
+  </ion-modal>
+
+  <ion-modal trigger="open-modal-categories" [initialBreakpoint]="0.75" [breakpoints]="[0, 0.75, 1]">
+    <ng-template>
+      <div class="sheet">
+        <div class="sheet-header">
+          <p>Categorias</p>
+        </div>
+        <div class="elements">
+          <div *ngFor="let category of categories" class="element" (click)="selectCategory(category)">
+            <fa-icon [icon]="category.icone"></fa-icon>
+            <p>{{ category.nome }}</p>
+          </div>
+        </div>
+      </div>
+    </ng-template>
+  </ion-modal>
+</ion-content>

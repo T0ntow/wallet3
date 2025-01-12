@@ -1,24 +1,53 @@
 <div class="saldo-container">
-  <div class="saldo">
-    <span>Saldo: <span id="mes">{{ mes }}</span></span>
-    <ion-text class="valor-saldo negativo" color="danger">- R$ {{ saldo.toFixed(2) }}</ion-text>
+  <!-- Exibição do mês e ano atual com clique -->
+  <div class="saldo" (click)="toggleDatePicker()">
+    <span>Saldo <strong id="mes">{{ nomeMes}}/{{ anoSelecionado }}</strong>:</span>
+    <ion-text class="valor-saldo" [color]="calcularDiferencaSaldo() >= 0 ? 'success' : 'danger'">
+      <p>{{ calcularDiferencaSaldo() | currency:'BRL':'symbol':'1.2-2'  }}</p>
+    </ion-text>
   </div>
 
+  <div *ngIf="mostrarDatePicker">
+    <div class="date-picker-container">
+      <div class="date-picker">
+        <div class="year-selector">
+          <ion-icon name="chevron-back-outline" (click)="mudarAno(-1)"></ion-icon>
+          <span>{{ anoSelecionado }}</span>
+          <ion-icon name="chevron-forward-outline" (click)="mudarAno(1)"></ion-icon>
+        </div>
+        <div class="month-list">
+          <div class="month-item" *ngFor="let mes of meses; let i = index" (click)="selecionarMes(i)"
+            [class.selected]="mesSelecionado === i">
+            {{ mes }}
+          </div>
+        </div>
+      </div>
+
+      <div class="date-picker-footer">
+        <span class="button" id="cancel" (click)="cancelar()">Cancelar</span>
+        <span class="button" id="mes-atual" (click)="mesAtual()">Mês Atual</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Detalhes financeiros -->
   <div class="detalhes-financeiros">
     <ion-chip outline>
-      <ion-icon  color="success" name="cash"></ion-icon>
+      <ion-icon color="success" name="cash"></ion-icon>
       <div>
         <ion-label>Receita</ion-label>
-        <p>R$ {{ receita.toFixed(2) }}</p>
+        <p>{{ calcularTotalReceitas() | currency:'BRL':'symbol':'1.2-2'  }}</p>
       </div>
     </ion-chip>
 
     <ion-chip outline>
-      <ion-icon  color="danger" name="cash"></ion-icon>
+      <ion-icon color="danger" name="cash"></ion-icon>
       <div>
         <ion-label>Despesa</ion-label>
-        <p>R$ {{ despesa.toFixed(2) }}</p>
+        <p>{{ calcularTotalDespesas() | currency:'BRL':'symbol':'1.2-2'  }}</p>
       </div>
     </ion-chip>
   </div>
 </div>
+
+<div class="back" *ngIf="mostrarDatePicker" (click)="cancelar()"></div>

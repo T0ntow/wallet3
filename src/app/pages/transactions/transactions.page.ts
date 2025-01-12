@@ -16,6 +16,7 @@ import { Card } from 'src/app/models/card.model';
 import { EditExpenseComponent } from 'src/app/components/expenses/edit-expense/edit-expense.component';
 import { EditCardExpenseComponent } from 'src/app/components/card-expenses/edit-card-expense/edit-card-expense.component';
 import { Parcela } from 'src/app/models/parcela.model';
+import { EditReceiveComponent } from 'src/app/components/receives/edit-receive/edit-receive.component';
 
 @Component({
   selector: 'app-transactions',
@@ -266,7 +267,7 @@ export class TransactionsPage implements OnInit {
     this.selectedReceita = receita;
     console.log("this.selectedDespesa", JSON.stringify(this.selectedDespesa));
 
-    this.isModalDespesaOpen = true;
+    this.isModalReceitaOpen = true;
   }
 
   closeModalDespesa() {
@@ -311,20 +312,20 @@ export class TransactionsPage implements OnInit {
   }
 
   async editIncome(receita: Transacao) {
-    // if (receita.conta_id) {
-    //   const modal = await this.modalController.create({
-    //     component: EditExpenseComponent,
-    //     componentProps: { receita: receita }
-    //   });
-    //   modal.onDidDismiss().then((data) => {
-    //     if (data.data) {
-    //       this.transactionService.notifyTransactionUpdate()
-    //       this.closeModalDespesa();
-    //     }
-    //   });
+    if (receita.conta_id) {
+      const modal = await this.modalController.create({
+        component: EditReceiveComponent,
+        componentProps: { receita: receita }
+      });
+      modal.onDidDismiss().then((data) => {
+        if (data.data) {
+          this.transactionService.notifyTransactionUpdate()
+          this.closeModalReceita();
+        }
+      });
 
-    //   return await modal.present();
-    // }
+      return await modal.present();
+    }
   }
 
   async payExpense(despesa: Transacao) {
@@ -393,41 +394,41 @@ export class TransactionsPage implements OnInit {
     await alert.present();
   }
 
-  async deleteIncome(despesa: Transacao) {
-    // const alert = await this.alertController.create({
-    //   header: 'Confirmar Exclusão',
-    //   message: `Tem certeza de que deseja excluir a despesa?`,
-    //   buttons: [
-    //     {
-    //       text: 'Cancelar',
-    //       role: 'cancel',
-    //       handler: () => {
-    //         console.log('A exclusão da despesa foi cancelada.');
-    //       },
-    //     },
-    //     {
-    //       text: 'Excluir',
-    //       handler: async () => {
-    //         if (despesa.transacao_id) {
-    //           try {
-    //             await this.transactionService.deleteTransaction(despesa.transacao_id);
-    //             this.closeModalDespesa();
-    //             console.log(`Despesa com ID ${despesa.transacao_id} foi deletada.`);
-    //             await this.presentToast('Despesa excluida com sucesso!', 'light');
+  async deleteIncome(receita: Transacao) {
+    const alert = await this.alertController.create({
+      header: 'Confirmar Exclusão',
+      message: `Tem certeza de que deseja excluir a receita?`,
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel',
+          handler: () => {
+            console.log('A exclusão da receita foi cancelada.');
+          },
+        },
+        {
+          text: 'Excluir',
+          handler: async () => {
+            if (receita.transacao_id) {
+              try {
+                await this.transactionService.deleteTransaction(receita.transacao_id);
+                this.closeModalReceita();
+                console.log(`Receita com ID ${receita.transacao_id} foi deletada.`);
+                await this.presentToast('Receita excluida com sucesso!', 'light');
 
-    //             this.transactionService.notifyTransactionUpdate();
-    //           } catch (error) {
-    //             this.closeModalDespesa();
-    //             console.error('Erro ao excluir a despesa:', error);
-    //             await this.presentToast('Erro ao excluir a despesa', 'danger');
+                this.transactionService.notifyTransactionUpdate();
+              } catch (error) {
+                this.closeModalReceita();
+                console.error('Erro ao excluir a receita:', error);
+                await this.presentToast('Erro ao excluir a receita', 'danger');
 
-    //           }
-    //         }
-    //       },
-    //     },
-    //   ],
-    // });
-    // await alert.present();
+              }
+            }
+          },
+        },
+      ],
+    });
+    await alert.present();
   }
 
   async deleteInstallment(parcela: Parcela) {

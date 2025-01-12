@@ -1,0 +1,99 @@
+* {
+  font-family: "Inria Sans";
+}
+.custom-card {
+  --background: var(--ion-item-background);
+  --box-shadow: 0 4px 8px rgba(80, 80, 80, 0.2); /* Sombra da caixa */
+  border-radius: 8px; /* Cantos arredondados */
+  margin: 10px 0;
+}
+
+/* Classe para esconder o gráfico */
+.minimized {
+  display: none;
+}
+
+.show-chart {
+  display: block;
+  animation: showChart 0.2s ease-in-out forwards; /* Animação ao mostrar */
+}
+
+@keyframes showChart {
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
+}
+
+.chart-container {
+  transition:
+    opacity 0.3s ease-in,
+    visibility 0.3s ease-in;
+  /* Certifique-se de que o gráfico esteja dimensionado corretamente em dispositivos móveis */
+  width: 100%;
+  height: auto;
+  max-width: 100%;
+  box-sizing: border-box;
+  margin: 30px 0 20px 0;
+}
+
+ion-card-title {
+  color: #000;
+}
+
+#container-toggle {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+
+  > div {
+    display: flex;
+    align-items: center;
+
+    span {
+      font-size: 12px;
+      font-weight: bold;
+    }
+  }
+
+  ion-chip {
+    padding: 2px 5px;
+    margin: 0;
+    --background: var(--ion-item-background);
+    --color: #000;
+    font-weight: bold;
+    display: flex;
+
+    ion-label {
+      font-size: 12px;
+      margin: 0 5px;
+    }
+  }
+}
+
+ion-toggle {
+  --track-background: #8f8f8f;
+  --track-background-checked: #8f8f8f;
+
+  --handle-background: #e4c673;
+  --handle-background-checked: #db6d6d;
+
+  --handle-width: 10px;
+  --handle-height: 15px;
+  --handle-max-height: auto;
+  --handle-spacing: 2px;
+
+  --handle-border-radius: 4px;
+  --handle-box-shadow: none;
+}
+
+ion-toggle::part(track) {
+  height: 10px;
+  width: 30px;
+
+  /* Required for iOS handle to overflow the height of the track */
+  overflow: visible;
+}

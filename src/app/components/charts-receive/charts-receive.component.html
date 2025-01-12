@@ -1,0 +1,17 @@
+<div #chartContainer class="chart-container">
+  <div id="container-toggle">
+    <div (click)="toggleMinimize()" style="cursor: pointer;">
+      <span *ngIf="!isMinimized">Minimizar</span>
+      <span *ngIf="isMinimized">Mostrar Gráfico</span>
+      <ion-icon [name]="isMinimized ? 'chevron-up-outline' : 'chevron-down-outline'"></ion-icon>
+    </div>
+  </div>
+
+  <ion-card class="custom-card">
+    <ion-card-content [ngClass]="{'minimized': isMinimized, 'show-chart': !isMinimized}">
+      <div style="display: block;">
+        <canvas id="chartCanvas"></canvas>
+      </div>
+    </ion-card-content>
+  </ion-card>
+</div>

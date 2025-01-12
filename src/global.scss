@@ -51,6 +51,40 @@
 
 // contrast: 262626
 
+ion-datetime {
+  color: #262626;
+  background-color: #fdfdfd;
+  box-shadow: none;
+  border-radius: 10px;
+
+  &::part(day) {
+    border: 1px solid #000000; // Borda preta
+    border-radius: 50%; // Forma circular
+    width: 34px;
+    height: 34px;
+    display: flex;
+    justify-content: center;
+    align-items: center; // Centraliza o texto no círculo
+  }
+
+  &::part(month-year) {
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: #ffffff; // Texto branco
+  }
+
+  &::part(active) {
+    background-color: #4caf50; // Fundo verde para a seleção ativa
+    color: #ffffff; // Texto branco
+  }
+
+  &::part(column) {
+    background-color: #f0f0f0; // Fundo cinza claro para os seletores
+    border-radius: 8px;
+    padding: 8px;
+  }
+}
+
 @media (prefers-color-scheme: dark), (prefers-color-scheme: light) {
     :root.md {
         --ion-color-primary: #262626;

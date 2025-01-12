@@ -146,7 +146,7 @@
           <p>Receita em {{ currentMonth.format('MMMM YYYY') }}: {{ calcularTotalReceitas() | currency:'BRL':'symbol':'1.2-2' }}</p>
         </div>
         <div>
-          <app-charts [receitas]="receitasFiltradas" [categorias]="categorias"></app-charts>
+          <app-charts-receive [receitas]="receitasFiltradas" [categorias]="categorias"></app-charts-receive>
         </div>
         <div class="transacoes">
           <div *ngFor="let grupo of receitasAgrupadas">

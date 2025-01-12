@@ -14,6 +14,8 @@ import { ReactiveFormsModule } from '@angular/forms';
 import { EditCardExpenseComponent } from 'src/app/components/card-expenses/edit-card-expense/edit-card-expense.component';
 import { ChartsComponent } from 'src/app/components/charts/charts.component';
 import { AddReceiveComponent } from 'src/app/components/receives/add-receive/add-receive.component';
+import { ChartsReceiveComponent } from 'src/app/components/charts-receive/charts-receive.component';
+import { EditReceiveComponent } from 'src/app/components/receives/edit-receive/edit-receive.component';
 @NgModule({
   imports: [
     CommonModule,
@@ -29,7 +31,9 @@ import { AddReceiveComponent } from 'src/app/components/receives/add-receive/add
     EditExpenseComponent,
     EditCardExpenseComponent,
     ChartsComponent,
-    AddReceiveComponent
+    AddReceiveComponent,
+    ChartsReceiveComponent,
+    EditReceiveComponent
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })
