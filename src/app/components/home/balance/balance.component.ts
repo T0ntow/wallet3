@@ -24,7 +24,6 @@ export class BalanceComponent implements OnInit {
   valorAtual: number = 0;
   valorFinal: number = 0; // O valor final desejado
 
-
   mesesCompletos: string[] = [
     'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
     'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
@@ -42,7 +41,6 @@ export class BalanceComponent implements OnInit {
     private renderer: Renderer2,
     private transactionService: TransactionsService,
     private changeDetectorRef: ChangeDetectorRef // Importando ChangeDetectorRef
-
   ) {}
 
   ngOnInit() {
@@ -71,7 +69,13 @@ export class BalanceComponent implements OnInit {
     this.anoSelecionado += valor;
     this.atualizarSaldo();
   }
-
+  
+  handleRefresh(event: any) {
+    this.atualizarSaldo().then(() => {
+      event.target.complete(); // Finaliza o loading do refresher
+    });
+  }
+  
   selecionarMes(indice: number) {
     this.mesSelecionado = indice;
     this.nomeMes = this.mesesCompletos[indice]; // Use os meses completos aqui

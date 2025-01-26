@@ -25,6 +25,13 @@ export class TransactionsPage implements OnInit {
       }
     });
   }
+  // Método para tratar o refresh (atualizar os dados)
+  handleRefresh(event: any) {
+    setTimeout(() => {
+      this.updateTransactionsByMonth(this.currentMonth.format('YYYY-MM'));
+      event.target.complete(); // Finaliza o efeito do refresh
+    }, 500); // Tempo de simulação
+  }
 
   // Método chamado quando o mês é alterado
   updateTransactionsByMonth(month: string) {

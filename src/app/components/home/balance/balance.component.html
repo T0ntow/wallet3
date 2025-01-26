@@ -1,10 +1,13 @@
+<ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+  <ion-refresher-content></ion-refresher-content>
+</ion-refresher>
+
 <div class="saldo-container">
   <div class="saldo">
-    <span style="display: flex; align-items: center; width: 100%; justify-content: center;" (click)="toggleDatePicker()">
+    <span style="display: flex; align-items: center; width: 100%; justify-content: center;"
+      (click)="toggleDatePicker()">
       <strong id="mes">{{ nomeMes }} / {{ anoSelecionado }}</strong>
-      <ion-icon 
-        style="margin: 0 5px;"
-        [name]="mostrarDatePicker ? 'chevron-up-outline' : 'chevron-down-outline'">
+      <ion-icon style="margin: 0 5px;" [name]="mostrarDatePicker ? 'chevron-up-outline' : 'chevron-down-outline'">
       </ion-icon>
     </span>
 
@@ -14,10 +17,7 @@
       <p *ngIf="!mostrarValores">******</p>
     </ion-text>
 
-    <ion-icon 
-      [name]="mostrarValores ? 'eye-off-outline' : 'eye-outline'" 
-      id="eye" 
-      (click)="toggleValores()">
+    <ion-icon [name]="mostrarValores ? 'eye-off-outline' : 'eye-outline'" id="eye" (click)="toggleValores()">
     </ion-icon>
   </div>
 
@@ -30,10 +30,7 @@
           <ion-icon name="chevron-forward-outline" (click)="mudarAno(1)"></ion-icon>
         </div>
         <div class="month-list">
-          <div 
-            class="month-item" 
-            *ngFor="let mes of mesesAbreviados; let i = index" 
-            (click)="selecionarMes(i)"
+          <div class="month-item" *ngFor="let mes of mesesAbreviados; let i = index" (click)="selecionarMes(i)"
             [class.selected]="mesSelecionado === i">
             {{ mes }}
           </div>

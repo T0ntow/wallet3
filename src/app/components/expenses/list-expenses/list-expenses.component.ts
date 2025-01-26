@@ -66,7 +66,7 @@ export class ListExpensesComponent implements OnInit {
     private renderer: Renderer2,
     private elRef: ElementRef,
   ) { }
-
+  
   async loadCards() {
     try {
       this.cartoes = await this.cardService.getCards(); // Carrega todas as contas

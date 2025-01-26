@@ -6,7 +6,6 @@
     name="chevron-down-outline">
   </ion-icon>
   </span>
-
 </ion-header>
 
 <div *ngIf="mostrarViewPicker" class="viewSelect">
@@ -26,7 +25,10 @@
 <div class="back" *ngIf="mostrarViewPicker" (click)="cancelar()"></div>
 
 <ion-content #page [fullscreen]="true">
-
+  <ion-refresher slot="fixed" (ionRefresh)="handleRefresh($event)">
+    <ion-refresher-content></ion-refresher-content>
+  </ion-refresher>
+  
   <app-month-navigation (monthChanged)="updateTransactionsByMonth($event)"></app-month-navigation>
 
   <ion-segment-view>
@@ -41,5 +43,4 @@
       <app-list-receives [month]="currentMonth"></app-list-receives>
     </ion-segment-content>
   </ion-segment-view>
-
 </ion-content>
