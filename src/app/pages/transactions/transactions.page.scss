@@ -1,9 +1,22 @@
 @import "../../mixins/segment-mixin.scss";
-
 @include segment-style;
 
 * {
   font-family: "Inria Sans";
+}
+
+.back {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 200;
+  background-color: #5f5f5f25;
+
+  width: 100vw;
+  height: 100vh;
+  transition: opacity 0.3s ease-in-out;
 }
 
 ion-header {
@@ -12,15 +25,89 @@ ion-header {
   background-color: var(--ion-background-color);
   padding: 0 25px;
   height: 8vh;
+  z-index: 200;
 
   display: flex;
   align-items: center;
+
+  span {
+    display: flex;
+    align-items: center;
+    font-size: 18px;
+  }
 
   ion-title {
     padding: 0 !important;
   }
 }
 
+.viewSelect {
+  position: absolute;
+  top: 0;
+  left: 25px;
+  z-index: 999;
+
+  @keyframes show-view-select {
+    0% {
+      opacity: 0;
+      transform: translateY(-50%); 
+    }
+  
+    100% {
+      opacity: 1;
+      transform: translateY(0); 
+    }
+  }
+
+  .list-view {
+    background-color: #F9F9F9;
+    display: flex;
+    flex-direction: column;
+    padding: 10px 0;
+    gap: 5px;
+    animation: show-view-select .25s ease-in;
+
+    border-radius: 0 0 10px 10px;
+    ion-label::before{
+      content: "";
+      width: 15px;
+      height: 15px;
+      position: absolute;
+      left: 5px;
+      border: 1px solid #fff;
+      border-radius: 50%;
+    }
+
+    #transacoes-label::before {
+      background-color: #3e80b6;
+    }
+    #despesas-label::before {
+      background-color: var(--ion-color-danger);
+    }
+    #receitas-label::before {
+      background-color: var(--ion-color-success);
+    }
+    
+    .item-view {
+      padding: 10px 15px;
+    }
+
+    .item-view:hover {
+      background-color: #a5a5a5;
+      cursor: pointer;
+    }
+
+    ion-label {
+      display: flex;
+      margin-left: 20px;
+      align-items: center;
+      height: 10px;
+      font-size: 16px;
+      color: #000;
+      font-weight: bold;
+    }
+  }
+}
 main {
   padding: 15px;
   .resumo {
@@ -46,7 +133,6 @@ main {
 }
 
 .transacoes {
-
   .titulo-grupo-data {
     font-size: 15px;
     border-bottom: 1px solid black;

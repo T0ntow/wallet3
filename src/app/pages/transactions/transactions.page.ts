@@ -1,4 +1,4 @@
-import { Component, inject, OnInit } from '@angular/core';
+import { Component, ElementRef, inject, OnInit, Renderer2 } from '@angular/core';
 import * as moment from 'moment';
 import { TransactionsService } from 'src/app/services/transactions/transactions.service';
 import { Transacao } from 'src/app/models/transaction.model';
@@ -62,7 +62,10 @@ export class TransactionsPage implements OnInit {
   despesasAgrupadas: { data: string; transacoes: Transacao[]; }[] | undefined;
   receitasAgrupadas: { data: string; transacoes: Transacao[]; }[] | undefined;
 
-  constructor() { }
+  constructor(
+    private renderer: Renderer2,
+    private elRef: ElementRef,
+  ) { }
 
   async loadCards() {
     try {
@@ -81,7 +84,6 @@ export class TransactionsPage implements OnInit {
   }
 
 
-  
 
   async loadCategories() {
     try {
@@ -111,6 +113,28 @@ export class TransactionsPage implements OnInit {
       },
       error: err => console.error("Subscription error:", err)
     });
+
+    this.renderer.listen('document', 'click', (event: MouseEvent) => {
+      if (this.mostrarViewPicker && !this.elRef.nativeElement.contains(event.target)) {
+        this.toggleView();
+      }
+    });
+  }
+
+  selectedView: string = 'Transações'; // Valor padrão
+  mostrarViewPicker: boolean = false;
+  toggleView() {
+    this.mostrarViewPicker = !this.mostrarViewPicker;
+  }
+
+  cancelar() {
+    this.mostrarViewPicker = false;
+  }
+
+
+  selectView(view: string) {
+    this.selectedView = view
+    this.mostrarViewPicker = !this.mostrarViewPicker;
   }
 
   async initApp() {
@@ -125,43 +149,43 @@ export class TransactionsPage implements OnInit {
   async updateTransactionsByMonth(month: string) {
     try {
       await this.initApp();
-  
+
       this.currentMonth = moment(month); // Atualiza currentMonth com o novo mês
-  
+
       // Obtém todas as despesas
       const despesas = await this.transactionService.getAllTransactions();
-  
+
       // Obter despesas recorrentes e filtrar pelo mês
       const recurringExpenses = await this.transactionService.getRecorrencias();
-      console.log("RECORRENTES --: ",JSON.stringify(recurringExpenses));
-      
-      const filteredRecurringExpenses = await this.filterRecurringExpensesByType(recurringExpenses, month);
-      console.log("RECORRENTES FILTRADAS --: ",JSON.stringify(filteredRecurringExpenses));
+      console.log("RECORRENTES --: ", JSON.stringify(recurringExpenses));
 
-  
+      const filteredRecurringExpenses = await this.filterRecurringExpensesByType(recurringExpenses, month);
+      console.log("RECORRENTES FILTRADAS --: ", JSON.stringify(filteredRecurringExpenses));
+
+
       // Obtém despesas de cartão e conta
       const [despesasCartao, despesasConta] = await Promise.all([
         this.transactionService.getDespesasCartaoByMonth(month),
         this.transactionService.getDespesasContaByMonth(month),
       ]);
-  
+
       // Obtém receitas
       const receitas = await this.transactionService.getReceitasByMonth(month);
-  
+
       // Obter parcelas pendentes para o mês
       const installmentsResult = await this.transactionService.getParcelasByMonth(month);
-  
+
       // Mapeia as parcelas para incluir detalhes da despesa associada
       const mappedInstallments = installmentsResult.map((installment) => {
         const associatedExpense = despesas.find((transaction) => transaction.transacao_id === installment.transacao_id);
-  
+
         // Retorna a parcela com os detalhes associados
         return {
           ...installment,
           ...associatedExpense, // Inclui propriedades diretamente no objeto da parcela
         };
       });
-  
+
       // Preenche a lista de despesas combinadas
       this.despesasFiltradas = [
         ...despesasCartao,
@@ -169,35 +193,35 @@ export class TransactionsPage implements OnInit {
         ...mappedInstallments, // Inclui as parcelas mapeadas dentro do mês
         ...filteredRecurringExpenses, // Inclui as despesas recorrentes filtradas
       ];
-  
+
       this.receitasFiltradas = [...receitas];
-  
+
       console.log("Receitas filtradas:", this.receitasFiltradas);
       console.log("Despesas filtradas:", JSON.stringify(this.despesasFiltradas));
-  
+
       // Chama a função para separar e processar as despesas e receitas
       this.separarDespesasEReceitas();
     } catch (error) {
       console.error("Erro ao atualizar transações pelo mês:", error);
     }
   }
-  
+
   async filterRecurringExpensesByType(
     recurringExpenses: Transacao[],
     month: string
   ): Promise<Transacao[]> {
     const currentMonth = moment(month, 'YYYY-MM'); // Representa o mês atual
     const filteredExpenses: Transacao[] = [];
-  
+
     recurringExpenses.forEach((expense) => {
       const transactionDate = moment(expense.data_transacao, 'YYYY-MM-DD'); // Data da transação
-  
+
       // Verifica se a data da transação pertence ao mês fornecido
       if (transactionDate.isSame(currentMonth, 'month')) {
         filteredExpenses.push(expense);
       }
     });
-  
+
     return filteredExpenses;
   }
 
@@ -387,7 +411,7 @@ export class TransactionsPage implements OnInit {
       }
     }
   }
-  
+
   async payInstance(transacao: Transacao) {
     if (transacao.instancia_id) {
       try {
@@ -439,10 +463,10 @@ export class TransactionsPage implements OnInit {
     });
     await alert.present();
   }
-  
+
   async deleteSingleInstance(despesa: Transacao) {
     console.log("DELETE INSTANCIA", JSON.stringify(despesa));
-    
+
     const alert = await this.alertController.create({
       header: 'Confirmar Exclusão',
       message: `Tem certeza de que deseja excluir esta instância?`,
