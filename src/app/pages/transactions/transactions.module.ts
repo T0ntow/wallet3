@@ -16,6 +16,8 @@ import { ChartsComponent } from 'src/app/components/charts/charts.component';
 import { AddReceiveComponent } from 'src/app/components/receives/add-receive/add-receive.component';
 import { ChartsReceiveComponent } from 'src/app/components/charts-receive/charts-receive.component';
 import { EditReceiveComponent } from 'src/app/components/receives/edit-receive/edit-receive.component';
+import { ListExpensesComponent } from 'src/app/components/expenses/list-expenses/list-expenses.component';
+import { ListReceivesComponent } from 'src/app/components/receives/list-receives/list-receives.component';
 @NgModule({
   imports: [
     CommonModule,
@@ -33,7 +35,9 @@ import { EditReceiveComponent } from 'src/app/components/receives/edit-receive/e
     ChartsComponent,
     AddReceiveComponent,
     ChartsReceiveComponent,
-    EditReceiveComponent
+    EditReceiveComponent,
+    ListExpensesComponent,
+    ListReceivesComponent
   ],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],
 })

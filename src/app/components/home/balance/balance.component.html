@@ -10,7 +10,7 @@
 
     <ion-text class="valor-saldo" [color]="calcularDiferencaSaldo() >= 0 ? 'success' : 'danger'">
       <span>Saldo em contas</span>
-      <p *ngIf="mostrarValores">{{ calcularDiferencaSaldo() | currency:'BRL':'symbol':'1.2-2' }}</p>
+      <p *ngIf="mostrarValores">{{ valorAtual | currency:'BRL':'symbol':'1.2-2' }}</p>
       <p *ngIf="!mostrarValores">******</p>
     </ion-text>
 

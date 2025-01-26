@@ -1,0 +1,137 @@
+<main>
+  <div class="resumo">
+    <p>Gasto em {{ currentMonth.format('MMMM YYYY') }}: {{ calcularTotalDespesas() |
+      currency:'BRL':'symbol':'1.2-2' }}</p>
+    <p>Pendente: {{ calcularTotalPendentes() | currency:'BRL':'symbol':'1.2-2' }}</p>
+  </div>
+  <div>
+    <app-charts [despesas]="despesasFiltradas" [categorias]="categorias"></app-charts>
+  </div>
+  <div class="transacoes">
+    <div *ngFor="let grupo of despesasAgrupadas">
+      <h4 class="titulo-grupo-data">{{ grupo.data | date: 'dd MMMM' }}</h4>
+      <div class="grupo-transacoes">
+        <div *ngFor="let despesa of grupo.transacoes" class="transacao-item" (click)="openModalDespesa(despesa)">
+          <div class="transacao-info">
+            <div class="esquerda">
+              <fa-icon *ngIf="getIconByCategoryId(despesa.categoria_id) as icon" [icon]="icon"
+                class="icon"></fa-icon>
+              <div>
+                <h4 *ngIf="!despesa.is_parcelado">{{ despesa.descricao }}</h4>
+                <h4 *ngIf="despesa.valor_parcela">{{ despesa.descricao_parcela }}</h4>
+                <p class="banco" *ngIf="despesa.conta_id">{{ getAccountNameById(despesa.conta_id) }}</p>
+                <p class="banco" *ngIf="despesa.cartao_id">{{ getCardNameById(despesa.cartao_id) }}</p>
+              </div>
+            </div>
+            <div class="direita">
+              <h5 *ngIf="despesa.valor">{{ despesa.valor | currency:'BRL':'symbol':'1.2-2' }}</h5>
+              <h5 *ngIf="despesa.valor_parcela">{{ despesa.valor_parcela | currency:'BRL':'symbol':'1.2-2' }}</h5>
+              <div class="details">
+                <ion-icon *ngIf="despesa.cartao_id" class="cartao" name="card"></ion-icon>
+                <ion-icon *ngIf="despesa.status === 'pago'" class="pago" name="checkmark-circle"></ion-icon>
+                <ion-icon *ngIf="despesa.status === 'pendente'" class="pendente" name="alert-circle"></ion-icon>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<!-- Modal for expense details -->
+<ion-modal #modal [isOpen]="isModalDespesaOpen" [componentProps]="{ despesa: selectedDespesa }"
+  [initialBreakpoint]="0.5" [breakpoints]="[0, 0.5]" (ionModalDidDismiss)="closeModalDespesa()">
+  <ng-template>
+    <ion-content>
+      <ion-grid>
+        <ion-row class="header-grid">
+          <ion-col *ngIf="selectedDespesa?.status === 'pendente'">
+            <ion-icon class="pendente" name="alert-circle"></ion-icon>
+            <ion-label>Pendente</ion-label>
+          </ion-col>
+          <ion-col *ngIf="selectedDespesa?.status === 'pago'">
+            <ion-icon class="pago" name="checkmark-circle"></ion-icon>
+            <ion-label>Pago</ion-label>
+          </ion-col>
+          <ion-col *ngIf="selectedDespesa?.cartao_id">
+            <ion-icon class="cartao" name="card"></ion-icon>
+            <ion-label>Despesa Cartão</ion-label>
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col>
+            <ion-label>Descrição:</ion-label>
+            <span>{{ selectedDespesa?.descricao }}</span>
+          </ion-col>
+          <!-- Caso não tenha parcelas -->
+          <ion-col *ngIf="selectedDespesa?.valor">
+            <ion-label>Valor:</ion-label>
+            <span>{{ selectedDespesa?.valor | currency }}</span>
+          </ion-col>
+          <ion-col *ngIf="selectedDespesa?.valor_parcela">
+            <ion-label>Valor Parcela:</ion-label>
+            <span>{{ selectedDespesa?.valor_parcela | currency }}</span>
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col *ngIf="selectedDespesa?.conta_id">
+            <ion-label>Conta:</ion-label>
+            <span>{{ getAccountNameById(selectedDespesa?.conta_id) }}</span>
+          </ion-col>
+          <ion-col *ngIf="selectedDespesa?.cartao_id">
+            <ion-label>Cartão:</ion-label>
+            <span>{{ getCardNameById(selectedDespesa?.cartao_id) }}</span>
+          </ion-col>
+          <ion-col>
+            <ion-label>Categoria:</ion-label>
+            <span>{{ getCategoryNameById(selectedDespesa?.categoria_id) }}</span>
+          </ion-col>
+        </ion-row>
+        <ion-row>
+          <ion-col class="buttons">
+            <ion-button fill="outline" color="warning" (click)="editExpense(selectedDespesa)">Editar
+              Despesa</ion-button>
+            <!-- Botão para pagar a despesa completa -->
+            <ion-button fill="outline" color="success" *ngIf="selectedDespesa?.status === 'pendente'"
+              (click)="payExpense(selectedDespesa)">
+              Pagar Despesa
+            </ion-button>
+            <!-- Botão para pagar uma parcela específica -->
+            <ion-button fill="outline" color="success"
+              *ngIf="selectedDespesa?.status === 'pendente' && selectedDespesa?.is_parcelado === 1"
+              (click)="payInstallment(selectedDespesa)">
+              Pagar Parcela
+            </ion-button>
+
+            <ion-button fill="outline" color="success"
+              *ngIf="selectedDespesa?.status === 'pendente' && selectedDespesa?.is_parcelado === 1"
+              (click)="payInstallment(selectedDespesa)">
+              Pagar instancia
+            </ion-button>
+
+            <ion-button fill="outline" color="danger" *ngIf="selectedDespesa?.is_recorrente != 1"
+              (click)="deleteExpense(selectedDespesa)">Excluir
+              Despesa</ion-button>
+
+            <ion-button fill="outline" color="danger" *ngIf="selectedDespesa?.is_parcelado === 1"
+              (click)="deleteInstallment(selectedDespesa)">
+              Excluir Parcela
+            </ion-button>
+
+            <ion-button fill="outline" color="danger" *ngIf="selectedDespesa?.is_recorrente === 1"
+              (click)="deleteExpense(selectedDespesa)">
+              Excluir Todas as Instâncias
+            </ion-button>
+
+            <ion-button fill="outline" color="danger" *ngIf="selectedDespesa?.is_recorrente === 1"
+              (click)="deleteSingleInstance(selectedDespesa)">
+              Excluir Instância
+            </ion-button>
+
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+    </ion-content>
+  </ng-template>
+</ion-modal>

@@ -1,4 +1,4 @@
-import { Component, OnInit, ElementRef, Renderer2 } from '@angular/core';
+import { Component, OnInit, ElementRef, Renderer2, ChangeDetectorRef } from '@angular/core';
 import * as moment from 'moment';
 import { Transacao } from 'src/app/models/transaction.model';
 import { BalanceService } from 'src/app/services/balance/balance.service';
@@ -20,7 +20,11 @@ export class BalanceComponent implements OnInit {
 
   despesasFiltradas: Transacao[] = [];
   receitasFiltradas: Transacao[] = [];
-  
+
+  valorAtual: number = 0;
+  valorFinal: number = 0; // O valor final desejado
+
+
   mesesCompletos: string[] = [
     'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
     'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
@@ -36,23 +40,25 @@ export class BalanceComponent implements OnInit {
   constructor(
     private elRef: ElementRef,
     private renderer: Renderer2,
-    private transactionService: TransactionsService
+    private transactionService: TransactionsService,
+    private changeDetectorRef: ChangeDetectorRef // Importando ChangeDetectorRef
+
   ) {}
 
   ngOnInit() {
     const now = moment();
     this.mesSelecionado = now.month(); // Inicializa com o mês atual
     this.nomeMes = this.mesesCompletos[this.mesSelecionado]; // Nome completo do mês atual
-  
+
     this.atualizarSaldo();
-  
+
     this.renderer.listen('document', 'click', (event: MouseEvent) => {
       if (this.mostrarDatePicker && !this.elRef.nativeElement.contains(event.target)) {
         this.toggleDatePicker();
       }
     });
   }
-  
+
   toggleValores(): void {
     this.mostrarValores = !this.mostrarValores;
   }
@@ -83,7 +89,7 @@ export class BalanceComponent implements OnInit {
     this.atualizarSaldo();
     this.toggleDatePicker();
   }
-  
+
 
   cancelar() {
     this.toggleDatePicker();
@@ -91,16 +97,41 @@ export class BalanceComponent implements OnInit {
   }
 
   async atualizarSaldo() {
-    const mesSelecionado = this.mesSelecionado !== null 
+    const mesSelecionado = this.mesSelecionado !== null
       ? moment().year(this.anoSelecionado).month(this.mesSelecionado).startOf('month')
       : moment().startOf('month');
-    
+  
     const month = mesSelecionado.format('YYYY-MM');
     console.log(`Atualizando saldo para: ${month}`);
-
+  
     await this.updateTransactionsByMonth(month);
+  
+    // Obtém o novo valor final e inicia a animação
+    this.valorFinal = this.calcularDiferencaSaldo();
+    this.animarValorSaldo(this.valorFinal);
   }
 
+  animarValorSaldo(valorFinal: number) {
+    const duracao = 1000; // Duração da animação em milissegundos
+    const intervalo = 10; // Intervalo entre atualizações
+    const passos = duracao / intervalo;
+    const diferenca = valorFinal - this.valorAtual;
+    const incremento = diferenca / passos;
+    
+    let passoAtual = 0;
+  
+    const animacao = setInterval(() => {
+      this.valorAtual += incremento;
+      this.changeDetectorRef.detectChanges(); // Atualiza a view manualmente
+  
+      passoAtual++;
+      if (passoAtual >= passos) {
+        this.valorAtual = valorFinal; // Garante que o valor final seja exato
+        clearInterval(animacao);
+      }
+    }, intervalo);
+  }
+  
   async updateTransactionsByMonth(month: string) {
     const despesas = await this.transactionService.getAllTransactions();
     const despesasCartao = await this.transactionService.getDespesasCartaoByMonth(month);
