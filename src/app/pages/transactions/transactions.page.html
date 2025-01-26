@@ -122,13 +122,36 @@
                   Pagar Parcela
                 </ion-button>
 
-                <ion-button fill="outline" color="danger" (click)="deleteExpense(selectedDespesa)">Excluir
+                <ion-button fill="outline" color="success"
+                *ngIf="selectedDespesa?.status === 'pendente' && selectedDespesa?.is_parcelado === 1"
+                (click)="payInstallment(selectedDespesa)">
+                Pagar instancia
+              </ion-button>
+
+                <ion-button fill="outline" color="danger"  *ngIf="selectedDespesa?.is_recorrente != 1"  (click)="deleteExpense(selectedDespesa)">Excluir
                   Despesa</ion-button>
 
                 <ion-button fill="outline" color="danger" *ngIf="selectedDespesa?.is_parcelado === 1"
                   (click)="deleteInstallment(selectedDespesa)">
                   Excluir Parcela
                 </ion-button>
+
+                <ion-button 
+                fill="outline" 
+                color="danger" 
+                *ngIf="selectedDespesa?.is_recorrente === 1" 
+                (click)="deleteExpense(selectedDespesa)">
+                Excluir Todas as Instâncias
+              </ion-button>
+
+              <ion-button 
+              fill="outline" 
+              color="danger" 
+              *ngIf="selectedDespesa?.is_recorrente === 1" 
+              (click)="deleteSingleInstance(selectedDespesa)">
+              Excluir Instância
+            </ion-button>
+            
               </ion-col>
             </ion-row>
           </ion-grid>

@@ -15,22 +15,22 @@ import { AbstractControl, ValidatorFn } from '@angular/forms';
 
 export function atLeastOneRequiredValidator(): ValidatorFn {
   return (control: AbstractControl): { [key: string]: boolean } | null => {
-    const valor = control.get('valor')?.value;
-    const valor_parcela = control.get('valor_parcela')?.value;
-    const is_parcelado = control.get('is_parcelado')?.value;
+  const valor = control.get('valor')?.value;
+  const valor_parcela = control.get('valor_parcela')?.value;
+  const is_parcelado = control.get('is_parcelado')?.value;
 
-    // If is_parcelado is true, then valor_parcela is required
-    if (is_parcelado && !valor_parcela) {
-      return { required: true };
-    }
+  // Validação: se `is_parcelado` é verdadeiro, `valor_parcela` é obrigatório
+  if (is_parcelado && !valor_parcela) {
+    return { required: true };
+  }
 
-    // If is_parcelado is false, then valor is required
-    if (!is_parcelado && !valor) {
-      return { required: true };
-    }
+  // Validação: se não é parcelado, `valor` é obrigatório
+  if (!is_parcelado && !valor) {
+    return { required: true };
+  }
 
-    return null; // No errors
-  };
+  return null; // Sem erros
+};
 }
 
 @Component({
@@ -65,7 +65,7 @@ export class AddExpenseComponent implements OnInit {
     this.transacaoForm = this.formBuilder.group({
       descricao: ['', Validators.required],
       conta_id: [null],
-      categoria_id: [null, Validators.required],
+      categoria_id: [null, Validators.required] ,
       data: [moment().format('YYYY-MM-DD'), Validators.required],
       valor: ['', Validators.required],
       valor_parcela: [{ value: '', disabled: true }], // Inicialmente desabilitado
@@ -74,19 +74,17 @@ export class AddExpenseComponent implements OnInit {
       is_parcelado: [false],
       num_parcelas: [null],
       is_recorrente: [false],
-      quantidade_repetir: [null],
-      periodo: [null],
+      quantidade_repetir: [{ value: null, disabled: true }], // Inicialmente desabilitado
+      periodo: [{ value: null, disabled: true }], // Inicialmente desabilitado
       mes_fatura: [null]
     }, { validators: atLeastOneRequiredValidator() }); // Adicionando o validador personalizado
     
-    // No seu ngOnInit ou no construtor
     this.transacaoForm.get('is_parcelado')?.valueChanges.subscribe((isParcelado: boolean) => {
-      if (isParcelado) {
-        this.transacaoForm.get('valor_parcela')?.enable();
-      } else {
-        this.transacaoForm.get('valor_parcela')?.disable();
-        this.transacaoForm.get('valor_parcela')?.reset(); // Opcional: limpar o campo
-      }
+      this.toggleCampoParcelado(isParcelado);
+    });
+
+    this.transacaoForm.get('is_recorrente')?.valueChanges.subscribe((isRecorrente: boolean) => {
+      this.toggleCamposRecorrencia(isRecorrente);
     });
   }
 
@@ -98,6 +96,49 @@ export class AddExpenseComponent implements OnInit {
     this.popover!.event = e;
     this.isOpen = true;
   }
+
+  private toggleCampoParcelado(isParcelado: boolean) {
+    const valorParcelaControl = this.transacaoForm.get('valor_parcela');
+  
+    if (isParcelado) {
+      valorParcelaControl?.enable();
+    } else {
+      valorParcelaControl?.disable();
+      valorParcelaControl?.reset(); // Opcional: limpar o campo
+    }
+  }
+
+  private toggleCamposRecorrencia(isRecorrente: boolean) {
+    // Obtém os controles do formulário
+    const quantidadeRepetirControl = this.transacaoForm.get('quantidade_repetir');
+    const periodoControl = this.transacaoForm.get('periodo');
+  
+    if (isRecorrente) {
+      // Habilita os campos
+      quantidadeRepetirControl?.enable();
+      periodoControl?.enable();
+  
+      // Adiciona validadores (opcional)
+      quantidadeRepetirControl?.setValidators([Validators.required]);
+      periodoControl?.setValidators([Validators.required]);
+    } else {
+      // Desabilita os campos
+      quantidadeRepetirControl?.disable();
+      periodoControl?.disable();
+  
+      // Remove validadores e reseta os campos
+      quantidadeRepetirControl?.clearValidators();
+      quantidadeRepetirControl?.reset(); // Limpa o valor do campo
+  
+      periodoControl?.clearValidators();
+      periodoControl?.reset(); // Limpa o valor do campo
+    }
+  
+    // Atualiza o estado de validação dos campos
+    quantidadeRepetirControl?.updateValueAndValidity();
+    periodoControl?.updateValueAndValidity();
+  }
+  
 
   async ngOnInit() {
     try {
@@ -134,14 +175,20 @@ export class AddExpenseComponent implements OnInit {
 
   selectPeriod(period: string) {
     this.periodo = period;
+    this.transacaoForm.patchValue({ periodo: period });
+    console.log('Periodo:', period);
+    
     this.isOpen = false; // Fecha o popover
   }
 
   toggleRecorrente(event: any) {
-    this.recorrente = event.detail.checked;
-    console.log('Recorrente:', this.recorrente);
-  }
+    this.transacaoForm.patchValue({ is_recorrente: event.detail.checked });
+    const isRecorrente = this.transacaoForm.get('is_recorrente')?.value;
+    console.log('Recorrente:', isRecorrente);
 
+    this.recorrente = event.detail.checked;
+  }
+  
   submitTransacao() {
     if (this.transacaoForm.valid) {
       const formData = this.transacaoForm.value;
@@ -189,6 +236,8 @@ export class AddExpenseComponent implements OnInit {
         .then(async () => {
           console.log('Transação adicionada com sucesso');
           await this.presentToast('Transação adicionada com sucesso!', 'light');
+          console.log("TRANSAÇÂO", transacao);
+          
           this.modalController.dismiss({ transacao: this.transacaoForm });
 
           this.transacaoForm.reset(); // Reseta o formulário

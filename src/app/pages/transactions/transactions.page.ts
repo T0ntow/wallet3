@@ -56,7 +56,7 @@ export class TransactionsPage implements OnInit {
   isModalDespesaOpen = false;
   isModalReceitaOpen = false;
 
-  selectedDespesa: any = null;  
+  selectedDespesa: any = null;
   selectedReceita: any = null;
 
   despesasAgrupadas: { data: string; transacoes: Transacao[]; }[] | undefined;
@@ -80,11 +80,14 @@ export class TransactionsPage implements OnInit {
     }
   }
 
+
+  
+
   async loadCategories() {
     try {
       this.categorias = await this.categoriesService.loadCategories(); // Carrega todas as contas
       console.log("CATEGORIAS");
-      
+
     } catch (error) {
       console.error('Erro ao carregar contas:', error);
     }
@@ -120,54 +123,82 @@ export class TransactionsPage implements OnInit {
   }
 
   async updateTransactionsByMonth(month: string) {
-    await this.initApp();
-    
-    this.currentMonth = moment(month); // Atualiza currentMonth com o novo mês
-    // Obtém as despesas de cartão e conta
-    const despesas = await this.transactionService.getAllTransactions(); //todas as despesas
-    const despesasCartao = await this.transactionService.getDespesasCartaoByMonth(month);
-    const despesasConta = await this.transactionService.getDespesasContaByMonth(month);
+    try {
+      await this.initApp();
+  
+      this.currentMonth = moment(month); // Atualiza currentMonth com o novo mês
+  
+      // Obtém todas as despesas
+      const despesas = await this.transactionService.getAllTransactions();
+  
+      // Obter despesas recorrentes e filtrar pelo mês
+      const recurringExpenses = await this.transactionService.getRecorrencias();
+      console.log("RECORRENTES --: ",JSON.stringify(recurringExpenses));
+      
+      const filteredRecurringExpenses = await this.filterRecurringExpensesByType(recurringExpenses, month);
+      console.log("RECORRENTES FILTRADAS --: ",JSON.stringify(filteredRecurringExpenses));
 
-    const receitas = await this.transactionService.getReceitasByMonth(month);
-
-    // Obter parcelas pendentes para o mês
-    const installmentsResult = await this.transactionService.getParcelasByMonth(month);
-
-    // Mapeia as parcelas para incluir detalhes da despesa associada
-    const mappedInstallments = installmentsResult.map(installment => {
-      const associatedExpense = despesas.find(transaction => transaction.transacao_id === installment.transacao_id);
-
-      // Extrair as informações da despesa associada
-      const associatedExpenseData = associatedExpense ? {
-        tipo: associatedExpense.tipo,
-        descricao: associatedExpense.descricao,
-        categoria_id: associatedExpense.categoria_id,
-        cartao_id: associatedExpense.cartao_id,
-        is_parcelado: associatedExpense.is_parcelado,
-        num_parcelas: associatedExpense.num_parcelas,
-        data_transacao: associatedExpense.data_transacao,
-        mes_fatura: associatedExpense.mes_fatura
-      } : null;
-
-      // Retornar a parcela com a despesa associada separada
-      return {
-        ...installment,
-        ...associatedExpenseData // Inclui as propriedades diretamente no objeto da parcela
-      };
+  
+      // Obtém despesas de cartão e conta
+      const [despesasCartao, despesasConta] = await Promise.all([
+        this.transactionService.getDespesasCartaoByMonth(month),
+        this.transactionService.getDespesasContaByMonth(month),
+      ]);
+  
+      // Obtém receitas
+      const receitas = await this.transactionService.getReceitasByMonth(month);
+  
+      // Obter parcelas pendentes para o mês
+      const installmentsResult = await this.transactionService.getParcelasByMonth(month);
+  
+      // Mapeia as parcelas para incluir detalhes da despesa associada
+      const mappedInstallments = installmentsResult.map((installment) => {
+        const associatedExpense = despesas.find((transaction) => transaction.transacao_id === installment.transacao_id);
+  
+        // Retorna a parcela com os detalhes associados
+        return {
+          ...installment,
+          ...associatedExpense, // Inclui propriedades diretamente no objeto da parcela
+        };
+      });
+  
+      // Preenche a lista de despesas combinadas
+      this.despesasFiltradas = [
+        ...despesasCartao,
+        ...despesasConta,
+        ...mappedInstallments, // Inclui as parcelas mapeadas dentro do mês
+        ...filteredRecurringExpenses, // Inclui as despesas recorrentes filtradas
+      ];
+  
+      this.receitasFiltradas = [...receitas];
+  
+      console.log("Receitas filtradas:", this.receitasFiltradas);
+      console.log("Despesas filtradas:", JSON.stringify(this.despesasFiltradas));
+  
+      // Chama a função para separar e processar as despesas e receitas
+      this.separarDespesasEReceitas();
+    } catch (error) {
+      console.error("Erro ao atualizar transações pelo mês:", error);
+    }
+  }
+  
+  async filterRecurringExpensesByType(
+    recurringExpenses: Transacao[],
+    month: string
+  ): Promise<Transacao[]> {
+    const currentMonth = moment(month, 'YYYY-MM'); // Representa o mês atual
+    const filteredExpenses: Transacao[] = [];
+  
+    recurringExpenses.forEach((expense) => {
+      const transactionDate = moment(expense.data_transacao, 'YYYY-MM-DD'); // Data da transação
+  
+      // Verifica se a data da transação pertence ao mês fornecido
+      if (transactionDate.isSame(currentMonth, 'month')) {
+        filteredExpenses.push(expense);
+      }
     });
-
-    // Preenche a lista de despesas combinadas
-    this.despesasFiltradas = [
-      ...despesasCartao,
-      ...despesasConta,
-      ...mappedInstallments // Inclui as parcelas mapeadas dentro do mês
-    ];
-
-    this.receitasFiltradas = [...receitas];
-    console.log("this.receitasFiltradas", this.receitasFiltradas);
-    
-    // Chama a função para separar e processar as despesas e receitas
-    this.separarDespesasEReceitas();
+  
+    return filteredExpenses;
   }
 
   separarDespesasEReceitas() {
@@ -178,7 +209,7 @@ export class TransactionsPage implements OnInit {
     // Filtra despesas e receitas
     const despesas = this.despesasFiltradas.filter(transacao => transacao.tipo === 'despesa');
     const receitas = this.receitasFiltradas.filter(transacao => transacao.tipo === 'receita');
-  
+
     // Agrupa despesas por data
     despesas.forEach(despesa => {
       const data = moment(despesa.data_transacao).format('YYYY-MM-DD');
@@ -187,7 +218,7 @@ export class TransactionsPage implements OnInit {
       }
       despesasAgrupadas[data].push(despesa);
     });
-  
+
     // Agrupa receitas por data
     receitas.forEach(receita => {
       const data = moment(receita.data_transacao).format('YYYY-MM-DD');
@@ -196,19 +227,19 @@ export class TransactionsPage implements OnInit {
       }
       receitasAgrupadas[data].push(receita);
     });
-  
+
     // Salva os grupos ordenados
     this.despesasAgrupadas = this.ordenarGruposPorData(despesasAgrupadas);
     this.receitasAgrupadas = this.ordenarGruposPorData(receitasAgrupadas);
   }
-  
+
   // Função para ordenar os grupos por data
   ordenarGruposPorData(grupos: Record<string, any[]>) {
     return Object.keys(grupos)
       .sort((a, b) => moment(b).diff(moment(a))) // Ordena as datas de forma decrescente
       .map(data => ({ data, transacoes: grupos[data] }));
   }
-  
+
 
   calcularTotalDespesas(): number {
     return this.despesasFiltradas.reduce((total, despesa) => {
@@ -356,6 +387,21 @@ export class TransactionsPage implements OnInit {
       }
     }
   }
+  
+  async payInstance(transacao: Transacao) {
+    if (transacao.instancia_id) {
+      try {
+        await this.transactionService.payInstance(transacao.instancia_id);
+        this.closeModalDespesa();
+        console.log(`Instancia com ID ${transacao.instancia_id} foi marcada como paga.`);
+        this.transactionService.notifyTransactionUpdate()
+
+      } catch (error) {
+        this.closeModalDespesa();
+        console.error('Erro ao pagar a instancia:', error);
+      }
+    }
+  }
 
   async deleteExpense(despesa: Transacao) {
     const alert = await this.alertController.create({
@@ -375,6 +421,45 @@ export class TransactionsPage implements OnInit {
             if (despesa.transacao_id) {
               try {
                 await this.transactionService.deleteTransaction(despesa.transacao_id);
+                this.closeModalDespesa();
+                console.log(`Despesa com ID ${despesa.transacao_id} foi deletada.`);
+                await this.presentToast('Despesa excluida com sucesso!', 'light');
+
+                this.transactionService.notifyTransactionUpdate();
+              } catch (error) {
+                this.closeModalDespesa();
+                console.error('Erro ao excluir a despesa:', error);
+                await this.presentToast('Erro ao excluir a despesa', 'danger');
+
+              }
+            }
+          },
+        },
+      ],
+    });
+    await alert.present();
+  }
+  
+  async deleteSingleInstance(despesa: Transacao) {
+    console.log("DELETE INSTANCIA", JSON.stringify(despesa));
+    
+    const alert = await this.alertController.create({
+      header: 'Confirmar Exclusão',
+      message: `Tem certeza de que deseja excluir esta instância?`,
+      buttons: [
+        {
+          text: 'Cancelar',
+          role: 'cancel',
+          handler: () => {
+            console.log('A exclusão da despesa foi cancelada.');
+          },
+        },
+        {
+          text: 'Excluir',
+          handler: async () => {
+            if (despesa.instancia_id) {
+              try {
+                await this.transactionService.deleteSingleInstance(despesa.instancia_id);
                 this.closeModalDespesa();
                 console.log(`Despesa com ID ${despesa.transacao_id} foi deletada.`);
                 await this.presentToast('Despesa excluida com sucesso!', 'light');

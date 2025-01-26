@@ -80,6 +80,17 @@ export class DatabaseService {
         );
     `);
 
+
+      await this.db.execute(`
+        CREATE TABLE instancias_recorrentes (
+        instancia_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        despesa_mae_id INTEGER NOT NULL,
+        data_transacao DATE NOT NULL,
+        status VARCHAR(20) DEFAULT 'pendente',
+        FOREIGN KEY (despesa_mae_id) REFERENCES transacoes(transacao_id) ON DELETE CASCADE
+      );
+    `);
+
       // await this.db.execute(`DROP TABLE IF EXISTS transacoes`);
 
       await this.db.execute(`

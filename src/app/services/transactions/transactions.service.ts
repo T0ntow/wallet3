@@ -19,7 +19,7 @@ export class TransactionsService {
   }
 
   constructor(private databaseService: DatabaseService) { }
-
+  
   async addTransaction(
     conta_id: number | null,
     cartao_id: number | null,
@@ -39,22 +39,23 @@ export class TransactionsService {
     mes_fatura: string | null
   ): Promise<void> {
     const db = await this.databaseService.getDb();
-
+  
     if (!db) {
-      console.error('Database is not initialized');
+      console.error("Database is not initialized");
       return;
     }
-
-    // Inserir transação na tabela 'transacoes'
-    const sql = `INSERT INTO transacoes 
-                 (conta_id, cartao_id, categoria_id, tipo, valor, descricao, 
-                  is_parcelado, num_parcelas, valor_parcela, is_recorrente, 
-                  quantidade_repetir, periodo, status, 
-                  fk_parcelas_parcela_id, data_transacao, mes_fatura) 
-                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`;
-
+  
+    const sql = `
+      INSERT INTO transacoes 
+      (conta_id, cartao_id, categoria_id, tipo, valor, descricao, 
+      is_parcelado, num_parcelas, valor_parcela, is_recorrente, 
+      quantidade_repetir, periodo, status, 
+      fk_parcelas_parcela_id, data_transacao, mes_fatura) 
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+  
     try {
-      // Executa a inserção da transação
+      // Inserir transação principal
       const result = await db.run(sql, [
         conta_id,
         cartao_id,
@@ -71,43 +72,174 @@ export class TransactionsService {
         status,
         fk_parcelas_parcela_id,
         data_transacao,
-        mes_fatura
+        mes_fatura,
       ]);
+  
       console.log("Transação inserida com sucesso!");
-
-      // Se a transação for parcelada, cria as parcelas associadas
+  
+      // Obter o ID da última transação inserida
+      const idResult = await db.query("SELECT last_insert_rowid() AS id");
+      const transacao_id = idResult.values![0].id;
+  
+      // Lógica para gerar parcelas se a transação for parcelada
       if (is_parcelado && num_parcelas && valor_parcela && mes_fatura) {
-        // Obter o ID da última inserção (se necessário para criar parcelas futuras)
-        const idResult = await db.query('SELECT last_insert_rowid() AS id');
-        const transacao_id = idResult.values![0].id;
-
-        // Adicionar as parcelas relacionadas à transação
-        for (let i = 0; i < num_parcelas; i++) {  // Começa em 0 para que a primeira parcela seja no mês da fatura
-          const vencimento = this.calculateDueDate(mes_fatura, i); // Passa o índice da parcela
-
-          const descricaoParcela = `${descricao} (${i + 1} de ${num_parcelas})`; // Exemplo: "Descricao (1 de 3)"
-
+        for (let i = 0; i < num_parcelas; i++) {
+          const vencimento = this.calculateDueDate(mes_fatura, i);
+          const descricaoParcela = `${descricao} (${i + 1} de ${num_parcelas})`;
+  
           const insertParcelaSql = `
-          INSERT INTO parcelasTable 
-          (transacao_id, valor_parcela, data_vencimento, status, descricao_parcela) 
-          VALUES (?, ?, ?, ?, ?)
-        `;
-
+            INSERT INTO parcelasTable 
+            (transacao_id, valor_parcela, data_vencimento, status, descricao_parcela) 
+            VALUES (?, ?, ?, ?, ?)
+          `;
+  
           await db.run(insertParcelaSql, [
             transacao_id,
             valor_parcela,
             vencimento,
-            status,  // Status 'pendente' para a parcela
-            descricaoParcela
+            status,
+            descricaoParcela,
           ]);
         }
         console.log(`${num_parcelas} parcelas inseridas com sucesso!`);
       }
+  
+      // Lógica para gerar instâncias recorrentes se for uma transação recorrente
+      if (is_recorrente && quantidade_repetir && periodo) {
+        for (let i = 1; i < quantidade_repetir; i++) {
+          // Calcular a data da próxima instância
+          const dataProximaInstancia = this.calculateNextDate(data_transacao, periodo, i);
+  
+          const insertInstanciaSql = `
+            INSERT INTO instancias_recorrentes 
+            (despesa_mae_id, data_transacao, status) 
+            VALUES (?, ?, ?)
+          `;
+  
+          await db.run(insertInstanciaSql, [
+            transacao_id,
+            dataProximaInstancia,
+            'pendente',
+          ]);
+        }
+        console.log(`Foram geradas ${quantidade_repetir} instâncias recorrentes com sucesso!`);
+      }
     } catch (error) {
-      console.error("Erro ao inserir transação ou parcelas: ", error);
+      console.error("Erro ao inserir transação ou instâncias: ", error);
     }
   }
 
+  // async gerarInstanciasRecorrentes(
+  //   transacao_id: number,
+  //   quantidade_repetir: number,
+  //   periodo: string,
+  //   data_transacao: string
+  // ): Promise<void> {
+  //   const db = await this.databaseService.getDb();
+  
+  //   if (!db) {
+  //     console.error("Database is not initialized");
+  //     return;
+  //   }
+  
+  //   try {
+  //     for (let i = 1; i <= quantidade_repetir; i++) {
+  //       // Calcula a data da próxima instância com base no período
+  //       const novaDataTransacao = this.calculateNextDate(data_transacao, periodo, i);
+  
+  //       const sql = `
+  //         INSERT INTO instancias_recorrentes 
+  //         (despesa_mae_id, data_transacao, status) 
+  //         VALUES (?, ?, ?)`;
+  
+  //       await db.run(sql, [transacao_id, novaDataTransacao, 'pendente']);
+  //     }
+  
+  //     console.log(`Instâncias recorrentes geradas: ${quantidade_repetir}`);
+  //   } catch (error) {
+  //     console.error("Erro ao gerar instâncias recorrentes:", error);
+  //   }
+  // }
+  
+  async deleteAllInstances(despesaMaeId: number): Promise<void> {
+    const db = await this.databaseService.getDb();
+  
+    if (!db) {
+      console.error("Database is not initialized");
+      return;
+    }
+  
+    try {
+      const sql = `DELETE FROM instancias_recorrentes WHERE despesa_mae_id = ?`;
+      await db.run(sql, [despesaMaeId]);
+  
+      console.log('Todas as instâncias da despesa recorrente foram removidas!');
+    } catch (error) {
+      console.error('Erro ao excluir as instâncias:', error);
+    }
+  }
+  
+  calculateNextDate(startDate: string, periodo: string, incremento: number): string {
+    const date = new Date(startDate);
+  
+    switch (periodo) {
+      case "mensal":
+        date.setMonth(date.getMonth() + incremento);
+        break;
+      case "semanal":
+        date.setDate(date.getDate() + 7 * incremento);
+        break;
+      case "diario":
+        date.setDate(date.getDate() + incremento);
+        break;
+      default:
+        throw new Error(`Período desconhecido: ${periodo}`);
+    }
+  
+    return date.toISOString().split("T")[0]; // Retorna apenas a data no formato 'YYYY-MM-DD'
+  }
+
+  async deleteSingleInstance(instanceId: number): Promise<void> {
+    const db = await this.databaseService.getDb();
+  
+    if (!db) {
+      console.error("Database is not initialized");
+      return;
+    }
+  
+    try {
+      const sql = `DELETE FROM instancias_recorrentes WHERE instancia_id = ?`;
+      await db.run(sql, [instanceId]);
+  
+      console.log('Instância específica excluída com sucesso!');
+    } catch (error) {
+      console.error('Erro ao excluir a instância:', error);
+    }
+  }
+
+ 
+
+  async removeAllRecorrenciasByTransacaoId(fk_transacao_id: number): Promise<void> {
+    const db = await this.databaseService.getDb();
+  
+    if (!db) {
+      console.error("Database is not initialized");
+      return;
+    }
+  
+    try {
+      // Consulta para remover todas as instâncias relacionadas à transação recorrente
+      const sql = `DELETE FROM transacoes WHERE despesa_mae_id = ?`;
+  
+      // Executa a exclusão de todas as instâncias associadas
+      await db.run(sql, [fk_transacao_id]);
+  
+      console.log(`Todas as instâncias da transação ${fk_transacao_id} foram removidas com sucesso.`);
+    } catch (error) {
+      console.error("Erro ao remover as instâncias:", error);
+    }
+  }
+  
   // Função para calcular a data de vencimento de cada parcela
   calculateDueDate(mes_fatura: string, parcelaIndex: number): string {
     // Aqui você pode implementar a lógica para calcular a data de vencimento, 
@@ -136,6 +268,82 @@ export class TransactionsService {
     }
   }
 
+  async getRecorrencias(): Promise<Transacao[]> {
+    const db = await this.databaseService.getDb();
+  
+    if (!db) {
+      console.error("Database is not initialized");
+      return [];
+    }
+  
+    try {
+      // Consulta para buscar as instâncias na tabela 'recorrenciasTable'
+      const sql = `
+        SELECT t.*, r.status AS instancia_status, r.instancia_id, r.data_transacao AS instancia_data
+        FROM transacoes t
+        INNER JOIN instancias_recorrentes r
+        ON t.transacao_id = r.despesa_mae_id
+      `;
+  
+      const result = await db.query(sql);
+      const recorrencias: Transacao[] = Array.isArray(result.values)
+        ? result.values.map((row) => {
+            return {
+              transacao_id: row.transacao_id,
+              conta_id: row.conta_id,
+              cartao_id: row.cartao_id,
+              categoria_id: row.categoria_id,
+              tipo: row.tipo,
+              valor: row.valor,
+              descricao: row.descricao,
+              is_parcelado: row.is_parcelado,
+              num_parcelas: row.num_parcelas,
+              is_recorrente: row.is_recorrente,
+              quantidade_repetir: row.quantidade_repetir,
+              periodo: row.periodo,
+              fk_parcelas_parcela_id: row.fk_parcelas_parcela_id,
+              status: row.instancia_status, // Status específico da instância
+              data_transacao: row.instancia_data,
+              mes_fatura: row.mes_fatura,
+              descricao_parcela: row.descricao_parcela,
+              parcela_id: row.parcela_id,
+              despesa_mae_id: row.despesa_mae_id, // ID da transação mãe
+              instancia_id: row.instancia_id, // ID da recorrencia
+            } as Transacao;
+          })
+        : [];
+  
+      return recorrencias;
+    } catch (error) {
+      console.error("Erro ao obter recorrências:", error);
+      return [];
+    }
+  }
+  
+  async pagarInstanciaRecorrente(transacaoId: number): Promise<boolean> {
+    const db = await this.databaseService.getDb();
+  
+    if (!db) {
+      console.error('Database is not initialized');
+      return false;
+    }
+  
+    const sql = `
+      UPDATE transacoes 
+      SET status = "pago" 
+      WHERE transacao_id = ? AND is_recorrente = 1
+    `;
+  
+    try {
+      await db.query(sql, [transacaoId]);
+      console.log(`Instância da transação ${transacaoId} marcada como paga.`);
+      return true;
+    } catch (error) {
+      console.error(`Erro ao pagar instância da transação ${transacaoId}:`, error);
+      return false;
+    }
+  }
+  
   async getAllTransactions(): Promise<Transacao[]> {
     const db = await this.databaseService.getDb();
 
@@ -178,7 +386,6 @@ export class TransactionsService {
       return [];
     }
   }
-
 
   // Exemplo de como garantir que o retorno seja um array
   async getParcelasByMonth(month: string): Promise<any[]> {
@@ -446,6 +653,28 @@ export class TransactionsService {
     }
   }
 
+  async payInstance(instanceId: number): Promise<void> {
+    const db = this.databaseService.getDb();
+
+    if (!db) {
+      console.error('Database is not initialized');
+      return;
+    }
+
+    try {
+      // Atualizar o status da parcela para "pago"
+      await db.run(`
+        UPDATE instancias_recorrentes
+        SET status = 'pago'
+        WHERE instanceId = ?
+      `, [instanceId]);
+
+      console.log(`Instancia com ID ${instanceId} foi marcada como paga.`);
+    } catch (error) {
+      console.error(`Erro ao pagar a parcela: ${error}`);
+    }
+  }
+
   async payInstallment(parcela_id: number) {
     const db = this.databaseService.getDb();
 
@@ -471,27 +700,27 @@ export class TransactionsService {
   // Deletar uma transação
   async deleteTransaction(transacao_id: number) {
     const db = this.databaseService.getDb();
-  
+
     if (!db) {
       console.error('O banco de dados não está inicializado.');
       return;
     }
-  
+
     try {
       // Excluir parcelas associadas à transação
       await db.run(`
         DELETE FROM parcelasTable 
         WHERE transacao_id = ?
       `, [transacao_id]);
-  
+
       console.log(`Parcelas associadas à transação com ID ${transacao_id} foram excluídas.`);
-  
+
       // Excluir a transação
       await db.run(`
         DELETE FROM transacoes 
         WHERE transacao_id = ?
       `, [transacao_id]);
-  
+
       console.log(`Transação com ID ${transacao_id} foi excluída com sucesso.`);
     } catch (error) {
       console.error(`Erro ao excluir a transação ou suas parcelas para o ID ${transacao_id}:`, error);

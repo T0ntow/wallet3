@@ -9,8 +9,8 @@ export interface Transacao {
     descricao?: string; // Descrição opcional da transação
     is_parcelado: number; // Se a transação é parcelada ou não
     num_parcelas?: number | null; // Número de parcelas, se for parcelada
-    is_recorrente: boolean; // Se a transação é recorrente
-    quantidade_repetir?: number | null; // Quantidade de vezes que a transação vai se repetir, se recorrente
+    is_recorrente: boolean | number; // Se a transação é recorrente
+    quantidade_repetir?: number; // Quantidade de vezes que a transação vai se repetir, se recorrente
     periodo?: string | null; // Período de recorrência (ex: semanal, mensal), se aplicável
     fk_parcelas_parcela_id?: number | null; // ID da parcela associada, se parcelado
     status: string; // Status da transação: "pago" ou "pendente"
@@ -18,5 +18,6 @@ export interface Transacao {
     mes_fatura?: string; // Para quando a despesa for em cartão
     descricao_parcela?: string;
     parcela_id?: number  | null;
+    instancia_id?: number | null;
   }
   
