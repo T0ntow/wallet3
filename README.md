@@ -1,4 +1,4 @@
-# Gerenciador de Gastos e Receitas Wallet 
+# Gerenciador de Gastos e Receitas 
 
 ## Descrição
 
