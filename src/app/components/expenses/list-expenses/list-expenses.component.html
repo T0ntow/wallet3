@@ -93,7 +93,7 @@
             <ion-button fill="outline" color="warning" (click)="editExpense(selectedDespesa)">Editar
               Despesa</ion-button>
             <!-- Botão para pagar a despesa completa -->
-            <ion-button fill="outline" color="success" *ngIf="selectedDespesa?.status === 'pendente'"
+            <ion-button fill="outline" color="success" *ngIf="selectedDespesa?.status === 'pendente' && selectedDespesa?.is_recorrente === 0 "
               (click)="payExpense(selectedDespesa)">
               Pagar Despesa
             </ion-button>
@@ -105,8 +105,8 @@
             </ion-button>
 
             <ion-button fill="outline" color="success"
-              *ngIf="selectedDespesa?.status === 'pendente' && selectedDespesa?.is_parcelado === 1"
-              (click)="payInstallment(selectedDespesa)">
+              *ngIf="selectedDespesa?.status === 'pendente' && selectedDespesa?.is_recorrente === 1"
+              (click)="payInstance(selectedDespesa)">
               Pagar instancia
             </ion-button>
 

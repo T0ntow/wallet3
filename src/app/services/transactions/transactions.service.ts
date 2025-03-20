@@ -666,7 +666,7 @@ export class TransactionsService {
       await db.run(`
         UPDATE instancias_recorrentes
         SET status = 'pago'
-        WHERE instanceId = ?
+        WHERE instancia_id = ?
       `, [instanceId]);
 
       console.log(`Instancia com ID ${instanceId} foi marcada como paga.`);
