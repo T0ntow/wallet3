@@ -8,6 +8,7 @@ import { CategoryLoaderService } from 'src/app/services/categories/category-load
 import { TransactionsService } from 'src/app/services/transactions/transactions.service';
 import { Card } from 'src/app/models/card.model';
 import { CardService } from 'src/app/services/card/card.service';
+import { IconDefinition } from '@fortawesome/free-solid-svg-icons';
 
 
 @Component({
@@ -17,7 +18,6 @@ import { CardService } from 'src/app/services/card/card.service';
 })
 export class AddCardExpenseComponent implements OnInit {
   transacaoForm: FormGroup;
-  selectedCard: string = '';
   selectedCategory: string = '';
   selectedInvoice: string = '';
 
@@ -36,6 +36,10 @@ export class AddCardExpenseComponent implements OnInit {
   cardService = inject(CardService)
   transactionService = inject(TransactionsService)
   toastController = inject(ToastController)
+
+  selectedCard: string = '';
+  selectedCardLogo: string | undefined;
+  selectedCategoryIcon: IconDefinition | undefined;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -73,11 +77,34 @@ export class AddCardExpenseComponent implements OnInit {
       this.categories = await this.categoryLoaderService.loadCategoriesByExpenses();
       this.cards = await this.cardService.getCards();
 
+      // Inicializar Cartão
       if (this.cards.length > 0) {
         const firstAccount = this.cards[0];
-        this.selectedCard = firstAccount.nome; // Atualiza o nome da conta selecionada
-        this.transacaoForm.patchValue({ cartao_id: firstAccount.cartao_id }); // Atualiza o ID da conta no formulário
+        this.selectedCard = firstAccount.nome;// Atualiza o nome da conta selecionada
+        this.selectedCardLogo = firstAccount.logo_url;
+
+        this.transacaoForm.patchValue({ cartao_id: firstAccount.cartao_id }); 
+        this.generateInvoiceOptions(firstAccount); // Gera opções de fatura para o cartão selecionado
       }
+
+      // Inicializar Categoria
+      if (this.categories.length > 0) {
+        const firstCategory = this.categories[0];
+        this.selectedCategory = firstCategory.nome;// Atualiza o nome da conta selecionada
+        this.selectedCategoryIcon = firstCategory.icone;
+
+        this.transacaoForm.patchValue({ categoria_id: firstCategory.id }); 
+      }
+
+       // Inicializar Fatura
+       if (this.invoices.length > 0) {
+        const firstInvoice = this.invoices[2];
+        this.selectedInvoice = firstInvoice.label;
+        this.transacaoForm.patchValue({ mes_fatura: firstInvoice.date.format('YYYY-MM-DD') }); // Define o campo mes_fatura para SQLite
+      }
+
+      // Inicializar Data
+      this.transacaoForm.patchValue({ data: moment().format('YYYY-MM-DD') });
     } catch (error) {
       console.error('Error loading categories or accounts:', error);
     }
@@ -113,6 +140,7 @@ export class AddCardExpenseComponent implements OnInit {
 
   async selectCard(card: Card) {
     this.selectedCard = card.nome;
+    this.selectedCardLogo = card.logo_url;
     this.transacaoForm.patchValue({ cartao_id: card.cartao_id }); 
     this.generateInvoiceOptions(card); // Gera opções de fatura para o cartão selecionado
     await this.modalController.dismiss();
@@ -120,6 +148,7 @@ export class AddCardExpenseComponent implements OnInit {
 
   async selectCategory(category: Category) {
     this.selectedCategory = category.nome;
+    this.selectedCategoryIcon = category.icone;
     this.transacaoForm.patchValue({ categoria_id: category.id }); // Atualiza o valor do ícone no formulário
     await this.modalController.dismiss(); // Fecha o modal
   }

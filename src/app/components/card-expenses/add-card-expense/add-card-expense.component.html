@@ -24,6 +24,7 @@
     <div class="container-item" id="open-modal-card" expand="block">
       <label position="stacked">Cartão</label>
       <div class="custom-input" style="display: flex; align-items: center;"  [ngClass]="{'invalid-input': transacaoForm.get('cartao_id')?.invalid && transacaoForm.get('cartao_id')?.touched}">
+        <img *ngIf="selectedCardLogo" [src]="selectedCardLogo" alt="{{ selectedCard }}" class="logo" style="width: 23px; height: 23px; margin: 0 5px;" />
         <p style="margin: 0;"> {{ selectedCard || 'Selecione um cartão' }} </p>
       </div>
     </div>
@@ -31,6 +32,7 @@
     <div class="container-item" id="open-modal-categories" expand="block">
       <label position="stacked">Categoria</label>
       <div class="custom-input" style="display: flex; align-items: center;"   [ngClass]="{'invalid-input': transacaoForm.get('categoria_id')?.invalid && transacaoForm.get('categoria_id')?.touched}">
+        <fa-icon *ngIf="selectedCategoryIcon" [icon]="selectedCategoryIcon"  style="font-size: 16px; margin: 0 5px;"></fa-icon>
         <p style="margin: 0;" > {{ selectedCategory || 'Selecione uma categoria' }}</p>
       </div>
     </div>
