@@ -1,6 +1,6 @@
 <main>
   <div class="resumo">
-    <p>Gasto em {{ currentMonth.format('MMMM YYYY') }}: {{ calcularTotalDespesas() |
+    <p>Gasto em {{ month.format('MMMM YYYY') }}: {{ calcularTotalDespesas() |
       currency:'BRL':'symbol':'1.2-2' }}</p>
     <p>Pendente: {{ calcularTotalPendentes() | currency:'BRL':'symbol':'1.2-2' }}</p>
   </div>

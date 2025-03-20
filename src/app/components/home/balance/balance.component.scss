@@ -96,18 +96,17 @@
 @keyframes show-date-picker {
   0% {
     opacity: 0;
-    transform: translate(-50%, -100px); /* Centraliza horizontalmente e inicia o movimento do topo */
+    transform: translate(-50%, -100px) scale(0.5); /* Começa menor */
   }
 
   100% {
     opacity: 1;
-    transform: translate(-50%, 0); /* Move até a posição final, centralizado */
+    transform: translate(-50%, 0) scale(1); /* Cresce até o tamanho normal */
   }
 }
 
-
 .date-picker-container {
-  animation: show-date-picker .25s ease-in;
+  animation: show-date-picker .15s ease-in;
 
   background-color: #f9f9f9;
   border-radius: 12px;

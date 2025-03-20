@@ -8,7 +8,7 @@
       <!-- <ion-title> -->
       <div class="month-display">
         <ion-label (click)="selectPrevMonth()" class="clickable">{{ prevMonthLabel }}</ion-label>
-        <ion-label class="active">{{ selectedMonthLabel }}</ion-label>
+        <ion-label class="active" (click)="toggleDatePicker()">{{ selectedMonthLabel }}</ion-label>
         <ion-label (click)="selectNextMonth()" class="clickable">{{ nextMonthLabel }}</ion-label>
       </div>
       <!-- </ion-title> -->
@@ -19,3 +19,28 @@
       </ion-buttons>
     </div>
 </ion-header>
+
+<div *ngIf="mostrarDatePicker">
+  <div class="date-picker-container">
+    <div class="date-picker">
+      <div class="year-selector">
+        <ion-icon name="chevron-back-outline" (click)="mudarAno(-1)"></ion-icon>
+        <span>{{ anoSelecionado }}</span>
+        <ion-icon name="chevron-forward-outline" (click)="mudarAno(1)"></ion-icon>
+      </div>
+      <div class="month-list">
+        <div class="month-item" *ngFor="let mes of mesesAbreviados; let i = index" (click)="selecionarMes(i)"
+          [class.selected]="mesSelecionado === i">
+          {{ mes }}
+        </div>
+      </div>
+    </div>
+
+    <div class="date-picker-footer">
+      <span class="button" id="cancel" (click)="cancelar()">Cancelar</span>
+      <span class="button" id="mes-atual" (click)="mesAtual()">Mês Atual</span>
+    </div>
+  </div>
+</div>
+
+<div class="back" *ngIf="mostrarDatePicker" (click)="cancelar()"></div>
