@@ -165,28 +165,6 @@ export class AddCardExpenseComponent implements OnInit {
     await this.modalController.dismiss();
   }
 
-  toggleParcelado(event: CustomEvent) {
-    const isChecked = event.detail.checked;
-    this.parcelado = isChecked;
-    this.transacaoForm.patchValue({ is_parcelado: isChecked });
-
-    // Exemplo de lógica adicional (como desabilitar um campo dependendo do estado)
-    if (isChecked) {
-      this.transacaoForm.get('num_parcelas')?.enable();
-      this.transacaoForm.get('valor_parcela')?.enable();
-      this.transacaoForm.get('valor')?.disable();
-
-    } else {
-      // Desabilitar campos relacionados a parcelamento
-      this.transacaoForm.get('num_parcelas')?.disable();
-      this.transacaoForm.get('valor_parcela')?.disable();
-      this.transacaoForm.get('valor')?.enable();
-    }
-
-    // Exibe o estado do campo parcelado no console
-    console.log('Parcelado:', this.parcelado);
-  }
-
   generateInvoiceOptions(card: Card) {
     const dayDue = card.dia_fechamento; // Dia de vencimento do cartão
     const currentDate = moment();
@@ -227,9 +205,6 @@ export class AddCardExpenseComponent implements OnInit {
     if (this.transacaoForm.valid) {
       const formData = this.transacaoForm.value;
 
-      console.log("VALOR ANTES", formData.valor);
-      console.log("VALOR", parseFloat(formData.valor.toString().replace(/[^\d,]/g, '').replace(',', '.')));
-
       // Formatação dos dados
       const transacao = {
         descricao: formData.descricao,
@@ -239,7 +214,7 @@ export class AddCardExpenseComponent implements OnInit {
         tipo: formData.tipo,  // "despesa" ou "receita", deve ser parte do seu formulário
         // Formatação da data usando moment
         data: moment(formData.data).format('YYYY-MM-DD'), // Formato desejado
-        valor: isParcelado ? null : parseFloat(formData.valor.replace(/[^\d,]/g, '').replace(',', '.')),
+        valor: parseFloat(formData.valor.replace(/[^\d,]/g, '').replace(',', '.')),
         status: formData.status,  // Adicionando status, padrão como 'pendente'
         is_parcelado: formData.is_parcelado,
         num_parcelas: formData.num_parcelas || null,
@@ -347,7 +322,6 @@ export class AddCardExpenseComponent implements OnInit {
     }
   }
   
-
   selectedInstallment: { label: string; value: number; quantidade_parcelas: number; } | undefined;
   selectInstallment(installment: { label: string; value: number; quantidade_parcelas: number; }) {
     this.selectedInstallment = installment;

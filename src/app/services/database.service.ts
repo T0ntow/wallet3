@@ -66,32 +66,7 @@ export class DatabaseService {
       );
   `);
 
-      // await this.db.execute(`DROP TABLE IF EXISTS parcelasTable`);
-
-      await this.db.execute(`
-        CREATE TABLE IF NOT EXISTS parcelasTable (
-        parcela_id INTEGER PRIMARY KEY AUTOINCREMENT,
-        transacao_id INTEGER NOT NULL, -- FK para relacionar com transações
-        valor_parcela REAL NOT NULL,
-        data_vencimento DATE NOT NULL,
-        status TEXT NOT NULL DEFAULT 'pendente', -- Campo para o status da parcela
-        descricao_parcela TEXT,
-        FOREIGN KEY (transacao_id) REFERENCES transacoes(transacao_id) -- Definindo a relação
-        );
-    `);
-
-
-      await this.db.execute(`
-        CREATE TABLE instancias_recorrentes (
-        instancia_id INTEGER PRIMARY KEY AUTOINCREMENT,
-        despesa_mae_id INTEGER NOT NULL,
-        data_transacao DATE NOT NULL,
-        status VARCHAR(20) DEFAULT 'pendente',
-        FOREIGN KEY (despesa_mae_id) REFERENCES transacoes(transacao_id) ON DELETE CASCADE
-      );
-    `);
-
-      // await this.db.execute(`DROP TABLE IF EXISTS transacoes`);
+      await this.db.execute(`DROP TABLE IF EXISTS transacoes`);
 
       await this.db.execute(`
         CREATE TABLE IF NOT EXISTS transacoes (
@@ -100,7 +75,7 @@ export class DatabaseService {
           cartao_id INTEGER,
           categoria_id INTEGER NOT NULL,
           tipo TEXT NOT NULL, -- Tipo de transação: "despesa" ou "receita"
-          valor REAL, -- Valor total da transação, ou NULL se parcelado
+          valor REAL, -- Valor total da transação, agora permitido mesmo se parcelado
           descricao TEXT, -- Descrição da transação
           is_parcelado BOOLEAN NOT NULL DEFAULT 0, -- Se a transação é parcelada (1 = sim, 0 = não)
           num_parcelas INTEGER, -- Número de parcelas, se parcelado
@@ -123,13 +98,37 @@ export class DatabaseService {
             (cartao_id IS NOT NULL AND conta_id IS NULL)
           ),
           CHECK (
-            -- Garante que apenas um dos campos valor ou valor_parcela tenha valor
+            -- Agora permite que valor seja preenchido mesmo se is_parcelado = 1
             (is_parcelado = 0 AND valor IS NOT NULL AND valor_parcela IS NULL) 
             OR 
-            (is_parcelado = 1 AND valor IS NULL AND valor_parcela IS NOT NULL)
+            (is_parcelado = 1 AND valor_parcela IS NOT NULL AND num_parcelas IS NOT NULL)
           )
         );
       `);
+      
+      await this.db.execute(`
+        CREATE TABLE instancias_recorrentes (
+        instancia_id INTEGER PRIMARY KEY AUTOINCREMENT,
+        despesa_mae_id INTEGER NOT NULL,
+        data_transacao DATE NOT NULL,
+        status VARCHAR(20) DEFAULT 'pendente',
+        FOREIGN KEY (despesa_mae_id) REFERENCES transacoes(transacao_id) ON DELETE CASCADE
+      );
+    `);
+
+
+      await this.db.execute(`
+      CREATE TABLE IF NOT EXISTS parcelasTable (
+      parcela_id INTEGER PRIMARY KEY AUTOINCREMENT,
+      transacao_id INTEGER NOT NULL, -- FK para relacionar com transações
+      valor_parcela REAL NOT NULL,
+      data_vencimento DATE NOT NULL,
+      status TEXT NOT NULL DEFAULT 'pendente', -- Campo para o status da parcela
+      descricao_parcela TEXT,
+      FOREIGN KEY (transacao_id) REFERENCES transacoes(transacao_id) -- Definindo a relação
+      );
+  `);
+
 
       // await this.db.execute(`DROP TABLE IF EXISTS categories`);
 

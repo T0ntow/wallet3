@@ -11,6 +11,15 @@
 
 <ion-content>
   <form [formGroup]="transacaoForm">
+
+    <div id="valor_container">
+      <h3>Valor</h3>
+      <ion-input type="text" formControlName="valor" [maskito]="maskitoPrice" [maskitoElement]="maskPredicate"
+        class="custom-input" id="valor-expense">
+      </ion-input>
+    </div>
+
+
     <div class="container-item">
       <label position="stacked">Descrição</label>
       <ion-input type="text" formControlName="descricao" class="custom-input"
@@ -22,17 +31,23 @@
       <label position="stacked">Cartão</label>
       <div class="custom-input" style="display: flex; align-items: center;"
         [ngClass]="{'invalid-input': transacaoForm.get('cartao_id')?.invalid && transacaoForm.get('cartao_id')?.touched}">
+        <img *ngIf="selectedCardLogo" [src]="selectedCardLogo" alt="{{ selectedCard }}" class="logo"
+          style="width: 23px; height: 23px; margin: 0 5px;" />
         <p style="margin: 0;"> {{ selectedCard || 'Selecione um cartão' }} </p>
       </div>
     </div>
+
 
     <div class="container-item" id="open-modal-categories" expand="block">
       <label position="stacked">Categoria</label>
       <div class="custom-input" style="display: flex; align-items: center;"
         [ngClass]="{'invalid-input': transacaoForm.get('categoria_id')?.invalid && transacaoForm.get('categoria_id')?.touched}">
+        <fa-icon *ngIf="selectedCategoryIcon" [icon]="selectedCategoryIcon"
+          style="font-size: 16px; margin: 0 5px;"></fa-icon>
         <p style="margin: 0;"> {{ selectedCategory || 'Selecione uma categoria' }}</p>
       </div>
     </div>
+
 
     <div class="container-item" id="open-modal-invoice" expand="block">
       <label position="stacked">Fatura</label>
@@ -49,24 +64,6 @@
             <label position="stacked">Data</label>
             <ion-input type="date" formControlName="data" class="custom-input"
               [ngClass]="{'invalid-input': transacaoForm.get('data')?.invalid && transacaoForm.get('data')?.touched}">
-            </ion-input>
-          </div>
-        </ion-col>
-
-        <ion-col size="6" *ngIf="!parcelado">
-          <div class="container-item">
-            <label position="stacked">Valor</label>
-            <ion-input type="number" formControlName="valor" class="custom-input"
-              [ngClass]="{'invalid-input': transacaoForm.get('valor')?.invalid && transacaoForm.get('valor')?.touched}">
-            </ion-input>
-          </div>
-        </ion-col>
-
-        <ion-col size="6" *ngIf="parcelado">
-          <div class="container-item">
-            <label position="stacked">Valor Parcela</label>
-            <ion-input type="number" formControlName="valor_parcela" class="custom-input"
-              [ngClass]="{'invalid-input': transacaoForm.get('valor_parcela')?.invalid && transacaoForm.get('valor_parcela')?.touched}">
             </ion-input>
           </div>
         </ion-col>
@@ -90,24 +87,22 @@
           <div class="container-item">
             <label position="stacked">Detalhes</label>
             <div>
-              <ion-toggle slot="start" class="custom-input" #mytoggle
-                (ionChange)="toggleParcelado($event)">Parcelado</ion-toggle>
+              <ion-toggle checked={{myValue}} (ionChange)="handleInstallmentToggle($event)" class="custom-input">
+                Parcelado
+              </ion-toggle>
             </div>
           </div>
-        </ion-col>
 
-        <ion-col size="6" *ngIf="parcelado">
-          <div class="container-item">
-            <label position="stacked">Quantidade</label>
-            <ion-input type="text" formControlName="num_parcelas" class="custom-input"
-              [ngClass]="{'invalid-input': transacaoForm.get('num_parcelas')?.invalid && transacaoForm.get('num_parcelas')?.touched}">
-            </ion-input>
+          <div class="container-item" *ngIf="selectedInstallment">
+            <label position="stacked" style="padding: 5px; font-size: 14px; color: var(--ion-text-color2);">
+              {{selectedInstallment.label}}
+            </label>
           </div>
         </ion-col>
       </ion-row>
     </ion-grid>
 
-    <button (click)="submitTransacao()" class="submit-button">Adicionar Despesa Cartão</button>
+    <button (click)="submitTransacao()" class="submit-button">Editar Despesa Cartão</button>
   </form>
 
   <ion-modal trigger="open-modal-card" [initialBreakpoint]="0.75" [breakpoints]="[0, 0.75, 1]">
@@ -158,6 +153,49 @@
             <ion-label>{{ invoice.label }}</ion-label>
           </div>
         </div>
+      </div>
+    </ng-template>
+  </ion-modal>
+
+  <ion-modal #installmentModal [isOpen]="isModalOpen" [initialBreakpoint]="0.75" [breakpoints]="[0, 0.75]"
+    (didDismiss)="closeModal()">
+    <ng-template>
+      <div class="sheet">
+        <div class="sheet-header">
+          <p>Parcelas</p>
+        </div>
+
+        <!-- Entrada para digitar a quantidade de parcelas -->
+        <ion-item lines="none">
+          <ion-label style="width: 100px; font-size: 14px;">Quantas vezes?</ion-label>
+          <ion-input 
+          style="text-indent: 15px;" 
+          type="number" 
+          [(ngModel)]="customInstallmentCount"
+          (ionInput)="generateInstallments()">
+        </ion-input>
+        
+        <ion-button (click)="closeModal()" id="button-save-installment">Salvar</ion-button>
+        </ion-item>
+
+        <!-- Se o usuário digitou um número, mostra apenas essa opção -->
+        <ng-container *ngIf="customInstallmentCount && singleInstallment; else defaultInstallments">
+          <ion-list class="elements">
+            <div (click)="selectInstallment(singleInstallment)" class="element">
+              <ion-label>{{ singleInstallment.label }}</ion-label>
+            </div>
+          </ion-list>
+        </ng-container>
+
+        <!-- Caso contrário, exibe a lista padrão de 12 parcelas -->
+        <ng-template #defaultInstallments>
+          <ion-list class="elements installments">
+            <div class="element" *ngFor="let installment of installments" (click)="selectInstallment(installment)"
+              [class.selected]="installment === selectedInstallment">
+              <ion-label>{{ installment.label }}</ion-label>
+            </div>
+          </ion-list>
+        </ng-template>
       </div>
     </ng-template>
   </ion-modal>

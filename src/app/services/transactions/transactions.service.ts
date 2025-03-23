@@ -539,7 +539,7 @@ export class TransactionsService {
     cartao_id: number | null,
     categoria_id: number,
     tipo: string,
-    valor: number,
+    valor: number | null,
     descricao: string,
     is_parcelado: boolean,
     num_parcelas: number | null,

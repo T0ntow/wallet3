@@ -24,8 +24,12 @@
               </div>
             </div>
             <div class="direita">
-              <h5 *ngIf="despesa.valor">{{ despesa.valor | currency:'BRL':'symbol':'1.2-2' }}</h5>
-              <h5 *ngIf="despesa.valor_parcela">{{ despesa.valor_parcela | currency:'BRL':'symbol':'1.2-2' }}</h5>
+              <h5 *ngIf="despesa.valor && despesa.is_parcelado === 0">
+                {{ despesa.valor | currency:'BRL':'symbol':'1.2-2' }}
+              </h5>
+              <h5 *ngIf="despesa.valor_parcela">
+                {{ despesa.valor_parcela | currency:'BRL':'symbol':'1.2-2' }}
+              </h5>
               <div class="details">
                 <ion-icon *ngIf="despesa.cartao_id" class="cartao" name="card"></ion-icon>
                 <ion-icon *ngIf="despesa.status === 'pago'" class="pago" name="checkmark-circle"></ion-icon>
@@ -67,11 +71,11 @@
           <!-- Caso não tenha parcelas -->
           <ion-col *ngIf="selectedDespesa?.valor">
             <ion-label>Valor:</ion-label>
-            <span>{{ selectedDespesa?.valor | currency }}</span>
+            <span>{{ selectedDespesa?.valor | currency:'BRL':'symbol':'1.2-2' }}</span>
           </ion-col>
           <ion-col *ngIf="selectedDespesa?.valor_parcela">
             <ion-label>Valor Parcela:</ion-label>
-            <span>{{ selectedDespesa?.valor_parcela | currency }}</span>
+            <span>{{ selectedDespesa?.valor_parcela | currency:'BRL':'symbol':'1.2-2' }}</span>
           </ion-col>
         </ion-row>
         <ion-row>

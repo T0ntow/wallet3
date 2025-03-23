@@ -3,14 +3,15 @@ import { IonToggle, ModalController, ToastController } from '@ionic/angular';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import * as moment from 'moment';
 import 'moment/locale/pt-br';  // Importa o locale para português
-import { Account } from 'src/app/models/account.model';
 import { Category } from 'src/app/models/category.model';
 import { CategoryLoaderService } from 'src/app/services/categories/category-loader-service.service';
-import { AccountService } from 'src/app/services/account/account.service';
 import { TransactionsService } from 'src/app/services/transactions/transactions.service';
 import { Card } from 'src/app/models/card.model';
 import { CardService } from 'src/app/services/card/card.service';
 import { Transacao } from 'src/app/models/transaction.model';
+import { MaskitoElementPredicate } from '@maskito/core';
+import { maskitoPrice } from '../../../mask';
+import { IconDefinition } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-edit-card-expense',
@@ -41,6 +42,20 @@ export class EditCardExpenseComponent implements OnInit {
 
   @Input() despesa: Transacao | undefined;
 
+  isModalOpen = false;
+  selectedCardLogo: string | undefined;
+  selectedCategoryIcon: IconDefinition | undefined;
+
+  installments: { label: string; value: number; quantidade_parcelas: number; }[] | undefined;
+
+  installmentCount = 12; // Valor inicial padrão
+  customInstallmentCount: number | null = null;
+  singleInstallment: any | null = null; // Para exibir apenas a parcela digitada
+
+  myValue: boolean = false;
+
+  readonly maskitoPrice = maskitoPrice;
+  readonly maskPredicate: MaskitoElementPredicate = async (el) => (el as HTMLIonInputElement).getInputElement();
 
   constructor(
     private formBuilder: FormBuilder,
@@ -51,7 +66,7 @@ export class EditCardExpenseComponent implements OnInit {
       cartao_id: [null, Validators.required],
       categoria_id: [null, Validators.required],
       data: ['', Validators.required],
-      valor: [null, [Validators.required, Validators.min(0)]], // Valor inicial como null e validado como número
+      valor: [(0).toFixed(2).replace('.', ','), [Validators.required, Validators.min(0)]], // Valor inicial como null e validado como número
       valor_parcela: [{ value: null, disabled: true }, [Validators.min(0)]], // Inicialmente desabilitado e validado como número
       status: ['pendente', Validators.required],
       tipo: ['despesa'],
@@ -92,13 +107,6 @@ export class EditCardExpenseComponent implements OnInit {
       this.transacaoForm.patchValue({
         is_parcelado: this.despesa.is_parcelado === 1 ? true : false
       });
-
-      // Sincroniza o estado do `ion-toggle` com o valor `is_parcelado` do formulário
-      if (this.mytoggle) {
-        this.mytoggle.checked = this.transacaoForm.get('is_parcelado')?.value;
-        this.parcelado = this.mytoggle.checked
-        this.mostrarParcelas(this.mytoggle.checked)
-      }
     }
 
     try {
@@ -162,16 +170,15 @@ export class EditCardExpenseComponent implements OnInit {
 
   getInvoiceByDate(date: string) {
     console.log("getInvoiceByDate");
-    
+
     const targetDate = moment(date, 'YYYY-MM-DD'); // Parse a data no formato correto
-    const invoice = this.invoices.find(invoice => 
+    const invoice = this.invoices.find(invoice =>
       moment(invoice.date, 'YYYY-MM-DD').isSame(targetDate, 'month') // Comparar apenas o mês
     );
     if (invoice) {
       this.selectInvoiceInitial(invoice);
     }
   }
-  
 
   async selectCardInitial(card: Card) {
     this.selectedCard = card.nome;
@@ -189,8 +196,8 @@ export class EditCardExpenseComponent implements OnInit {
     this.selectedInvoice = invoice.label;
 
     console.log("this.selectedInvoice", this.selectedInvoice);
-    
-    
+
+
     this.transacaoForm.patchValue({ mes_fatura: invoice.date.format('YYYY-MM-DD') }); // Define o campo mes_fatura para SQLite
   }
 
@@ -213,30 +220,9 @@ export class EditCardExpenseComponent implements OnInit {
     await this.modalController.dismiss();
   }
 
-  toggleParcelado(event: CustomEvent) {
-    const isChecked = event.detail.checked;
-    this.parcelado = isChecked;
-    this.transacaoForm.patchValue({ is_parcelado: isChecked });
-
-    this.mostrarParcelas(isChecked)
-  }
-
-  mostrarParcelas(isChecked: boolean) {
-    if (isChecked === true) {
-      this.transacaoForm.get('num_parcelas')?.enable();
-      this.transacaoForm.get('valor_parcela')?.enable();
-      this.transacaoForm.get('valor')?.disable();
-    } else {
-      // Desabilitar campos relacionados a parcelamento
-      this.transacaoForm.get('num_parcelas')?.disable();
-      this.transacaoForm.get('valor_parcela')?.disable();
-      this.transacaoForm.get('valor')?.enable();
-    }
-  }
 
   generateInvoiceOptions(card: Card) {
     const dayDue = card.dia_fechamento; // Dia de vencimento do cartão
-    const currentDate = moment();
 
     // Calcula o mês anterior, considerando o dia de vencimento
     const previousMonthInvoice = moment().subtract(1, 'months').date(dayDue);
@@ -262,14 +248,15 @@ export class EditCardExpenseComponent implements OnInit {
     });
   }
 
-
   submitTransacao() {
     if (this.transacaoForm.invalid) {
       // Marca todos os campos como tocados para exibir a validação
       this.transacaoForm.markAllAsTouched();
       return;
     }
-    
+
+    const isParcelado = this.transacaoForm.value.is_parcelado;
+
     if (this.transacaoForm.valid) {
       const formData = this.transacaoForm.value;
       const transacao_id = this.despesa?.transacao_id;
@@ -282,11 +269,11 @@ export class EditCardExpenseComponent implements OnInit {
         categoria_id: formData.categoria_id,
         tipo: formData.tipo,  // "despesa" ou "receita", deve estar no formulário
         data_transacao: moment(formData.data).format('YYYY-MM-DD'), // Formato para data de transação
-        valor: formData.valor,
+        valor: parseFloat(formData.valor.replace(/[^\d,]/g, '').replace(',', '.')),
         status: formData.status, // Status padrão, como 'pendente'
         is_parcelado: formData.is_parcelado,
         num_parcelas: formData.num_parcelas || null,
-        valor_parcela: formData.valor_parcela || null,
+        valor_parcela: isParcelado ? formData.valor_parcela : null,
         is_recorrente: formData.is_recorrente,
         quantidade_repetir: formData.quantidade_repetir || null,
         periodo: formData.periodo || null,
@@ -328,7 +315,6 @@ export class EditCardExpenseComponent implements OnInit {
     }
   }
 
-
   async presentToast(message: string, color: string) {
     const toast = await this.toastController.create({
       message,
@@ -337,5 +323,70 @@ export class EditCardExpenseComponent implements OnInit {
       position: "top"
     });
     toast.present();
+  }
+
+
+  handleInstallmentToggle($event: any) {
+    this.myValue = !this.myValue;
+
+    if (this.myValue) {
+      this.generateInstallments();
+      this.transacaoForm.patchValue({ is_parcelado: true });
+      this.isModalOpen = true;
+    } else {
+      this.selectedInstallment = undefined
+      this.transacaoForm.patchValue({ is_parcelado: false });
+      this.isModalOpen = false;
+      this.transacaoForm.patchValue({ num_parcelas: null });
+      this.transacaoForm.patchValue({ valor_parcela: null });
+    }
+  }
+
+  generateInstallments() {
+    const formData = this.transacaoForm.value;
+
+    // Verifica se há um valor no input e o converte para número
+    const numParcelas = this.customInstallmentCount ? Number(this.customInstallmentCount) : 0;
+    const totalValue = parseFloat(formData.valor?.toString().replace(/[^\d,]/g, '').replace(',', '.')) || 0;
+
+    if (numParcelas > 0) {
+      // Gera apenas a parcela digitada
+      this.singleInstallment = {
+        label: `${numParcelas}x de R$ ${(totalValue / numParcelas).toFixed(2)}`,
+        value: totalValue / numParcelas,
+        quantidade_parcelas: numParcelas
+      };
+      this.installments = []; // Esconde a lista padrão
+    } else {
+      // Caso contrário, mostra a lista padrão de 12 parcelas
+      this.singleInstallment = null;
+      this.installments = Array.from({ length: 12 }, (_, i) => {
+        const numParcelas = i + 1;
+        return {
+          label: `${numParcelas}x de R$ ${(totalValue / numParcelas).toFixed(2)}`,
+          value: totalValue / numParcelas,
+          quantidade_parcelas: numParcelas
+        };
+      });
+    }
+  }
+
+
+  selectedInstallment: { label: string; value: number; quantidade_parcelas: number; } | undefined;
+  selectInstallment(installment: { label: string; value: number; quantidade_parcelas: number; }) {
+    this.selectedInstallment = installment;
+    this.transacaoForm.patchValue({ num_parcelas: installment.quantidade_parcelas });
+    this.transacaoForm.patchValue({ valor_parcela: installment.value });
+    console.log('Parcela selecionada:', installment);
+  }
+
+  closeModal() {
+    if (this.selectedInstallment === undefined) {
+      this.myValue = !this.myValue;
+      this.transacaoForm.patchValue({ is_parcelado: false });
+      this.isModalOpen = false;
+    }
+
+    this.isModalOpen = false;
   }
 }

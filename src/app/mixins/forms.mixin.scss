@@ -1,5 +1,29 @@
 // Mixin para o formulário
 @mixin form-style() {
+
+    #valor_container {
+        display: flex;
+        align-items: center;
+        flex-direction: column;
+    
+        background-color: #fdfdfd;
+        border-radius: 0 0 12px 12px;
+        padding: 10px 15px;
+        border: 1px solid rgba(128, 128, 128, 0.233);
+    
+        h3 {
+            margin: 0 auto;
+            font-size: 16px;
+            text-align: center;
+            font-weight: bold;
+        }
+    
+        #valor-expense {
+            text-align: center;
+            font-size: 25px;
+        }
+    }
+    
     ion-toggle {
         --track-background: #8f8f8f;
         --track-background-checked: #8f8f8f;

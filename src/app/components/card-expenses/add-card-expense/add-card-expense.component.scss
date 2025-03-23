@@ -15,32 +15,11 @@
 .installments {
     overflow: auto;
 }
-
 #button-save-installment {
     width: 170px;
 }
-#valor_container {
-    display: flex;
-    align-items: center;
-    flex-direction: column;
 
-    background-color: #fdfdfd;
-    border-radius: 0 0 12px 12px;
-    padding: 10px 15px;
-    border: 1px solid rgba(128, 128, 128, 0.233);
 
-    h3 {
-        margin: 0 auto;
-        font-size: 16px;
-        text-align: center;
-        font-weight: bold;
-    }
-
-    #valor-expense {
-        text-align: center;
-        font-size: 25px;
-    }
-}
 
 ion-title {
     font-size: 18px;
