@@ -12,12 +12,12 @@ import { RouterModule } from '@angular/router';
 
 import { registerLocaleData } from '@angular/common';
 import localePt from '@angular/common/locales/pt';
+import {MaskitoDirective} from '@maskito/angular';
 registerLocaleData(localePt, 'pt');
-
 
 @NgModule({
   declarations: [AppComponent, NavComponent],
-  imports: [BrowserModule, IonicModule.forRoot(), AppRoutingModule, BaseChartDirective,  RouterModule.forRoot([])],
+  imports: [BrowserModule, IonicModule.forRoot(), AppRoutingModule, BaseChartDirective,  RouterModule.forRoot([]), MaskitoDirective],
   providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy }, { provide: LOCALE_ID, useValue: 'pt' }],
   bootstrap: [AppComponent],
   schemas: [CUSTOM_ELEMENTS_SCHEMA],  // Adicione esta linha

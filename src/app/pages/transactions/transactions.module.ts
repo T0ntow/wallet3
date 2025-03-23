@@ -18,6 +18,7 @@ import { ChartsReceiveComponent } from 'src/app/components/charts-receive/charts
 import { EditReceiveComponent } from 'src/app/components/receives/edit-receive/edit-receive.component';
 import { ListExpensesComponent } from 'src/app/components/expenses/list-expenses/list-expenses.component';
 import { ListReceivesComponent } from 'src/app/components/receives/list-receives/list-receives.component';
+import { MaskitoDirective } from '@maskito/angular';
 @NgModule({
   imports: [
     CommonModule,
@@ -26,6 +27,7 @@ import { ListReceivesComponent } from 'src/app/components/receives/list-receives
     TransactionsPageRoutingModule,
     FontAwesomeModule,
     ReactiveFormsModule,
+    MaskitoDirective,
   ],
   declarations: [
     TransactionsPage,

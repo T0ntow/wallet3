@@ -28,6 +28,7 @@
         display: flex;
         flex-direction: column;
         gap: 3px;
+        padding: 0 12px;
 
         label {
             font-size: 16px;
@@ -58,7 +59,8 @@
     }
 
     .submit-button {
-        width: 100%;
+        margin:auto;
+        width: 95%;
         height: 40px;
         background: var(--ion-contrast);
         border-radius: 5px;
@@ -88,6 +90,7 @@
         flex-direction: column;
         gap: $banks-gap;
         padding: 10px 5px;
+        background-color: #EEEEEE;
 
         .element {
             padding: 5px;
@@ -140,10 +143,10 @@
 
 // Aplicando os mixins
 form {
-    padding: 24px 12px;
     display: flex;
     flex-direction: column;
     gap: 10px;
+    padding-bottom: 24px;
 
     @include form-style;
 }

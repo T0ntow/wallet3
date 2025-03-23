@@ -2,7 +2,6 @@ import { Component, Input, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { faEllipsis, IconDefinition } from '@fortawesome/free-solid-svg-icons';
 import { ModalController, ToastController } from '@ionic/angular';
-import { Category } from 'src/app/models/category.model';
 import { CategoriesService } from 'src/app/services/categories/categories.service';
 import { CategoryLoaderService } from 'src/app/services/categories/category-loader-service.service';
 
@@ -19,7 +18,6 @@ export class AddCategoryComponent implements OnInit {
 
   @Input() categoryType: string | undefined;
 
-
   foodAndShoppingIcons: { icon: IconDefinition }[] = [];
   transportIcons: { icon: IconDefinition }[] = [];
   homeIcons: { icon: IconDefinition }[] = [];
@@ -31,7 +29,6 @@ export class AddCategoryComponent implements OnInit {
   fashionIcons: { icon: IconDefinition }[] = [];
   toolsIcons: { icon: IconDefinition }[] = [];
   peopleIcons: { icon: IconDefinition }[] = [];
-
 
   constructor(
     private formBuilder: FormBuilder,
@@ -58,7 +55,6 @@ export class AddCategoryComponent implements OnInit {
     await this.modalController.dismiss(); // Fecha o modal
   }
 
-
   // Corrigindo o tipo do acumulador no `reduce`
   getSelectedIcon(): IconDefinition {
     // Achata a lista de ícones
@@ -70,7 +66,6 @@ export class AddCategoryComponent implements OnInit {
     const icon = allIcons.find(item => item.name === this.selectedIcon);
     return icon ? icon.icon : faEllipsis; // Retorna o ícone encontrado ou um padrão
   }
-
 
   dismissModal() {
     this.modalController.dismiss();
@@ -96,6 +91,7 @@ export class AddCategoryComponent implements OnInit {
       console.log('Formulário inválido');
     }
   }
+
   async presentToast(message: string, color: string) {
     const toast = await this.toastController.create({
       message,

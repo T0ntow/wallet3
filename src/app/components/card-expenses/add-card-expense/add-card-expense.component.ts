@@ -9,7 +9,8 @@ import { TransactionsService } from 'src/app/services/transactions/transactions.
 import { Card } from 'src/app/models/card.model';
 import { CardService } from 'src/app/services/card/card.service';
 import { IconDefinition } from '@fortawesome/free-solid-svg-icons';
-
+import { maskitoPrice } from '../../../mask';
+import { MaskitoElementPredicate } from '@maskito/core';
 
 @Component({
   selector: 'app-add-card-expense',
@@ -40,6 +41,11 @@ export class AddCardExpenseComponent implements OnInit {
   selectedCard: string = '';
   selectedCardLogo: string | undefined;
   selectedCategoryIcon: IconDefinition | undefined;
+  readonly maskitoPrice = maskitoPrice;
+  readonly maskPredicate: MaskitoElementPredicate = async (el) => (el as HTMLIonInputElement).getInputElement();
+
+  isModalOpen = false;
+  installments: { label: string; value: number; quantidade_parcelas: number; }[] | undefined;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -50,7 +56,7 @@ export class AddCardExpenseComponent implements OnInit {
       cartao_id: [null, Validators.required],
       categoria_id: [null, Validators.required],
       data: ['', Validators.required],
-      valor: [null, [Validators.required, Validators.min(0)]], // Valor inicial como null e validado como número
+      valor: [(0).toFixed(2).replace('.', ','), [Validators.required, Validators.min(0)]], // Valor inicial como null e validado como número
       valor_parcela: [{ value: null, disabled: true }, [Validators.min(0)]], // Inicialmente desabilitado e validado como número
       status: ['pendente', Validators.required],
       tipo: ['despesa'],
@@ -66,7 +72,6 @@ export class AddCardExpenseComponent implements OnInit {
   @ViewChild('popover') popover: { event: Event; } | undefined;
 
   isOpen = false;
-
   presentPopover(e: Event) {
     this.popover!.event = e;
     this.isOpen = true;
@@ -83,7 +88,7 @@ export class AddCardExpenseComponent implements OnInit {
         this.selectedCard = firstAccount.nome;// Atualiza o nome da conta selecionada
         this.selectedCardLogo = firstAccount.logo_url;
 
-        this.transacaoForm.patchValue({ cartao_id: firstAccount.cartao_id }); 
+        this.transacaoForm.patchValue({ cartao_id: firstAccount.cartao_id });
         this.generateInvoiceOptions(firstAccount); // Gera opções de fatura para o cartão selecionado
       }
 
@@ -93,11 +98,11 @@ export class AddCardExpenseComponent implements OnInit {
         this.selectedCategory = firstCategory.nome;// Atualiza o nome da conta selecionada
         this.selectedCategoryIcon = firstCategory.icone;
 
-        this.transacaoForm.patchValue({ categoria_id: firstCategory.id }); 
+        this.transacaoForm.patchValue({ categoria_id: firstCategory.id });
       }
 
-       // Inicializar Fatura
-       if (this.invoices.length > 0) {
+      // Inicializar Fatura
+      if (this.invoices.length > 0) {
         const firstInvoice = this.invoices[2];
         this.selectedInvoice = firstInvoice.label;
         this.transacaoForm.patchValue({ mes_fatura: firstInvoice.date.format('YYYY-MM-DD') }); // Define o campo mes_fatura para SQLite
@@ -113,8 +118,8 @@ export class AddCardExpenseComponent implements OnInit {
       this.parcelado = isParcelado;
       const numParcelasControl = this.transacaoForm.get('num_parcelas');
       const valorParcela = this.transacaoForm.get('valor_parcela');
-      
-      
+
+
       if (this.parcelado) {
         numParcelasControl?.setValidators([Validators.required, Validators.min(2), Validators.max(100)]);
         valorParcela?.setValidators([Validators.required, Validators.min(0)]);
@@ -128,7 +133,7 @@ export class AddCardExpenseComponent implements OnInit {
         valorParcela?.clearValidators();  // Remove o validador
         valorParcela?.disable();  // Desabilita o campo
       }
-      
+
       numParcelasControl?.updateValueAndValidity();  // Atualiza a validade do campo
       valorParcela?.updateValueAndValidity();  // Atualiza a validade do campo
     });
@@ -141,7 +146,7 @@ export class AddCardExpenseComponent implements OnInit {
   async selectCard(card: Card) {
     this.selectedCard = card.nome;
     this.selectedCardLogo = card.logo_url;
-    this.transacaoForm.patchValue({ cartao_id: card.cartao_id }); 
+    this.transacaoForm.patchValue({ cartao_id: card.cartao_id });
     this.generateInvoiceOptions(card); // Gera opções de fatura para o cartão selecionado
     await this.modalController.dismiss();
   }
@@ -159,25 +164,25 @@ export class AddCardExpenseComponent implements OnInit {
     console.log('Fatura selecionada:', invoice.label);
     await this.modalController.dismiss();
   }
-  
+
   toggleParcelado(event: CustomEvent) {
     const isChecked = event.detail.checked;
     this.parcelado = isChecked;
     this.transacaoForm.patchValue({ is_parcelado: isChecked });
-  
+
     // Exemplo de lógica adicional (como desabilitar um campo dependendo do estado)
     if (isChecked) {
       this.transacaoForm.get('num_parcelas')?.enable();
       this.transacaoForm.get('valor_parcela')?.enable();
       this.transacaoForm.get('valor')?.disable();
-      
+
     } else {
       // Desabilitar campos relacionados a parcelamento
       this.transacaoForm.get('num_parcelas')?.disable();
       this.transacaoForm.get('valor_parcela')?.disable();
       this.transacaoForm.get('valor')?.enable();
     }
-  
+
     // Exibe o estado do campo parcelado no console
     console.log('Parcelado:', this.parcelado);
   }
@@ -185,22 +190,22 @@ export class AddCardExpenseComponent implements OnInit {
   generateInvoiceOptions(card: Card) {
     const dayDue = card.dia_fechamento; // Dia de vencimento do cartão
     const currentDate = moment();
-  
+
     // Calcula o mês anterior, considerando o dia de vencimento
     const previousMonthInvoice = moment().subtract(1, 'months').date(dayDue);
-  
+
     // Próximos três meses, considerando o dia de vencimento
     const nextMonthsInvoices = [0, 1, 2, 3].map(i => moment().add(i, 'months').date(dayDue));
-  
+
     // Limpa faturas antigas antes de adicionar novas
     this.invoices = [];
-  
+
     // Adiciona o mês anterior à lista de faturas
     this.invoices.push({
       label: `Fatura ${dayDue.toString().padStart(2, '0')} ${previousMonthInvoice.format('MMM YYYY')}`,
       date: previousMonthInvoice
     });
-  
+
     // Adiciona os próximos três meses à lista de faturas
     nextMonthsInvoices.forEach(month => {
       this.invoices.push({
@@ -211,14 +216,19 @@ export class AddCardExpenseComponent implements OnInit {
   }
 
   submitTransacao() {
+    const isParcelado = this.transacaoForm.value.is_parcelado;
+
     if (this.transacaoForm.invalid) {
       // Marca todos os campos como tocados para exibir a validação
       this.transacaoForm.markAllAsTouched();
       return;
     }
-    
+
     if (this.transacaoForm.valid) {
       const formData = this.transacaoForm.value;
+
+      console.log("VALOR ANTES", formData.valor);
+      console.log("VALOR", parseFloat(formData.valor.toString().replace(/[^\d,]/g, '').replace(',', '.')));
 
       // Formatação dos dados
       const transacao = {
@@ -229,7 +239,7 @@ export class AddCardExpenseComponent implements OnInit {
         tipo: formData.tipo,  // "despesa" ou "receita", deve ser parte do seu formulário
         // Formatação da data usando moment
         data: moment(formData.data).format('YYYY-MM-DD'), // Formato desejado
-        valor: formData.valor,
+        valor: isParcelado ? null : parseFloat(formData.valor.replace(/[^\d,]/g, '').replace(',', '.')),
         status: formData.status,  // Adicionando status, padrão como 'pendente'
         is_parcelado: formData.is_parcelado,
         num_parcelas: formData.num_parcelas || null,
@@ -237,7 +247,7 @@ export class AddCardExpenseComponent implements OnInit {
         quantidade_repetir: formData.quantidade_repetir || null,
         periodo: formData.periodo || null,
         fk_parcelas_parcela_id: formData.fk_parcelas_parcela_id || null, // Caso aplicável
-        valor_parcela: formData.valor_parcela || null,
+        valor_parcela: isParcelado ? formData.valor_parcela : null,
         mes_fatura: moment(formData.mes_fatura).format('YYYY-MM-DD') || null
       };
 
@@ -285,6 +295,75 @@ export class AddCardExpenseComponent implements OnInit {
       position: "top"
     });
     toast.present();
+  }
+
+  installmentCount = 12; // Valor inicial padrão
+  customInstallmentCount: number | null = null;
+  singleInstallment: any | null = null; // Para exibir apenas a parcela digitada
+
+  myValue: boolean = false;
+  handleInstallmentToggle($event: any) {
+    this.myValue = !this.myValue;
+
+    if (this.myValue) {
+      this.generateInstallments();
+      this.transacaoForm.patchValue({ is_parcelado: true });
+      this.isModalOpen = true;
+    } else {
+      this.selectedInstallment = undefined
+      this.transacaoForm.patchValue({ is_parcelado: false });
+      this.isModalOpen = false;
+      this.transacaoForm.patchValue({ num_parcelas: null });
+      this.transacaoForm.patchValue({ valor_parcela: null });
+    }
+  }
+
+  generateInstallments() {
+    const formData = this.transacaoForm.value;
+  
+    // Verifica se há um valor no input e o converte para número
+    const numParcelas = this.customInstallmentCount ? Number(this.customInstallmentCount) : 0;
+    const totalValue = parseFloat(formData.valor?.toString().replace(/[^\d,]/g, '').replace(',', '.')) || 0;
+  
+    if (numParcelas > 0) {
+      // Gera apenas a parcela digitada
+      this.singleInstallment = {
+        label: `${numParcelas}x de R$ ${(totalValue / numParcelas).toFixed(2)}`,
+        value: totalValue / numParcelas,
+        quantidade_parcelas: numParcelas
+      };
+      this.installments = []; // Esconde a lista padrão
+    } else {
+      // Caso contrário, mostra a lista padrão de 12 parcelas
+      this.singleInstallment = null;
+      this.installments = Array.from({ length: 12 }, (_, i) => {
+        const numParcelas = i + 1;
+        return {
+          label: `${numParcelas}x de R$ ${(totalValue / numParcelas).toFixed(2)}`,
+          value: totalValue / numParcelas,
+          quantidade_parcelas: numParcelas
+        };
+      });
+    }
+  }
+  
+
+  selectedInstallment: { label: string; value: number; quantidade_parcelas: number; } | undefined;
+  selectInstallment(installment: { label: string; value: number; quantidade_parcelas: number; }) {
+    this.selectedInstallment = installment;
+    this.transacaoForm.patchValue({ num_parcelas: installment.quantidade_parcelas });
+    this.transacaoForm.patchValue({ valor_parcela: installment.value });
+    console.log('Parcela selecionada:', installment);
+  }
+
+  closeModal() {
+    if (this.selectedInstallment === undefined) {
+      this.myValue = !this.myValue;
+      this.transacaoForm.patchValue({ is_parcelado: false });
+      this.isModalOpen = false;
+    }
+
+    this.isModalOpen = false;
   }
 
 }

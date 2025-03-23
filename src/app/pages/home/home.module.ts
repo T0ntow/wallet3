@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { CUSTOM_ELEMENTS_SCHEMA, NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { IonicModule } from '@ionic/angular';
 import { FormsModule } from '@angular/forms';
@@ -18,7 +18,7 @@ import { CurrencyPipe } from '@angular/common';
 import { FontAwesomeModule } from '@fortawesome/angular-fontawesome';
 import { AddExpenseComponent } from 'src/app/components/expenses/add-expense/add-expense.component';
 import { AddCardExpenseComponent } from 'src/app/components/card-expenses/add-card-expense/add-card-expense.component';
-
+import { MaskitoDirective } from '@maskito/angular';
 @NgModule({
   imports: [
     CommonModule,
@@ -27,7 +27,8 @@ import { AddCardExpenseComponent } from 'src/app/components/card-expenses/add-ca
     HomePageRoutingModule,
     HttpClientModule,
     ReactiveFormsModule,
-    FontAwesomeModule
+    FontAwesomeModule,
+    MaskitoDirective
   ],
   declarations: [
     HomePage,
@@ -38,7 +39,8 @@ import { AddCardExpenseComponent } from 'src/app/components/card-expenses/add-ca
     AddAccountComponent,
     AddCardComponent,
     AddExpenseComponent,
-    AddCardExpenseComponent
+    AddCardExpenseComponent,
+    
   ],
   providers: [CurrencyPipe],
 })
