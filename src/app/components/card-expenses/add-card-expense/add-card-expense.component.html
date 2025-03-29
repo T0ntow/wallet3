@@ -14,14 +14,20 @@
 
     <div id="valor_container">
       <h3>Valor</h3>
-      <ion-input type="text" formControlName="valor" [maskito]="maskitoPrice" [maskitoElement]="maskPredicate"
-        class="custom-input" id="valor-expense">
-      </ion-input>
+      <ion-input 
+      type="text" 
+      formControlName="valor"  
+      [maskito]="maskitoPrice" 
+      [maskitoElement]="maskPredicate"
+      class="custom-input" 
+      id="valor-expense"
+      placeholder="R$ 0,00">
+    </ion-input>
     </div>
 
     <div class="container-item">
       <label position="stacked">Descrição</label>
-      <ion-input type="text" formControlName="descricao" class="custom-input"
+      <ion-input type="text" formControlName="descricao" class="custom-input" [clearInput]="true"
         [ngClass]="{'invalid-input': transacaoForm.get('descricao')?.invalid && transacaoForm.get('descricao')?.touched}">
       </ion-input>
     </div>

@@ -76,7 +76,7 @@ export class AddExpenseComponent implements OnInit {
       conta_id: [null],
       categoria_id: [null, Validators.required],
       data: [moment().format('YYYY-MM-DD'), Validators.required],
-      valor: [(0).toFixed(2).replace('.', ','), [Validators.required, Validators.min(0)]], // Valor inicial como null e validado como número
+      valor: [null, [Validators.required, Validators.min(0)]], // Valor inicial como null e validado como número
       valor_parcela: [{ value: '', disabled: true }], // Inicialmente desabilitado
       status: ['pago', Validators.required],
       tipo: ['despesa'],

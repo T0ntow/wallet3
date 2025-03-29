@@ -19,10 +19,9 @@
       </ion-input>
     </div>
 
-
     <div class="container-item">
       <label position="stacked">Descrição</label>
-      <ion-input type="text" formControlName="descricao" class="custom-input"
+      <ion-input type="text" formControlName="descricao"  [clearInput]="true" class="custom-input"
         [ngClass]="{'invalid-input': transacaoForm.get('descricao')?.invalid && transacaoForm.get('descricao')?.touched}">
       </ion-input>
     </div>

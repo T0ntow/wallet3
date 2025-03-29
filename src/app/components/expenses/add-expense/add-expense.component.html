@@ -14,13 +14,13 @@
     <div id="valor_container">
       <h3>Valor</h3>
       <ion-input type="text" formControlName="valor" [maskito]="maskitoPrice" [maskitoElement]="maskPredicate"
-        class="custom-input" id="valor-expense">
+        class="custom-input" id="valor-expense" placeholder="R$ 0,00">
       </ion-input>
     </div>
 
     <div class="container-item">
       <label position="stacked">Descrição</label>
-      <ion-input type="text" formControlName="descricao" class="custom-input"></ion-input>
+      <ion-input type="text" [clearInput]="true" formControlName="descricao" class="custom-input"></ion-input>
     </div>
 
     <div class="container-item" id="open-modal-account" expand="block">

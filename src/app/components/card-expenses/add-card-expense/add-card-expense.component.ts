@@ -56,7 +56,7 @@ export class AddCardExpenseComponent implements OnInit {
       cartao_id: [null, Validators.required],
       categoria_id: [null, Validators.required],
       data: ['', Validators.required],
-      valor: [(0).toFixed(2).replace('.', ','), [Validators.required, Validators.min(0)]], // Valor inicial como null e validado como número
+      valor: [null, [Validators.required, Validators.min(0)]], // Valor inicial como null e validado como número
       valor_parcela: [{ value: null, disabled: true }, [Validators.min(0)]], // Inicialmente desabilitado e validado como número
       status: ['pendente', Validators.required],
       tipo: ['despesa'],
