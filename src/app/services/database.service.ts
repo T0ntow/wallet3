@@ -66,7 +66,7 @@ export class DatabaseService {
       );
   `);
 
-      await this.db.execute(`DROP TABLE IF EXISTS transacoes`);
+      // await this.db.execute(`DROP TABLE IF EXISTS transacoes`);
 
       await this.db.execute(`
         CREATE TABLE IF NOT EXISTS transacoes (
@@ -105,7 +105,7 @@ export class DatabaseService {
           )
         );
       `);
-      
+
       await this.db.execute(`
         CREATE TABLE instancias_recorrentes (
         instancia_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -115,7 +115,6 @@ export class DatabaseService {
         FOREIGN KEY (despesa_mae_id) REFERENCES transacoes(transacao_id) ON DELETE CASCADE
       );
     `);
-
 
       await this.db.execute(`
       CREATE TABLE IF NOT EXISTS parcelasTable (
@@ -129,7 +128,6 @@ export class DatabaseService {
       );
   `);
 
-
       // await this.db.execute(`DROP TABLE IF EXISTS categories`);
 
       await this.db.execute(`
@@ -140,7 +138,6 @@ export class DatabaseService {
         tipo TEXT NOT NULL
       );
     `);
-
 
       console.log('Tables created successfully');
     } catch (error) {

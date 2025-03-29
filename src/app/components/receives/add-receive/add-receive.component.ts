@@ -10,8 +10,10 @@ import { Account } from 'src/app/models/account.model';
 import { AccountService } from 'src/app/services/account/account.service';
 import { TransactionsService } from 'src/app/services/transactions/transactions.service';
 import * as moment from 'moment';
+import { maskitoPrice } from '../../../mask';
 
 import { AbstractControl, ValidatorFn } from '@angular/forms';
+import { MaskitoElementPredicate } from '@maskito/core';
 export function atLeastOneRequiredValidator(): ValidatorFn {
   return (control: AbstractControl): { [key: string]: boolean } | null => {
     const valor = control.get('valor')?.value;
@@ -40,7 +42,13 @@ export function atLeastOneRequiredValidator(): ValidatorFn {
 export class AddReceiveComponent implements OnInit {
   transacaoForm: FormGroup;
   selectedAccount: string = '';
+  selectedAccountLogo: string | undefined;
+
+
   selectedCategory: string = '';
+  selectedCategoryIcon: IconDefinition | undefined;
+
+
   periodo: string = '';
 
   // toogle repetir
@@ -55,6 +63,8 @@ export class AddReceiveComponent implements OnInit {
   transactionService = inject(TransactionsService)
 
   faBus = faBus
+  readonly maskitoPrice = maskitoPrice;
+  readonly maskPredicate: MaskitoElementPredicate = async (el) => (el as HTMLIonInputElement).getInputElement();
 
   constructor(
     private formBuilder: FormBuilder,
@@ -66,7 +76,7 @@ export class AddReceiveComponent implements OnInit {
       conta_id: [null],
       categoria_id: [null, Validators.required],
       data: [moment().format('YYYY-MM-DD'), Validators.required],
-      valor: ['', Validators.required],
+      valor: [(0).toFixed(2).replace('.', ','), [Validators.required, Validators.min(0)]], // Valor inicial como null e validado como número
       valor_parcela: [{ value: '', disabled: true }], // Inicialmente desabilitado
       status: ['pago', Validators.required],
       tipo: ['receita'],
@@ -105,8 +115,21 @@ export class AddReceiveComponent implements OnInit {
       if (this.accounts.length > 0) {
         const firstAccount = this.accounts[0];
         this.selectedAccount = firstAccount.nome; // Atualiza o nome da conta selecionada
+        this.selectedAccountLogo = firstAccount.logo_url;
+
+
         this.transacaoForm.patchValue({ conta_id: firstAccount.conta_id }); // Atualiza o ID da conta no formulário
       }
+
+      // Inicializar Categoria
+      if (this.categories.length > 0) {
+        const firstCategory = this.categories[0];
+        this.selectedCategory = firstCategory.nome;// Atualiza o nome da conta selecionada
+        this.selectedCategoryIcon = firstCategory.icone;
+
+        this.transacaoForm.patchValue({ categoria_id: firstCategory.id });
+      }
+
     } catch (error) {
       console.error('Error loading categories or accounts:', error);
     }
@@ -151,7 +174,7 @@ export class AddReceiveComponent implements OnInit {
         tipo: formData.tipo,  // "despesa" ou "receita", deve ser parte do seu formulário
         // Formatação da data usando moment
         data: moment(formData.data).format('YYYY-MM-DD'), // Formato desejado
-        valor: formData.valor,
+        valor: parseFloat(formData.valor.replace(/[^\d,]/g, '').replace(',', '.')),
         status: formData.status,  // Adicionando status, padrão como 'pendente'
         is_parcelado: formData.is_parcelado,
         num_parcelas: formData.num_parcelas || null,

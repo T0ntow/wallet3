@@ -157,12 +157,18 @@ export class EditCardExpenseComponent implements OnInit {
   }
 
   getCardById(id: number) {
+    const firstAccount = this.cards[0];
+    this.selectedCardLogo = firstAccount.logo_url;
+
     const card = this.cards.find(card => card.cartao_id === id);
     if (card)
       this.selectCardInitial(card);
   }
 
   getCategoryById(id: number) {
+    const firstCategory = this.categories[0];
+    this.selectedCategoryIcon = firstCategory.icone;
+    
     const category = this.categories.find(category => category.id === id);
     if (category)
       this.selectCategoryInitial(category);

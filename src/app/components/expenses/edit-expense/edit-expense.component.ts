@@ -9,6 +9,9 @@ import { TransactionsService } from 'src/app/services/transactions/transactions.
 import * as moment from 'moment';
 
 import { Transacao } from 'src/app/models/transaction.model';
+import { MaskitoElementPredicate } from '@maskito/core';
+import { maskitoPrice } from '../../../mask';
+import { IconDefinition } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-edit-expense',
@@ -18,7 +21,11 @@ import { Transacao } from 'src/app/models/transaction.model';
 export class EditExpenseComponent implements OnInit {
   transacaoForm: FormGroup;
   selectedAccount: string = '';
+  selectedAccountLogo: string | undefined;
+
   selectedCategory: string = '';
+  selectedCategoryIcon: IconDefinition | undefined;
+
   periodo: string = '';
 
   // toogle repetir
@@ -33,6 +40,10 @@ export class EditExpenseComponent implements OnInit {
   transactionService = inject(TransactionsService)
 
   @Input() despesa: Transacao | undefined;
+
+  readonly maskitoPrice = maskitoPrice;
+  readonly maskPredicate: MaskitoElementPredicate = async (el) => (el as HTMLIonInputElement).getInputElement();
+
 
   constructor(
     private formBuilder: FormBuilder,
@@ -99,11 +110,17 @@ export class EditExpenseComponent implements OnInit {
 
   getAccountById(id: number) {
     const account = this.accounts.find(account => account.conta_id === id);
+    const firstAccount = this.accounts[0];
+    this.selectedAccountLogo = firstAccount.logo_url;
+
     if (account)
       this.selectAccountInitial(account);
   }
 
   getCategoryById(id: number) {
+    const firstCategory = this.categories[0];
+    this.selectedCategoryIcon = firstCategory.icone;
+
     const category = this.categories.find(category => category.id === id);
     if (category)
       this.selectCategoryInitial(category);
@@ -154,7 +171,7 @@ export class EditExpenseComponent implements OnInit {
         categoria_id: formData.categoria_id,
         tipo: formData.tipo,  // "despesa" ou "receita", deve estar no formulário
         data_transacao: moment(formData.data).format('YYYY-MM-DD'), // Formato para data de transação
-        valor: formData.valor,
+        valor: parseFloat(formData.valor.replace(/[^\d,]/g, '').replace(',', '.')),
         status: formData.status, // Status padrão, como 'pendente'
         is_parcelado: formData.is_parcelado,
         num_parcelas: formData.num_parcelas || null,

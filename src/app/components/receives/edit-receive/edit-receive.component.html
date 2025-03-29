@@ -11,16 +11,24 @@
 
 <ion-content>
   <form [formGroup]="transacaoForm">
+    <div id="valor_container">
+      <h3>Valor</h3>
+      <ion-input type="text" formControlName="valor" [maskito]="maskitoPrice" [maskitoElement]="maskPredicate"
+        class="custom-input" id="valor-expense">
+      </ion-input>
+    </div>
     <!-- Descrição -->
     <div class="container-item">
       <label position="stacked">Descrição</label>
       <ion-input type="text" formControlName="descricao" class="custom-input"></ion-input>
     </div>
 
-    <!-- Seleção de Conta ou Cartão -->
     <div class="container-item" id="open-modal-account" expand="block">
       <label position="stacked">Conta</label>
-      <div class="custom-input" style="display: flex; align-items: center;">
+      <div class="custom-input" style="display: flex; align-items: center;"
+        [ngClass]="{'invalid-input': transacaoForm.get('conta_id')?.invalid && transacaoForm.get('conta_id')?.touched}">
+        <img *ngIf="selectedAccountLogo" [src]="selectedAccountLogo" alt="{{ selectedAccount }}" class="logo"
+          style="width: 23px; height: 23px; margin: 0 5px;" />
         <p style="margin: 0;"> {{ selectedAccount || 'Selecione uma conta' }} </p>
       </div>
     </div>
@@ -28,10 +36,14 @@
     <!-- Seleção de Categoria -->
     <div class="container-item" id="open-modal-categories" expand="block">
       <label position="stacked">Categoria</label>
-      <div class="custom-input" style="display: flex; align-items: center;">
+      <div class="custom-input" style="display: flex; align-items: center;"
+        [ngClass]="{'invalid-input': transacaoForm.get('categoria_id')?.invalid && transacaoForm.get('categoria_id')?.touched}">
+        <fa-icon *ngIf="selectedCategoryIcon" [icon]="selectedCategoryIcon"
+          style="font-size: 16px; margin: 0 5px;"></fa-icon>
         <p style="margin: 0;"> {{ selectedCategory || 'Selecione uma categoria' }}</p>
       </div>
     </div>
+
 
     <!-- Data -->
     <ion-grid>
@@ -40,14 +52,6 @@
           <div class="container-item">
             <label position="stacked">Data</label>
             <ion-input type="date" formControlName="data" class="custom-input"></ion-input>
-          </div>
-        </ion-col>
-
-        <!-- Valor -->
-        <ion-col size="5">
-          <div class="container-item">
-            <label position="stacked">Valor</label>
-            <ion-input type="text" formControlName="valor" class="custom-input"></ion-input>
           </div>
         </ion-col>
       </ion-row>

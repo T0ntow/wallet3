@@ -9,6 +9,9 @@ import { TransactionsService } from 'src/app/services/transactions/transactions.
 import * as moment from 'moment';
 
 import { Transacao } from 'src/app/models/transaction.model';
+import { MaskitoElementPredicate } from '@maskito/core';
+import { maskitoPrice } from '../../../mask';
+import { IconDefinition } from '@fortawesome/free-solid-svg-icons';
 
 @Component({
   selector: 'app-edit-receive',
@@ -18,7 +21,11 @@ import { Transacao } from 'src/app/models/transaction.model';
 export class EditReceiveComponent  implements OnInit {
   transacaoForm: FormGroup;
   selectedAccount: string = '';
+  selectedAccountLogo: string | undefined;
+
   selectedCategory: string = '';
+  selectedCategoryIcon: IconDefinition | undefined;
+  
   periodo: string = '';
 
   categories: Category[] = [];
@@ -31,6 +38,9 @@ export class EditReceiveComponent  implements OnInit {
   @Input() receita: Transacao | undefined;
 
   recorrente: boolean = false; // Estado para controle de "recorrente"
+    readonly maskitoPrice = maskitoPrice;
+    readonly maskPredicate: MaskitoElementPredicate = async (el) => (el as HTMLIonInputElement).getInputElement();
+  
 
    constructor(
       private formBuilder: FormBuilder,
@@ -96,12 +106,18 @@ export class EditReceiveComponent  implements OnInit {
     }
   
     getAccountById(id: number) {
+      const firstAccount = this.accounts[0];
+      this.selectedAccountLogo = firstAccount.logo_url;
+  
       const account = this.accounts.find(account => account.conta_id === id);
       if (account)
         this.selectAccountInitial(account);
     }
   
     getCategoryById(id: number) {
+      const firstCategory = this.categories[0];
+      this.selectedCategoryIcon = firstCategory.icone;
+      
       const category = this.categories.find(category => category.id === id);
       if (category)
         this.selectCategoryInitial(category);
@@ -152,7 +168,7 @@ export class EditReceiveComponent  implements OnInit {
           categoria_id: formData.categoria_id,
           tipo: formData.tipo,  // "despesa" ou "receita", deve estar no formulário
           data_transacao: moment(formData.data).format('YYYY-MM-DD'), // Formato para data de transação
-          valor: formData.valor,
+          valor: parseFloat(formData.valor.replace(/[^\d,]/g, '').replace(',', '.')),
           status: formData.status, // Status padrão, como 'pendente'
           is_parcelado: formData.is_parcelado,
           num_parcelas: formData.num_parcelas || null,
