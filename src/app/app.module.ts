@@ -20,6 +20,6 @@ registerLocaleData(localePt, 'pt');
   imports: [BrowserModule, IonicModule.forRoot(), AppRoutingModule, BaseChartDirective,  RouterModule.forRoot([]), MaskitoDirective],
   providers: [{ provide: RouteReuseStrategy, useClass: IonicRouteStrategy }, { provide: LOCALE_ID, useValue: 'pt' }],
   bootstrap: [AppComponent],
-  schemas: [CUSTOM_ELEMENTS_SCHEMA],  // Adicione esta linha
+  schemas: [CUSTOM_ELEMENTS_SCHEMA], 
 })
 export class AppModule {}

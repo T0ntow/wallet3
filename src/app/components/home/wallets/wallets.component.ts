@@ -19,6 +19,9 @@ export class WalletsComponent  implements OnInit {
 
   cards: Card[] = []; // Altere para o tipo apropriado se necessário
 
+  isModalCardOpen = false;
+  selectedCard: Card | undefined;
+
   constructor(
     private modalCtrl: ModalController
   ) { }
@@ -46,9 +49,19 @@ export class WalletsComponent  implements OnInit {
     try {
       // Chama o método do serviço para buscar as contas
       this.cards = await this.cardService.getCards();
-      console.log('Contas carregadas:', JSON.stringify(this.cards));
+      console.log('Cards carregados:', JSON.stringify(this.cards));
     } catch (error) {
-      console.error('Erro ao buscar contas:', error);
+      console.error('Erro ao buscar cards:', error);
     }
+  }
+
+  openModalCard(card: Card) {
+    this.selectedCard = card;
+    this.isModalCardOpen = true;
+  }
+
+  closeModalCard() {
+    this.isModalCardOpen = false;
+    this.selectedCard = undefined; // Limpa a despesa selecionada
   }
 }

@@ -42,6 +42,12 @@ export class DatabaseService {
 
     try {
 
+      // await this.db.execute(`DROP TABLE IF EXISTS instancias_recorrentes`);
+      // await this.db.execute(`DROP TABLE IF EXISTS parcelasTable`);
+      // await this.db.execute(`DROP TABLE IF EXISTS transacoes`);
+      // await this.db.execute(`DROP TABLE IF EXISTS cartaoTable`);
+      // await this.db.execute(`DROP TABLE IF EXISTS accountTable`);
+
       await this.db.execute(`
         CREATE TABLE IF NOT EXISTS accountTable (
         conta_id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -53,20 +59,19 @@ export class DatabaseService {
         );
     `);
 
-      // await this.db.execute(`DROP TABLE IF EXISTS cartaoTable`);
 
       await this.db.execute(`
-          CREATE TABLE IF NOT EXISTS cartaoTable (
-          cartao_id INTEGER PRIMARY KEY,  -- ID da conta (chave primária)
-          nome TEXT NOT NULL,             -- Nome da conta
-          instituicao TEXT NOT NULL,      -- Instituição financeira da conta
-          limite REAL NOT NULL,           -- Limite do cartão
-          logo_url TEXT,                  -- URL do logo da instituição
-          dia_fechamento TEXT NOT NULL    -- Dia de fechamento da fatura (ex: "10")
-      );
-  `);
+        CREATE TABLE IF NOT EXISTS cartaoTable (
+            cartao_id INTEGER PRIMARY KEY AUTOINCREMENT,  -- ID do cartão (chave primária)
+            nome TEXT NOT NULL,                           -- Nome do cartão
+            instituicao TEXT NOT NULL,                    -- Instituição financeira
+            limite_total REAL NOT NULL,                   -- Limite total do cartão
+            limite_atual REAL NOT NULL DEFAULT 0,         -- Limite disponível para uso
+            logo_url TEXT,                                -- URL do logo da instituição
+            dia_fechamento INTEGER NOT NULL               -- Dia de fechamento da fatura
+        );
+    `);
 
-      // await this.db.execute(`DROP TABLE IF EXISTS transacoes`);
 
       await this.db.execute(`
         CREATE TABLE IF NOT EXISTS transacoes (

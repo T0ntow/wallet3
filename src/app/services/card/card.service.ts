@@ -15,7 +15,8 @@ export class CardService {
   async addCard(
     nome: string,
     instituicao: string,
-    limite: number,
+    limite_total: number,
+    limite_atual: number,
     logo_url: string,
     dia_fechamento: string
   ): Promise<void> {
@@ -26,9 +27,9 @@ export class CardService {
       return;
     }
 
-    const sql = `INSERT INTO cartaoTable (nome, instituicao, limite, logo_url, dia_fechamento) VALUES (?, ?, ?, ?, ?)`;
+    const sql = `INSERT INTO cartaoTable (nome, instituicao, limite_total,limite_atual, logo_url, dia_fechamento) VALUES (?, ?, ?, ?, ?, ?)`;
     try {
-      await db.run(sql, [nome, instituicao, limite, logo_url, dia_fechamento]);
+      await db.run(sql, [nome, instituicao, limite_total, limite_atual, logo_url, dia_fechamento]);
       console.log("Cartão inserido com sucesso!");
     } catch (error) {
       console.error("Erro ao inserir cartão: ", error);
@@ -54,7 +55,8 @@ export class CardService {
           cartao_id: row.cartao_id,
           nome: row.nome,
           instituicao: row.instituicao,
-          limite: row.limite || 0,
+          limiteTotal: row.limite_total || 0,
+          limiteAtual: row.limite_atual || 0,
           logo_url: row.logo_url,
           dia_fechamento: row.dia_fechamento
         } as Card;
@@ -89,29 +91,29 @@ export class CardService {
   }
 
   // Atualizar um cartão
-  async updateCard(
-    cartao_id: number,
-    nome: string,
-    tipo: string,
-    instituicao: string,
-    limite: number,
-    logo_url: string,
-    dia_fechamento: string
-  ): Promise<void> {
-    const db = await this.databaseService.getDb();
-    if (!db) {
-      console.error('Database is not initialized');
-      return;
-    }
+  // async updateCard(
+  //   cartao_id: number,
+  //   nome: string,
+  //   tipo: string,
+  //   instituicao: string,
+  //   limite: number,
+  //   logo_url: string,
+  //   dia_fechamento: string
+  // ): Promise<void> {
+  //   const db = await this.databaseService.getDb();
+  //   if (!db) {
+  //     console.error('Database is not initialized');
+  //     return;
+  //   }
 
-    const sql = `UPDATE cartaoTable SET nome = ?, tipo = ?, instituicao = ?, limite = ?, logo_url = ?, dia_fechamento = ? WHERE cartao_id = ?`;
-    try {
-      await db.run(sql, [nome, tipo, instituicao, limite, logo_url, dia_fechamento, cartao_id]);
-      console.log("Cartão atualizado com sucesso!");
-    } catch (error) {
-      console.error("Erro ao atualizar cartão: ", error);
-    }
-  }
+  //   const sql = `UPDATE cartaoTable SET nome = ?, instituicao = ?, limite = ?, logo_url = ?, dia_fechamento = ? WHERE cartao_id = ?`;
+  //   try {
+  //     await db.run(sql, [nome, tipo, instituicao, limite, logo_url, dia_fechamento, cartao_id]);
+  //     console.log("Cartão atualizado com sucesso!");
+  //   } catch (error) {
+  //     console.error("Erro ao atualizar cartão: ", error);
+  //   }
+  // }
 
   // Deletar um cartão
   async deleteCard(cartao_id: number): Promise<void> {

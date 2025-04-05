@@ -32,7 +32,7 @@ export class AddCardComponent implements OnInit {
     this.cardForm = this.formBuilder.group({
       institution: ['', Validators.required], // Validates that 'institution' is not empty
       name: ['', Validators.required],        // Validates that 'name' is not empty
-      limit: [null, [Validators.required, Validators.min(0)]], // Ensures 'limit' is a number >= 0
+      limite_total: [null, [Validators.required, Validators.min(0)]], // Ensures 'limit' is a number >= 0
       closing_day: [null, [Validators.required, Validators.min(1), Validators.max(31)]], // Ensures 'closing_day' is between 1 and 31
     });
   }
@@ -49,7 +49,8 @@ export class AddCardComponent implements OnInit {
   async submitCard() {
     if (this.cardForm.valid) {
       // Extract form values
-      const { institution, name, limit, closing_day } = this.cardForm.value;
+      const { institution, name, limite_total, closing_day } = this.cardForm.value;
+      const limite_atual = limite_total
   
       // Find the matching bank from the bankLogos list
       const bank = this.bankLogos.find(
@@ -61,7 +62,7 @@ export class AddCardComponent implements OnInit {
         const logo_url = bank ? bank.logo_url : '';
   
         // Call the CardService method to add a card to the database
-        await this.cardService.addCard(name,  institution, limit, logo_url, closing_day);
+        await this.cardService.addCard(name,  institution, limite_total, limite_atual, logo_url, closing_day);
   
         // Show a success message
         await this.presentToast('Cartão criada com sucesso!', 'light');

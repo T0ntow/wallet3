@@ -40,8 +40,10 @@ import { MaskitoDirective } from '@maskito/angular';
     AddCardComponent,
     AddExpenseComponent,
     AddCardExpenseComponent,
-    
   ],
   providers: [CurrencyPipe],
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
+
+
 })
 export class HomePageModule {}
